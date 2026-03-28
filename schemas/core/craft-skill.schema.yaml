@@ -1,0 +1,264 @@
+# Craft Skill Definition Schema
+#
+# Every craft skill must have a skill.yaml that follows this structure.
+# A craft skill teaches the agent HOW to do one thing well.
+# It has no knowledge of workflow sequencing — that belongs to orchestration.
+#
+# File structure convention:
+#
+#   skills/craft/{skill-name}/
+#     skill.yaml                <- follows this schema
+#     prompt_frontier.md        <- prompt for frontier models
+#     prompt_midtier.md         <- prompt for mid-tier models (optional)
+#     prompt_small.md           <- prompt for small models (optional)
+#     examples/
+#       {example-name}/
+#         input.yaml            <- example input following input contract
+#         expected_output.yaml  <- expected output following output contract
+
+schema_version: "1.0"
+schema_id: craft-skill
+
+# --- Identity ---
+
+name:
+  type: string
+  required: true
+  description: "Unique skill identifier, kebab-case"
+  pattern: "^[a-z][a-z0-9-]+$"
+  example: "requirement-writing"
+
+version:
+  type: string
+  required: true
+  description: "Semantic version of this skill"
+  pattern: "^\\d+\\.\\d+\\.\\d+$"
+  example: "1.0.0"
+
+category:
+  type: enum
+  required: true
+  values:
+    - requirements
+    - design
+    - verification
+    - implementation
+    - analysis
+    - traceability
+  description: "Skill category for organization and discovery"
+
+description:
+  type: string
+  required: true
+  description: "One-line description of what this skill does"
+  example: "Write a single EARS requirement from source material with traceability"
+
+responsibility:
+  type: string
+  required: true
+  description: >
+    Single responsibility statement. Must start with a verb.
+    If you need the word 'and', this skill should be split into two.
+  example: "Write one EARS-formatted software requirement from provided source material"
+
+# --- Input Contract ---
+
+input:
+  type: object
+  required: true
+  description: "Typed input contract. Defines what the skill needs to do its job."
+  fields:
+
+    required:
+      type: list
+      description: "Inputs the skill cannot function without"
+      items:
+        name:
+          type: string
+          description: "Input parameter name"
+          example: "source_material"
+        schema_ref:
+          type: string
+          description: >
+            Reference to an artifact schema that defines the shape of this input.
+            Path relative to schemas/ directory.
+            Use 'core/free-text' for unstructured text input.
+          example: "artifacts/sw-requirement"
+        description:
+          type: string
+          description: "What this input is and why the skill needs it"
+          example: "The source requirement or text to formalize into EARS format"
+
+    optional:
+      type: list
+      description: "Inputs that enhance the skill output but are not strictly required"
+      items:
+        name:
+          type: string
+        schema_ref:
+          type: string
+        description:
+          type: string
+        default:
+          type: any
+          description: "Default value or behavior when this input is not provided"
+
+# --- Output Contract ---
+
+output:
+  type: object
+  required: true
+  description: "Typed output contract. Defines what the skill produces."
+  fields:
+
+    primary:
+      type: object
+      required: true
+      description: "The main output artifact"
+      fields:
+        name:
+          type: string
+          description: "Output name"
+          example: "ears_requirement"
+        schema_ref:
+          type: string
+          description: "Reference to artifact schema for this output"
+          example: "artifacts/sw-requirement"
+        description:
+          type: string
+          example: "A single EARS requirement with all required fields populated"
+
+    secondary:
+      type: list
+      required: false
+      description: "Additional outputs like trace entries or status logs"
+      items:
+        name:
+          type: string
+        schema_ref:
+          type: string
+        description:
+          type: string
+
+# --- Validation Rules ---
+
+validation:
+  type: list
+  required: true
+  description: >
+    Deterministic checks run on the skill output.
+    AI generates, tools verify. Each rule is independently checkable.
+  items:
+    id:
+      type: string
+      description: "Validation rule ID, unique within this skill"
+      example: "V-RW-001"
+    description:
+      type: string
+      description: "Human-readable description of what this rule checks"
+      example: "Output contains exactly one 'shall' statement"
+    type:
+      type: enum
+      values:
+        - schema     # Output conforms to referenced artifact schema
+        - regex      # Output matches (or must not match) a pattern
+        - reference  # Referenced artifacts or IDs exist
+        - tool       # External tool check (compiler, linter, etc.)
+      description: "Type of validation check"
+    rule:
+      type: string
+      description: >
+        The check to perform. Interpretation depends on type:
+        - schema: artifact schema path to validate against
+        - regex: pattern that must match (prefix with '!' to negate)
+        - reference: field path whose value must exist in artifact store
+        - tool: command to run (exit 0 = pass)
+      example: "^.*\\bshall\\b.*$"
+    severity:
+      type: enum
+      values:
+        - error    # Must fix before output is accepted
+        - warning  # Flag for human review but don't block
+      description: "How to handle a validation failure"
+
+# --- Model Tier Configuration ---
+
+model_tiers:
+  type: object
+  required: false
+  description: >
+    Model-tier specific prompt strategy. If omitted, only prompt_frontier.md
+    is expected and the skill is assumed to work with any model.
+  fields:
+
+    frontier:
+      type: object
+      fields:
+        prompt_file:
+          type: string
+          default: "prompt_frontier.md"
+        max_retries:
+          type: integer
+          default: 1
+          description: "Frontier models are expected to get it right quickly"
+
+    midtier:
+      type: object
+      fields:
+        prompt_file:
+          type: string
+          default: "prompt_midtier.md"
+        max_retries:
+          type: integer
+          default: 3
+        template_required:
+          type: boolean
+          default: true
+          description: "Include fill-in-the-blank output template in the prompt"
+
+    small:
+      type: object
+      fields:
+        prompt_file:
+          type: string
+          default: "prompt_small.md"
+        max_retries:
+          type: integer
+          default: 5
+        template_required:
+          type: boolean
+          default: true
+        few_shot_required:
+          type: boolean
+          default: true
+          description: "Include example input/output pairs in the prompt"
+        decompose:
+          type: boolean
+          default: false
+          description: "Break this skill into sequential sub-steps for small models"
+
+# --- Examples ---
+
+examples:
+  type: list
+  required: false
+  description: >
+    Example input/output pairs. Serve two purposes:
+    1. Test cases for the skill (does the prompt produce correct output?)
+    2. Few-shot material for smaller models.
+  items:
+    name:
+      type: string
+      description: "Example name, descriptive"
+      example: "event-driven-safety-requirement"
+    description:
+      type: string
+      description: "What this example demonstrates"
+    input_file:
+      type: string
+      description: "Path to example input YAML, relative to skill directory"
+      example: "examples/event-driven-safety/input.yaml"
+    expected_output_file:
+      type: string
+      description: "Path to expected output YAML, relative to skill directory"
+      example: "examples/event-driven-safety/expected_output.yaml"

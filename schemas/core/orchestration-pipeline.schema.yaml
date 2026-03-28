@@ -1,0 +1,211 @@
+# Orchestration Pipeline Definition Schema
+#
+# Every orchestration pipeline must have a pipeline.yaml that follows this structure.
+# A pipeline knows WHEN to invoke skills, WHAT to hand off between them,
+# and HOW to gate progression. It has no domain knowledge — that belongs
+# to the craft skills it invokes.
+#
+# File structure convention:
+#
+#   skills/orchestration/{pipeline-name}/
+#     pipeline.yaml             <- follows this schema
+
+schema_version: "1.0"
+schema_id: orchestration-pipeline
+
+# --- Identity ---
+
+name:
+  type: string
+  required: true
+  description: "Unique pipeline identifier, kebab-case"
+  pattern: "^[a-z][a-z0-9-]+$"
+  example: "drtdd-pipeline"
+
+version:
+  type: string
+  required: true
+  description: "Semantic version of this pipeline"
+  pattern: "^\\d+\\.\\d+\\.\\d+$"
+  example: "1.0.0"
+
+description:
+  type: string
+  required: true
+  description: "One-line description of what this pipeline accomplishes"
+  example: "Design-Requirement-Test Driven Development loop for a single requirement"
+
+# --- Phases ---
+
+phases:
+  type: list
+  required: true
+  description: >
+    Ordered list of pipeline steps. Each phase invokes one craft skill.
+    Execution follows list order unless rejection routing redirects.
+  items:
+    id:
+      type: string
+      required: true
+      description: "Phase identifier, unique within this pipeline"
+      example: "require"
+
+    skill_ref:
+      type: string
+      required: true
+      description: >
+        Reference to the craft skill to invoke, relative to skills/ directory.
+        Orchestration resolves this to a skill.yaml and uses its contracts.
+      example: "craft/requirement-writing"
+
+    description:
+      type: string
+      required: true
+      description: "What this phase accomplishes in the pipeline context"
+      example: "Write an EARS requirement from source material"
+
+    gate:
+      type: object
+      required: false
+      description: >
+        Gate condition that must be satisfied before the pipeline proceeds
+        to the next phase. If omitted, the pipeline proceeds automatically
+        after validation passes.
+      fields:
+        type:
+          type: enum
+          values:
+            - human       # Human must explicitly approve
+            - automated   # Validation rules must all pass (no human needed)
+            - none        # Proceed immediately (same as omitting gate)
+          description: "Who or what decides if the gate passes"
+
+        criteria:
+          type: string
+          description: >
+            Description of what must be true to pass the gate.
+            For human gates, this is shown to the reviewer.
+            For automated gates, this documents the intent behind the validation rules.
+          example: "Requirement is complete, unambiguous, testable, and traces to parent"
+
+# --- Handoffs ---
+
+handoffs:
+  type: list
+  required: true
+  description: >
+    How outputs from one phase become inputs to the next.
+    Each handoff maps a named output from one skill to a named input of another.
+    Orchestration matches these by name — it does not interpret the data.
+  items:
+    from_phase:
+      type: string
+      required: true
+      description: "Phase ID that produces the output"
+      example: "require"
+
+    from_output:
+      type: string
+      required: true
+      description: "Output name from the producing skill's output contract"
+      example: "ears_requirement"
+
+    to_phase:
+      type: string
+      required: true
+      description: "Phase ID that consumes the input"
+      example: "design"
+
+    to_input:
+      type: string
+      required: true
+      description: "Input name from the consuming skill's input contract"
+      example: "requirement"
+
+# --- Retry Rules ---
+
+retry:
+  type: object
+  required: true
+  description: >
+    What to do when a phase fails (skill output fails validation).
+    Each retry must use a different approach — never repeat the same attempt.
+  fields:
+    max_attempts:
+      type: integer
+      required: true
+      description: "Maximum attempts per phase before escalation"
+      example: 3
+
+    strategy:
+      type: enum
+      required: true
+      values:
+        - different_approach   # Each retry must change something
+        - root_cause_then_retry  # After 2nd failure, run root cause analysis before attempt 3
+      description: >
+        Retry strategy. 'different_approach' requires each attempt to differ.
+        'root_cause_then_retry' adds mandatory root cause analysis after 2 failures.
+
+    escalation:
+      type: enum
+      required: true
+      values:
+        - halt_and_report  # Stop pipeline, report failure to human
+        - skip_and_flag    # Skip this phase, flag for human attention, continue
+      description: "What to do after max_attempts is exhausted"
+
+# --- Rejection Routing ---
+
+rejection_routing:
+  type: list
+  required: false
+  description: >
+    Where to return in the pipeline when a review phase rejects.
+    Maps finding types to the phase that should address them.
+    If a finding type is not listed, the pipeline halts for human decision.
+  items:
+    finding_type:
+      type: string
+      required: true
+      description: "Category of finding from the review skill's output"
+      example: "requirement_gap"
+
+    return_to_phase:
+      type: string
+      required: true
+      description: "Phase ID to return to for remediation"
+      example: "require"
+
+    description:
+      type: string
+      required: true
+      description: "Explains why this type of finding routes to this phase"
+      example: "Requirement gaps mean the requirement phase produced incomplete output"
+
+# --- Progress Tracking ---
+
+progress:
+  type: object
+  required: false
+  description: >
+    How the pipeline tracks progress across multiple work items.
+    Used when the pipeline processes a batch of requirements or modules.
+  fields:
+    work_item_id_field:
+      type: string
+      description: >
+        The field name in the primary input that uniquely identifies
+        the work item being processed (e.g., requirement ID, module name).
+      example: "requirement_id"
+
+    status_values:
+      type: list
+      description: "Valid status values for tracking"
+      default:
+        - pending
+        - in_progress
+        - gate_waiting    # Waiting for human gate approval
+        - completed
+        - failed
+        - skipped
