@@ -1,0 +1,84 @@
+# Link Types Registry
+#
+# Defines the valid link types for trace files and their semantics.
+# The trace schema references this registry via the link `type` field.
+#
+# Each link type defines:
+#   - direction: what kind of thing is source, what kind is target
+#   - semantics: what the relationship means
+#
+# This registry grows as we add artifact types at higher V levels.
+# Current scope: bottom of the V (detailed design through architecture).
+
+schema_version: "1.0"
+schema_id: link-types
+
+types:
+
+  allocated-to:
+    description: >
+      A requirement is allocated to an architecture component.
+      Used when a higher-level requirement is assigned to a component
+      for realization. The component's detailed designs then derive
+      from the requirement.
+    source: artifact
+    target: artifact
+    examples:
+      - source: "SWREQ-042"
+        target: "ARCH-001"
+        meaning: "SW requirement SWREQ-042 is allocated to architecture ARCH-001 (component: fuel-control)"
+
+  derived-from:
+    description: >
+      Source artifact was derived from the target artifact.
+      Used for vertical traceability between V-model levels.
+    source: artifact
+    target: artifact
+    examples:
+      - source: "DD-001"
+        target: "SWREQ-042"
+        meaning: "Detailed design DD-001 was derived from SW requirement SWREQ-042"
+
+  implemented-by:
+    description: >
+      Source artifact is realized in the target code file.
+      The code is the implementation of the design.
+    source: artifact
+    target: file
+    examples:
+      - source: "DD-001"
+        target: "src/main/java/com/example/fuel/FuelRateLimiter.java"
+        meaning: "DD-001 is implemented by FuelRateLimiter.java"
+
+  verified-by:
+    description: >
+      Source artifact is verified by the target test file.
+      The test code exercises the behavior defined in the design.
+    source: artifact
+    target: file
+    examples:
+      - source: "DD-001"
+        target: "src/test/java/com/example/fuel/FuelRateLimiterTest.java"
+        meaning: "DD-001 is verified by FuelRateLimiterTest.java"
+
+  results:
+    description: >
+      Source links to its test execution output. The target is a
+      tool-generated report file. Requires `format` field on the link.
+    source: artifact
+    target: file
+    examples:
+      - source: "DD-001"
+        target: "build/reports/TEST-FuelRateLimiterTest.xml"
+        meaning: "Test results for DD-001 verification"
+
+  coverage:
+    description: >
+      Source links to its code coverage report. The target is a
+      tool-generated coverage file. Requires `format` field on the link.
+    source: artifact
+    target: file
+    examples:
+      - source: "DD-001"
+        target: "build/reports/jacoco/FuelRateLimiter.html"
+        meaning: "Coverage data for DD-001 implementation"

@@ -1,0 +1,92 @@
+# Trace Schema
+#
+# Defines the structure of trace files that link artifacts to other
+# artifacts, code files, and tool outputs.
+#
+# This schema is part of Pillar 2 (Traceability).
+# It defines the data model — the 2A layer. The 2B layer (engine/tool)
+# reads these files, computes current hashes, compares, and reports.
+#
+# Key design decisions:
+#   - Trace files are pure data. No status fields — the tool derives
+#     status by comparing stored hashes against current hashes.
+#   - One trace file per source artifact. The source is always a
+#     framework artifact (has an artifact_id). Targets can be artifacts,
+#     code files, or tool outputs.
+#   - Hashes are updated only by explicit rebase (human confirms the
+#     link is still valid after a change).
+
+schema_version: "1.0"
+schema_id: trace
+
+fields:
+
+  source:
+    type: string
+    required: true
+    description: >
+      The artifact_id of the source artifact. This is always a
+      framework artifact (e.g., "DD-001", "SWREQ-042").
+
+  source_hash:
+    type: string
+    required: true
+    description: >
+      Hash of the source artifact's body content at the time the
+      trace was last verified/rebased. The tool compares this against
+      the current hash to detect source-side changes.
+
+  links:
+    type: list<object>
+    required: true
+    description: >
+      The set of links from this source to its targets. Each link
+      represents one traceability relationship.
+    min_items: 1
+    item_fields:
+
+      type:
+        type: string
+        required: true
+        description: >
+          The kind of relationship. Must be one of the defined link
+          types (see link-types.yaml for the registry of valid types).
+        examples:
+          - "derived-from"
+          - "implemented-by"
+          - "verified-by"
+          - "results"
+          - "coverage"
+
+      target:
+        type: string
+        required: true
+        description: >
+          What this link points to. Can be:
+            - An artifact_id (e.g., "SYSREQ-003") for artifact-to-artifact links
+            - A file path relative to project root (e.g., "src/main/java/...")
+              for artifact-to-code or artifact-to-tool-output links
+
+      target_hash:
+        type: string
+        required: true
+        description: >
+          Hash of the target at the time the trace was last verified/rebased.
+          For artifacts: hash of the body content.
+          For files: hash of the file content.
+          The tool compares this against the current hash to detect
+          target-side changes.
+
+      format:
+        type: string
+        required: false
+        description: >
+          For tool output targets, specifies the output format so the
+          tool knows how to parse/interpret the file.
+        examples:
+          - "junit-xml"
+          - "gtest-xml"
+          - "jacoco"
+          - "gcov"
+          - "lcov"
+          - "cobertura"

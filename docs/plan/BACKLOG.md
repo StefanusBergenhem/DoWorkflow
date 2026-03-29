@@ -25,15 +25,15 @@ Define YAML schemas for each V-model artifact type (the `body` content).
 
 **Left side (development):**
 - [ ] System Requirements schema
-- [ ] SW Requirements schema
-- [ ] SW Architecture schema
-- [ ] Detailed Design schema
-- [ ] Source Code metadata schema
+- [x] SW Requirements schema
+- [x] SW Architecture schema (includes tool-generated Mermaid diagram)
+- [x] Detailed Design schema (includes optional `realization` section)
+- [ ] ~~Source Code metadata schema~~ — replaced by pragmatic approach: source code is real files, linked via Pillar 2 trace files
 
 **Right side (verification):**
-- [ ] Test Specification schema (covers unit, integration, qualification)
-- [ ] Test Results schema
-- [ ] Coverage Report schema
+- [ ] ~~Test Specification schema~~ — replaced by pragmatic approach: tests are real test files (unit, integration, qualification), linked via Pillar 2 trace files
+- [ ] ~~Test Results schema~~ — replaced by pragmatic approach: test results are tool output (JUnit XML, gtest XML), linked via Pillar 2 trace files with `format` field
+- [ ] ~~Coverage Report schema~~ — same as above (jacoco, gcov, lcov), linked via trace files
 - [ ] Review Record schema (checklist, findings, verdict, reviewer qualification)
 
 **Plans:**
@@ -69,13 +69,13 @@ Define YAML schemas for each V-model artifact type (the `body` content).
 
 ### 2A: Data Model (now)
 
-- [ ] Define link schema (source, target, link_type, status, metadata)
-- [ ] Define link type catalog (verified-by, allocated-to, derived-from, reviewed-in, implements, etc.)
+- [x] Define trace schema (source, source_hash, links with target + target_hash)
+- [x] Define link type catalog (verified-by, allocated-to, derived-from, implemented-by, results, coverage)
 - [ ] Define link type rules (which artifact types can be source/target per link type)
 - [ ] Define completeness rules (which links are required per artifact type per assurance level)
 - [ ] Define orphan detection rules
 - [ ] Define coverage metrics definitions
-- [ ] Define staleness detection (content hash comparison)
+- [x] Define staleness detection (content hash comparison — tool computes current hash vs stored hash)
 - [ ] Define trace matrix output format
 
 ### 2A-temp: Agent Skill as Temporary Engine

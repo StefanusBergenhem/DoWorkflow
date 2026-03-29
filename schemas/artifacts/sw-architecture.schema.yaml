@@ -1,0 +1,152 @@
+# SW Architecture Schema
+#
+# Defines the `body` structure for artifacts of type: sw-architecture
+#
+# An SW architecture artifact decomposes a system (or subsystem) into
+# components, defines their responsibilities, and specifies the
+# interfaces between them.
+#
+# Detailed designs (artifact_type: detailed-design) reference components
+# defined here via their `component` field.
+#
+# This schema is part of Pillar 1 (V-Model Compliance).
+# It has no dependency on Pillar 2 (Traceability) or Pillar 3 (Agentic Skills).
+
+schema_version: "1.0"
+schema_id: sw-architecture
+
+fields:
+
+  title:
+    type: string
+    required: true
+    description: "Short descriptive name for this architecture"
+
+  description:
+    type: string
+    required: true
+    description: >
+      High-level overview of what this architecture covers and its
+      scope. Should orient a reader before they dive into components.
+
+  components:
+    type: list<object>
+    required: true
+    description: >
+      The building blocks of this architecture. Each component groups
+      related units (detailed designs) under a common responsibility.
+    min_items: 1
+    item_fields:
+
+      id:
+        type: string
+        required: true
+        description: >
+          Unique identifier for this component within the architecture.
+          Referenced by detailed-design artifacts in their `component` field.
+        examples:
+          - "fuel-control"
+          - "sensor-interface"
+          - "external-api-client"
+
+      description:
+        type: string
+        required: true
+        description: "What this component is and why it exists"
+
+      responsibilities:
+        type: list<string>
+        required: true
+        description: >
+          What this component is responsible for. Each entry is one
+          discrete responsibility.
+        min_items: 1
+
+  interfaces:
+    type: list<object>
+    required: false
+    description: >
+      Communication paths between components. Each interface defines
+      a directional data flow. Omit if the architecture has only one
+      component.
+    item_fields:
+
+      from:
+        type: string
+        required: true
+        description: "Component id of the sender/caller"
+
+      to:
+        type: string
+        required: true
+        description: "Component id of the receiver/callee"
+
+      mechanism:
+        type: string
+        required: true
+        description: >
+          How the communication happens. Language-agnostic but specific
+          enough to guide implementation.
+        examples:
+          - "function call"
+          - "message queue"
+          - "shared memory"
+          - "REST API"
+          - "callback"
+          - "event"
+
+      data:
+        type: string
+        required: true
+        description: >
+          What data flows through this interface. Describe the content,
+          not the serialization format.
+        examples:
+          - "Structured sensor reading (fuel_rate, temperature, timestamp)"
+          - "Fuel rate decision (effective_rate, was_limited, mode)"
+
+      description:
+        type: string
+        required: false
+        description: "Additional context about this interface"
+
+  design_rationale:
+    type: string
+    required: true
+    description: >
+      Why the architecture is decomposed this way. Captures the
+      reasoning behind component boundaries, interface choices,
+      and trade-offs. This is often the first thing lost over time
+      and the hardest to reconstruct.
+
+  # --- Tool-Generated Fields ---
+
+  diagram:
+    type: string
+    required: false
+    description: >
+      Mermaid diagram representing the architecture. This field is
+      TOOL-GENERATED from the components and interfaces fields.
+      Do not edit manually — run the diagram generator tool to update.
+      Generation rule:
+        - Each component.id becomes a Mermaid node
+        - Each interface becomes a directed edge (from -> to)
+        - Interface data becomes the edge label
+        - Format: graph LR (left-to-right)
+
+  # --- Optional Fields ---
+
+  constraints:
+    type: list<string>
+    required: false
+    description: >
+      Architectural constraints that apply across components (e.g.,
+      'no shared mutable state between components', 'all inter-component
+      communication must be asynchronous').
+
+  notes:
+    type: string
+    required: false
+    description: >
+      Free-form additional context. References to external documents,
+      historical context, known limitations, etc.

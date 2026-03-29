@@ -1,0 +1,280 @@
+# Detailed Design Schema
+#
+# Defines the `body` structure for artifacts of type: detailed-design
+#
+# A detailed design describes a single unit (class, function, module)
+# at a level of detail sufficient for implementation and test derivation.
+# It lives inside exactly one architecture component.
+#
+# This schema is part of Pillar 1 (V-Model Compliance).
+# It has no dependency on Pillar 2 (Traceability) or Pillar 3 (Agentic Skills).
+
+schema_version: "1.0"
+schema_id: detailed-design
+
+fields:
+
+  title:
+    type: string
+    required: true
+    description: "Short descriptive name for this unit design"
+
+  description:
+    type: string
+    required: true
+    description: >
+      What this unit does and why it exists. Should give a reader enough
+      context to understand the purpose without reading the full behavior
+      section.
+
+  unit_id:
+    type: string
+    required: true
+    description: >
+      Logical identifier for the unit being designed. Language-agnostic —
+      could map to a class name, function name, module name, etc.
+      Must be unique within its component.
+    examples:
+      - "FuelRateLimiter"
+      - "SensorDataParser"
+      - "RateLimitRetryHandler"
+
+  component:
+    type: string
+    required: true
+    description: >
+      Which architecture component this unit belongs to. References a
+      component defined in an sw-architecture artifact. A unit belongs
+      to exactly one component.
+    examples:
+      - "fuel-control"
+      - "sensor-interface"
+      - "external-api-client"
+
+  responsibilities:
+    type: list<string>
+    required: true
+    description: >
+      What this unit is responsible for. Each entry is one discrete
+      responsibility. Together they form the unit's contract — what it
+      must do, and implicitly what it must NOT do (anything not listed).
+    min_items: 1
+
+  interfaces:
+    type: object
+    required: true
+    description: >
+      The unit's boundary — what goes in and what comes out.
+      Defines the testable surface.
+
+    fields:
+
+      inputs:
+        type: list<object>
+        required: true
+        description: "Data the unit receives"
+        item_fields:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+            description: "Language-agnostic type (float, integer, string, boolean, enum, byte_array, object, union, list, map)"
+          unit:
+            type: string
+            required: false
+            description: "Physical or logical unit of measure (e.g., liters_per_hour, celsius, milliseconds)"
+          constraints:
+            type: string
+            required: false
+            description: "Value constraints (e.g., '>= 0.0', 'length 0..1024')"
+          values:
+            type: list<string>
+            required: false
+            description: "Allowed values for enum types"
+          description:
+            type: string
+            required: false
+
+      outputs:
+        type: list<object>
+        required: true
+        description: "Data the unit produces"
+        item_fields:
+          name:
+            type: string
+            required: true
+          type:
+            type: string
+            required: true
+          unit:
+            type: string
+            required: false
+          constraints:
+            type: string
+            required: false
+          values:
+            type: list<string>
+            required: false
+          variants:
+            type: list<object>
+            required: false
+            description: >
+              For union types — the possible shapes of the output.
+              Each variant has a name and its own fields.
+            item_fields:
+              name:
+                type: string
+                required: true
+              fields:
+                type: list<object>
+                required: true
+                item_fields:
+                  name:
+                    type: string
+                    required: true
+                  type:
+                    type: string
+                    required: true
+                  unit:
+                    type: string
+                    required: false
+          description:
+            type: string
+            required: false
+
+  behavior:
+    type: list<object>
+    required: true
+    description: >
+      How the unit transforms inputs to outputs. Each entry describes
+      one rule, condition, or processing step. Together they form both
+      the implementation guide and the source for test case derivation.
+      Can be structured as condition/result pairs, sequential steps,
+      or a mix of both.
+    item_fields:
+      condition:
+        type: string
+        required: false
+        description: "When this rule applies (e.g., 'operational_mode is startup')"
+      step:
+        type: string
+        required: false
+        description: "A processing step to execute (for sequential algorithms)"
+      steps:
+        type: list<string>
+        required: false
+        description: "Multiple sequential steps under one condition"
+      rule:
+        type: string
+        required: false
+        description: "General behavioral rule (when condition/step structure doesn't fit)"
+      on_failure:
+        type: string
+        required: false
+        description: "What to do if this step fails"
+    # At least one of condition, step, steps, or rule must be present per entry
+
+  error_handling:
+    type: list<object>
+    required: true
+    description: >
+      Explicit handling for error conditions and edge cases.
+      Every foreseeable failure mode should be listed. If the unit
+      has no error cases, state that explicitly with a single entry.
+    min_items: 1
+    item_fields:
+      condition:
+        type: string
+        required: true
+        description: "The error condition (e.g., 'requested_rate is negative')"
+      behavior:
+        type: string
+        required: true
+        description: "What the unit does in response"
+
+  # --- Optional Fields ---
+
+  internal_state:
+    type: list<object>
+    required: false
+    description: >
+      State retained between invocations. Only present for stateful units.
+      Omit entirely for stateless units.
+    item_fields:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      description:
+        type: string
+        required: true
+
+  configuration:
+    type: list<object>
+    required: false
+    description: >
+      Configurable parameters that affect behavior but are not per-call
+      inputs. These are set at initialization or deployment time.
+    item_fields:
+      name:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      unit:
+        type: string
+        required: false
+      default:
+        type: any
+        required: false
+        description: "Default value if not explicitly configured"
+      description:
+        type: string
+        required: false
+
+  realization:
+    type: object
+    required: false
+    description: >
+      Points to where this design is realized in code and tests.
+      Provides a quick "where did this end up?" without duplicating
+      Pillar 2 traceability. Detailed mappings (which test verifies
+      which behavior, tool output links) belong in Pillar 2 trace files.
+    fields:
+      source_files:
+        type: list<string>
+        required: false
+        description: >
+          Paths to source files that implement this design, relative
+          to the project root.
+        examples:
+          - "src/main/java/com/example/fuel/FuelRateLimiter.java"
+      test_files:
+        type: list<string>
+        required: false
+        description: >
+          Paths to test files that verify this design, relative
+          to the project root.
+        examples:
+          - "src/test/java/com/example/fuel/FuelRateLimiterTest.java"
+
+  constraints:
+    type: list<string>
+    required: false
+    description: >
+      Non-functional requirements and design constraints that apply to
+      this unit. These are verifiable during review (e.g., 'must be
+      stateless', 'must be thread-safe', 'must execute in constant time').
+
+  notes:
+    type: string
+    required: false
+    description: >
+      Free-form additional context. Use for information that doesn't
+      fit elsewhere — references to external documents, historical
+      context, known limitations, etc.
