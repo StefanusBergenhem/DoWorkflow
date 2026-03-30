@@ -24,16 +24,17 @@ Schemas, templates, checklists. Usable by humans, agents, or both.
 Define YAML schemas for each V-model artifact type (the `body` content).
 
 **Left side (development):**
-- [ ] System Requirements schema
+- [x] System Requirements schema
 - [x] SW Requirements schema
 - [x] SW Architecture schema (includes tool-generated Mermaid diagram)
 - [x] Detailed Design schema (includes optional `realization` section)
 - [ ] ~~Source Code metadata schema~~ — replaced by pragmatic approach: source code is real files, linked via Pillar 2 trace files
 
 **Right side (verification):**
-- [ ] ~~Test Specification schema~~ — replaced by pragmatic approach: tests are real test files (unit, integration, qualification), linked via Pillar 2 trace files
-- [ ] ~~Test Results schema~~ — replaced by pragmatic approach: test results are tool output (JUnit XML, gtest XML), linked via Pillar 2 trace files with `format` field
-- [ ] ~~Coverage Report schema~~ — same as above (jacoco, gcov, lcov), linked via trace files
+- [x] System Test Case schema (procedure + expected results combined, verification method, environment) + docs/guide updated + E2E walkthrough extended
+- [x] ~~Test Specification schema~~ — replaced by pragmatic approach: tests are real test files (unit, integration, qualification), linked via Pillar 2 trace files
+- [x] ~~Test Results schema~~ — replaced by pragmatic approach: test results are tool output (JUnit XML, gtest XML), linked via Pillar 2 trace files with `format` field
+- [x] ~~Coverage Report schema~~ — same as above (jacoco, gcov, lcov), linked via trace files
 - [ ] Review Record schema (checklist, findings, verdict, reviewer qualification)
 
 **Plans:**

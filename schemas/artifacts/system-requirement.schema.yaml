@@ -1,0 +1,134 @@
+# System Requirement Schema
+#
+# Defines the `body` structure for artifacts of type: system-requirement
+#
+# A system requirement defines what the system as a whole must do. These
+# are the top-level requirements from which SW requirements, HW requirements,
+# and other lower-level artifacts are derived.
+#
+# System requirements are origin artifacts — they are not derived during
+# design. Derivation of SW/HW requirements from system requirements is
+# managed by Pillar 2 (derived-from links), not by fields in this schema.
+#
+# Allocation to SW, HW, or both is also managed by Pillar 2
+# (allocated-to links), not by fields in this schema.
+#
+# This schema is part of Pillar 1 (V-Model Compliance).
+# It has no dependency on Pillar 2 (Traceability) or Pillar 3 (Agentic Skills).
+
+schema_version: "1.0"
+schema_id: system-requirement
+
+fields:
+
+  # --- Required Fields ---
+
+  title:
+    type: string
+    required: true
+    description: "Short descriptive name for this requirement"
+
+  statement:
+    type: string
+    required: true
+    description: >
+      The requirement text. Free-form — any syntax is valid at the
+      schema level. EARS syntax may be used by craft skills but is
+      not enforced here.
+
+  requirement_type:
+    type: enum
+    required: true
+    description: >
+      Classification of the requirement by its nature. System-level
+      requirements span multiple concerns that get decomposed differently
+      during allocation to SW and HW.
+    values:
+      - functional       # What the system must do
+      - performance      # Timing, throughput, capacity constraints
+      - safety           # Hazard mitigation, fail-safe behavior
+      - interface        # External system boundaries and protocols
+      - environmental    # Operating conditions (temperature, vibration, EMI)
+      - constraint       # Design constraints imposed by standards, customer, or platform
+
+  verification_method:
+    type: enum
+    required: true
+    description: >
+      How this requirement will be verified. Every requirement must
+      declare its verification method. This is universal across
+      DO-178C, ASPICE, IEC 62304, and other V-model standards.
+    values:
+      - test              # Verified by executing test cases
+      - analysis          # Verified by analytical methods (calculation, simulation)
+      - inspection        # Verified by visual examination of the artifact
+      - demonstration     # Verified by operating the system under specific conditions
+      - review            # Verified by formal review process
+
+  # --- Optional Fields ---
+
+  rationale:
+    type: string
+    required: false
+    description: >
+      Why this requirement exists. Captures the motivation or
+      justification. Especially valuable when the requirement
+      is not self-evident from the system's purpose.
+
+  acceptance_criteria:
+    type: string
+    required: false
+    description: >
+      How stakeholders confirm this requirement is satisfied.
+      Distinct from verification_method — verification is the
+      technical V&V approach, acceptance criteria describe the
+      conditions under which the stakeholder accepts the result.
+
+  source:
+    type: string
+    required: false
+    description: >
+      Provenance metadata — where this requirement originated.
+      This is informational context, NOT a formal trace link.
+      Formal traceability (derived-from, allocated-to) is managed
+      by Pillar 2 trace files.
+    examples:
+      - "Customer specification CS-2024-Rev3, Section 4.2.1"
+      - "Safety analysis SA-003, hazard H-12"
+      - "Regulatory requirement DO-178C 6.3.1.a"
+      - "Stakeholder workshop, 2024-02-20"
+
+  attributes:
+    type: object
+    required: false
+    description: >
+      Classification flags for this requirement. All are boolean
+      and optional. Used for filtering and reporting, not for
+      traceability.
+    fields:
+      safety_relevant:
+        type: boolean
+        required: false
+        description: "True if this requirement is safety-critical"
+      performance:
+        type: boolean
+        required: false
+        description: "True if this requirement specifies timing or throughput constraints"
+      interface:
+        type: boolean
+        required: false
+        description: "True if this requirement defines an external interface contract"
+      regulatory:
+        type: boolean
+        required: false
+        description: >
+          True if this requirement is imposed by a regulation,
+          standard, or certification authority. Regulatory requirements
+          typically cannot be negotiated or descoped.
+
+  notes:
+    type: string
+    required: false
+    description: >
+      Free-form additional context. References to external documents,
+      historical context, known limitations, etc.

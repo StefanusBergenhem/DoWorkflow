@@ -53,11 +53,18 @@ Define what artifacts are needed for V-model compliance, their structure, and th
 ### Components
 
 **Artifact Schemas** — YAML definitions for each V-level artifact type:
+
+Left side (development):
 - System Requirements, SW Requirements, Architecture, Detailed Design
-- Test Specifications, Test Results, Coverage Reports
+- ~~Source Code metadata~~ — replaced by pragmatic approach: source code is real files, linked via Pillar 2 trace files
+
+Right side (verification):
+- System Test Cases (YAML artifact — system tests are often manual procedures, demonstrations, or analyses, not executable code)
+- ~~Test Specifications, Test Results, Coverage Reports~~ — replaced by pragmatic approach: lower-level tests are real test files (unit, integration, qualification), results are tool output (JUnit XML, gtest XML), coverage is tool output (jacoco, gcov) — all linked via Pillar 2 trace files
 - Review Records (separate artifact type, linked via traceability)
-- Plans (development, verification, CM, QA)
-- Source Code metadata
+
+Plans:
+- Development, Verification, CM, QA
 
 Each schema defines: required fields, optional fields, field types. Schemas do NOT enforce specific content patterns (e.g., EARS is not required by the schema).
 

@@ -1,0 +1,126 @@
+# System Test Case Schema
+#
+# Defines the `body` structure for artifacts of type: system-test-case
+#
+# A system test case defines how a system requirement is verified at the
+# system level. Unlike lower-level tests (unit, integration, qualification)
+# which are real code files linked via Pillar 2, system tests are often
+# manual procedures, demonstrations, or analyses that need their own
+# artifact format.
+#
+# System test cases combine test procedure and expected results in each
+# step, avoiding the common confusion of splitting these into separate
+# artifacts while still covering V-model expectations.
+#
+# Traceability to system requirements is managed by Pillar 2
+# (verified-by links), not by fields in this schema.
+#
+# This schema is part of Pillar 1 (V-Model Compliance).
+# It has no dependency on Pillar 2 (Traceability) or Pillar 3 (Agentic Skills).
+
+schema_version: "1.0"
+schema_id: system-test-case
+
+fields:
+
+  # --- Required Fields ---
+
+  title:
+    type: string
+    required: true
+    description: "Short descriptive name for this test case"
+
+  objective:
+    type: string
+    required: true
+    description: >
+      What this test verifies and why. Captures the intent of the test
+      case independent of the traced requirement — a reader should
+      understand the purpose without looking up the linked requirement.
+
+  verification_method:
+    type: enum
+    required: true
+    description: >
+      How this test case verifies the requirement. Should be consistent
+      with the verification_method declared on the linked system
+      requirement(s). This field makes the test case self-describing —
+      a reader knows whether this is a hands-on test, an analysis, etc.
+    values:
+      - test              # Verified by executing test procedures
+      - analysis          # Verified by analytical methods (calculation, simulation)
+      - inspection        # Verified by visual examination of the artifact
+      - demonstration     # Verified by operating the system under specific conditions
+      - review            # Verified by formal review process
+
+  preconditions:
+    type: list
+    required: true
+    item_type: string
+    description: >
+      What must be true before this test case can be executed.
+      Includes system state, configuration, loaded data, connected
+      equipment, operator qualifications, etc.
+    examples:
+      - "System powered on in nominal mode"
+      - "Test database loaded with dataset TD-003"
+      - "External simulator connected and initialized"
+
+  steps:
+    type: list
+    required: true
+    description: >
+      Ordered sequence of actions and expected results. Each step
+      combines what the tester does with what should happen, keeping
+      procedure and verification together.
+    item_type: object
+    item_fields:
+      step_number:
+        type: integer
+        required: true
+        description: "Sequential step number, starting at 1"
+      action:
+        type: string
+        required: true
+        description: >
+          What the tester does. Should be specific enough that a
+          qualified tester can execute without ambiguity.
+      expected_result:
+        type: string
+        required: true
+        description: >
+          What should happen after the action. Written to be
+          unambiguously pass/fail — a tester should be able to
+          determine whether the result matches without interpretation.
+
+  # --- Optional Fields ---
+
+  postconditions:
+    type: list
+    required: false
+    item_type: string
+    description: >
+      State after the test completes. Includes cleanup actions,
+      system state restoration, or conditions to verify before
+      proceeding to the next test.
+
+  test_data:
+    type: string
+    required: false
+    description: >
+      Description of required test data, input files, datasets, or
+      parameters. Can be a reference to an external data package.
+
+  environment:
+    type: string
+    required: false
+    description: >
+      Required test environment for this test case. Describes the
+      platform, configuration, or equipment needed.
+
+  notes:
+    type: string
+    required: false
+    description: >
+      Free-form additional context. References to external documents,
+      known limitations, special considerations, etc.

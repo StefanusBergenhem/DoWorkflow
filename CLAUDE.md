@@ -53,6 +53,10 @@ Each phase produces traceable artifacts. Human gates between phases.
 ```
 research/              — Research documents on standards, patterns, strategies
 docs/plan/             — Architecture and backlog documents
+docs/guide/            — Interactive HTML documentation (V-model guide + framework docs)
+  css/                 — Styling
+  js/                  — domain.js (translation plugin), app.js (nav), v-diagram.js (SVG)
+  domains/             — Domain translation plugins (generic.json, do178c.json, aspice.json)
 schemas/
   core/                — Meta-schemas (skill contracts, pipeline contracts)
   artifacts/           — V-model artifact type definitions (Pillar 1)
@@ -63,6 +67,20 @@ skills/
   craft/               — Atomic domain skills (Pillar 3)
   orchestration/       — Workflow pipelines (Pillar 3)
 ```
+
+## Documentation (docs/guide/)
+
+**Keep documentation in sync with every change.** Whenever any of the three pillars is updated (schemas, trace model, skills, orchestration), the corresponding section in `docs/guide/index.html` must also be updated. This includes:
+
+- New or changed artifact schemas → update the artifact section + examples
+- New or changed link types / trace rules → update the traceability section
+- New or changed craft skills / orchestration → update the framework section
+- New domain translations → add or update the JSON plugin in `docs/guide/domains/`
+- Calculator E2E walkthrough should be extended when new artifact types are added
+
+The documentation uses a domain translation plugin system (SOLID: content uses generic terms via `data-term` attributes, domain-specific vocabulary is applied at runtime from JSON plugins). Never hard-couple domain-specific terms into the HTML content.
+
+**Proactively raise this**: when working on pillar changes, always remind that docs/guide/ needs a corresponding update before the work is considered complete.
 
 ## Conventions
 

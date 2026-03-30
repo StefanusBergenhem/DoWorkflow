@@ -1,0 +1,24 @@
+{
+  "id": "do178c",
+  "name": "DO-178C (Aviation)",
+  "description": "RTCA DO-178C — Software Considerations in Airborne Systems and Equipment Certification.",
+  "terms": {
+    "system-requirement": { "label": "System Requirement", "note": "DO-178C §5.1 — derived from system-level safety assessment" },
+    "sw-requirement": { "label": "High-Level Requirement", "abbrev": "HLR", "note": "DO-178C §6.3.1 — developed from system requirements allocated to software" },
+    "sw-architecture": { "label": "Software Architecture", "note": "DO-178C §6.3.2 — describes software structure" },
+    "detailed-design": { "label": "Low-Level Requirement", "abbrev": "LLR", "note": "DO-178C §6.3.3 — source code can be directly implemented from LLRs" },
+    "implementation": { "label": "Source Code", "note": "DO-178C §6.3.4 — coding and integration" },
+    "unit-test": { "label": "Low-Level Test", "note": "DO-178C §6.4 — verifies LLRs" },
+    "integration-test": { "label": "Software Integration Test", "note": "DO-178C §6.4 — verifies architecture and integration" },
+    "sw-verification": { "label": "SW Verification", "note": "DO-178C §6.4 — verifies HLRs against test results" },
+    "system-test": { "label": "HW/SW Integration Test", "note": "DO-178C §6.4 — target environment testing" },
+    "assurance-level": { "label": "Design Assurance Level", "abbrev": "DAL", "note": "Levels A (catastrophic) through E (no effect) per DO-178C §2.3" },
+    "review-record": { "label": "Review/Analysis Record", "note": "DO-178C §6.3.5" },
+    "development-plan": { "label": "Plan for Software Aspects of Certification", "abbrev": "PSAC", "note": "DO-178C §11.1" },
+    "verification-plan": { "label": "Software Verification Plan", "abbrev": "SVP", "note": "DO-178C §11.3" },
+    "cm-plan": { "label": "Software Configuration Management Plan", "abbrev": "SCMP", "note": "DO-178C §11.4" },
+    "qa-plan": { "label": "Software Quality Assurance Plan", "abbrev": "SQAP", "note": "DO-178C §11.5" },
+    "trace-link": { "label": "Traceability Data", "note": "DO-178C §6.7" },
+    "baseline": { "label": "Configuration Item", "note": "DO-178C §7.2" }
+  }
+}

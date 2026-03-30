@@ -22,6 +22,7 @@ artifact_id:
   pattern: "^[A-Z]+-\\d{3,}$"
   examples:
     - "SYSREQ-001"     # System Requirement
+    - "SYSTEST-001"    # System Test Case
     - "SWREQ-042"      # SW Requirement
     - "ARCH-003"       # SW Architecture
     - "DD-017"         # Detailed Design
@@ -43,6 +44,7 @@ artifact_type:
     Defines the structure of the body field.
   values:
     - system-requirement
+    - system-test-case
     - sw-requirement
     - sw-architecture
     - detailed-design
@@ -145,6 +147,7 @@ content_hash:
 # Artifacts live in the target project repository alongside code,
 # organized by type:
 #   docs/artifacts/system-requirements/SYSREQ-001.yaml
+#   docs/artifacts/system-test-cases/SYSTEST-001.yaml
 #   docs/artifacts/sw-requirements/SWREQ-042.yaml
 #   docs/artifacts/test-specifications/TS-042-01.yaml
 #   docs/artifacts/review-records/RR-042-001.yaml

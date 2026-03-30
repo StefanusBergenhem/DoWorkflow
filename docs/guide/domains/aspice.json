@@ -1,0 +1,24 @@
+{
+  "id": "aspice",
+  "name": "ASPICE / ISO 26262 (Automotive)",
+  "description": "Automotive SPICE process assessment model and ISO 26262 functional safety standard.",
+  "terms": {
+    "system-requirement": { "label": "System Requirement", "note": "SYS.2 — System Requirements Analysis" },
+    "sw-requirement": { "label": "Software Requirement", "note": "SWE.1 — Software Requirements Analysis" },
+    "sw-architecture": { "label": "Software Architectural Design", "note": "SWE.2 — Software Architectural Design" },
+    "detailed-design": { "label": "Software Detailed Design", "note": "SWE.3 — Software Detailed Design and Unit Construction" },
+    "implementation": { "label": "Unit Construction", "note": "SWE.3 — part of Detailed Design and Unit Construction" },
+    "unit-test": { "label": "Software Unit Verification", "note": "SWE.4 — Software Unit Verification" },
+    "integration-test": { "label": "Software Integration Test", "note": "SWE.5 — Software Integration and Integration Test" },
+    "sw-verification": { "label": "Software Qualification Test", "note": "SWE.6 — Software Qualification Test" },
+    "system-test": { "label": "System Qualification Test", "note": "SYS.5 — System Qualification Test" },
+    "assurance-level": { "label": "Automotive Safety Integrity Level", "abbrev": "ASIL", "note": "ASIL D (highest) through QM (no safety requirement) per ISO 26262" },
+    "review-record": { "label": "Review Record", "note": "SUP.4 — Joint Review Process" },
+    "development-plan": { "label": "Software Development Plan", "note": "MAN.3 — Project Management" },
+    "verification-plan": { "label": "Software Verification Plan", "note": "SWE.4–6 process plans" },
+    "cm-plan": { "label": "Configuration Management Plan", "note": "SUP.8 — Configuration Management" },
+    "qa-plan": { "label": "Quality Assurance Plan", "note": "SUP.1 — Quality Assurance" },
+    "trace-link": { "label": "Bidirectional Traceability", "note": "Required across all SWE processes" },
+    "baseline": { "label": "Configuration Baseline", "note": "SUP.8" }
+  }
+}

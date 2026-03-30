@@ -1,0 +1,28 @@
+{
+  "id": "generic",
+  "name": "Generic V-Model",
+  "description": "Standard V-model terminology, not specific to any industry domain.",
+  "terms": {
+    "system-requirement": { "label": "System Requirement" },
+    "sw-requirement": { "label": "SW Requirement" },
+    "sw-architecture": { "label": "SW Architecture" },
+    "detailed-design": { "label": "Detailed Design" },
+    "implementation": { "label": "Implementation" },
+    "unit-test": { "label": "Unit Test" },
+    "integration-test": { "label": "Integration Test" },
+    "sw-verification": { "label": "SW Verification" },
+    "system-test": { "label": "System Test" },
+    "review-record": { "label": "Review Record" },
+    "test-specification": { "label": "Test Specification" },
+    "test-result": { "label": "Test Result" },
+    "coverage-report": { "label": "Coverage Report" },
+    "development-plan": { "label": "Development Plan" },
+    "verification-plan": { "label": "Verification Plan" },
+    "cm-plan": { "label": "CM Plan" },
+    "qa-plan": { "label": "QA Plan" },
+    "source-code": { "label": "Source Code" },
+    "assurance-level": { "label": "Assurance Level" },
+    "trace-link": { "label": "Trace Link" },
+    "baseline": { "label": "Baseline" }
+  }
+}
