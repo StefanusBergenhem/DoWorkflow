@@ -1,0 +1,15 @@
+{
+  "eval_id": 2,
+  "eval_name": "message-parser-junit5",
+  "prompt": "I need tests for the MessageParser. Design artifact is at evals/files/message-parser-design.yaml. Use Java with JUnit 5.",
+  "assertions": [
+    "Output includes a coverage matrix mapping design elements to test cases",
+    "Every sequential behavior step's on_failure path has a dedicated test (invalid_sync, unsupported_version, length_mismatch, checksum_failed, unknown_type)",
+    "Every error_handling entry (null/empty raw_data, too-short raw_data) has a dedicated test",
+    "Boundary values tested for raw_data length (4 bytes minimum, 1024 bytes maximum, 3 bytes too short, 1025 bytes too long)",
+    "Union return type handled: tests assert on specific Success or Error variant fields, not just non-null",
+    "No test uses only 'assertDoesNotThrow' or 'assertNotNull' as its sole assertion",
+    "Test names describe the scenario being tested, not just the method name",
+    "Happy path test: valid message parsed correctly with verified payload fields"
+  ]
+}

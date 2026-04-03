@@ -1,0 +1,23 @@
+{
+  "skill_name": "derive-test-cases",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Derive test cases for the FuelRateLimiter unit. The detailed design is in evals/files/fuel-rate-limiter-design.yaml. Use Python with pytest.",
+      "expected_output": "A comprehensive pytest test file covering all behavior rules, error handling, boundary values, and equivalence classes from the design. Should include a coverage matrix.",
+      "files": ["evals/files/fuel-rate-limiter-design.yaml"]
+    },
+    {
+      "id": 2,
+      "prompt": "I need tests for the MessageParser. Design artifact is at evals/files/message-parser-design.yaml. Use Java with JUnit 5.",
+      "expected_output": "JUnit 5 test class covering the sequential parsing steps, each error path, boundary values for raw_data length, and the union return type. Should include coverage matrix.",
+      "files": ["evals/files/message-parser-design.yaml"]
+    },
+    {
+      "id": 3,
+      "prompt": "Write test cases for the FuelRateLimiter from the design in evals/files/fuel-rate-limiter-design.yaml. Use Go with the standard testing package. Focus especially on the rate-of-change limiting in cruise mode and the stateful behavior.",
+      "expected_output": "Go test file with table-driven tests where appropriate, covering rate-of-change limiting across multiple calls (stateful), mode transitions, and configuration boundary values.",
+      "files": ["evals/files/fuel-rate-limiter-design.yaml"]
+    }
+  ]
+}

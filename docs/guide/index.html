@@ -593,127 +593,320 @@ body:
   <section id="artifact-detailed-design" class="content-section">
     <h2><span data-term="detailed-design">Detailed Design</span></h2>
     <span class="level-indicator left">Left Side &middot; Level 3</span>
-    <p class="lead">Describes a single unit (class, function, module) at a level of detail sufficient for implementation and test derivation.</p>
+    <p class="lead">Describes components and their units at a level of detail sufficient for implementation and test derivation. Written as Markdown with YAML frontmatter.</p>
 
     <div class="card">
       <h3>What is a Detailed Design?</h3>
-      <p>If the architecture is the floor plan, the detailed design is the <em>blueprint for each room</em>. It describes exactly what one unit (a class, a function, a module) does &mdash; its inputs, outputs, behavior rules, and error handling &mdash; in enough detail that a developer can implement it and a tester can derive test cases from it.</p>
-      <p>For example, the architecture might define an &ldquo;arithmetic engine&rdquo; component. The detailed design for that component specifies: it takes two numbers and an operator, returns a result or an error, and handles division by zero by returning an error code. That&rsquo;s specific enough to code from, and specific enough to test against.</p>
+      <p>If the architecture is the floor plan, the detailed design is the <em>blueprint for each room</em>. It starts at the <strong>component</strong> level &mdash; the map of what exists, why, and how it connects &mdash; then adds <strong>unit-level</strong> detail where needed: inputs, outputs, behavior rules, and error handling, specific enough that a developer can implement from it and a tester can derive test cases from it.</p>
 
       <h3>Why bother?</h3>
       <p>This is where many teams skip straight to coding and regret it later:</p>
       <ul>
         <li><strong>Developers get a spec, not a guess</strong> &mdash; no ambiguity about what to build</li>
-        <li><strong>Testers get test cases directly</strong> &mdash; each behavior rule and error condition becomes a test</li>
+        <li><strong>Testers get test cases directly</strong> &mdash; each behavior rule (B1, B2...) and error condition (E1, E2...) becomes a test</li>
         <li><strong>Code reviews have a reference</strong> &mdash; does the code match the design?</li>
         <li><strong>Future maintainers understand intent</strong> &mdash; why the code does what it does, not just how</li>
+        <li><strong>Assessors see proportional effort</strong> &mdash; detail scales with criticality, not one-size-fits-all</li>
       </ul>
       <p>Detailed Design is Level 3 in the V-model &mdash; the last step before implementation. On the right side, unit tests (also Level 3) verify that each unit behaves exactly as its detailed design specifies.</p>
+
+      <div class="callout callout-warning">
+        <strong>Design must exist before code.</strong> If you write the detailed design after implementing the code, the unit test becomes meaningless &mdash; you&rsquo;re just documenting what already exists, not verifying that code fulfils a design. This is the #1 assessment failure in ASPICE SWE.3.
+      </div>
     </div>
 
-    <h3>Schema Fields</h3>
+    <!-- ---- Layered Approach ---- -->
+    <h3>Layered Design: Scale with Criticality</h3>
+    <p>Not every unit needs the same level of documentation. Detailed design uses an <strong>additive layering</strong> model &mdash; higher layers build on lower layers, you never skip a layer:</p>
+
     <table class="field-table">
       <thead>
-        <tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr>
+        <tr><th>Layer</th><th>What It Covers</th><th>When Required</th></tr>
       </thead>
       <tbody>
-        <tr><td class="field-name">title</td><td><code>string</code></td><td><span class="required">required</span></td><td>Short descriptive name</td></tr>
-        <tr><td class="field-name">description</td><td><code>string</code></td><td><span class="required">required</span></td><td>What this unit does and why</td></tr>
-        <tr><td class="field-name">unit_id</td><td><code>string</code></td><td><span class="required">required</span></td><td>Logical identifier (language-agnostic). E.g., <code>ArithmeticEngine</code></td></tr>
-        <tr><td class="field-name">component</td><td><code>string</code></td><td><span class="required">required</span></td><td>Architecture component this unit belongs to</td></tr>
-        <tr><td class="field-name">responsibilities</td><td><code>list</code></td><td><span class="required">required</span></td><td>What this unit is responsible for</td></tr>
-        <tr><td class="field-name">interfaces</td><td><code>object</code></td><td><span class="required">required</span></td><td><code>inputs[]</code> and <code>outputs[]</code> with name, type, constraints</td></tr>
-        <tr><td class="field-name">behavior</td><td><code>list</code></td><td><span class="required">required</span></td><td>How inputs transform to outputs. Condition/result pairs or steps.</td></tr>
-        <tr><td class="field-name">error_handling</td><td><code>list</code></td><td><span class="required">required</span></td><td>Every foreseeable error condition and the unit&rsquo;s response</td></tr>
-        <tr><td class="field-name">internal_state</td><td><code>list</code></td><td><span class="optional">optional</span></td><td>State retained between invocations (omit for stateless units)</td></tr>
-        <tr><td class="field-name">configuration</td><td><code>list</code></td><td><span class="optional">optional</span></td><td>Configurable parameters set at initialization</td></tr>
-        <tr><td class="field-name">realization</td><td><code>object</code></td><td><span class="optional">optional</span></td><td>Quick pointers to source and test files</td></tr>
-        <tr><td class="field-name">constraints</td><td><code>list</code></td><td><span class="optional">optional</span></td><td>Non-functional requirements (e.g., &ldquo;must be stateless&rdquo;)</td></tr>
-        <tr><td class="field-name">notes</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Free-form additional context</td></tr>
+        <tr>
+          <td><strong>Layer 1</strong><br>Component Design</td>
+          <td>Purpose, external interfaces, unit inventory, shared patterns, constraints. The <em>map</em> of what exists.</td>
+          <td>Always. Every component gets a Layer 1 regardless of criticality.</td>
+        </tr>
+        <tr>
+          <td><strong>Layer 2</strong><br>Unit Contracts</td>
+          <td>Per-unit interfaces (typed inputs/outputs), behavior rules, error handling, configuration, internal state.</td>
+          <td>ASIL A+ / DAL D+ / IEC 62304 Class B+ &mdash; or any non-trivial unit you want proper test derivation for.</td>
+        </tr>
+        <tr>
+          <td><strong>Layer 3</strong><br>Deep Evidence</td>
+          <td>Design rationale, state machines/sequence diagrams, concurrency model, negative requirements.</td>
+          <td>ASIL C-D / DAL A-C / IEC 62304 Class C &mdash; or any safety-critical or highly complex unit.</td>
+        </tr>
       </tbody>
     </table>
 
-    <h3>Example: Arithmetic Engine</h3>
+    <p>Layer 2 and 3 content for units can either be <strong>embedded in the component document</strong> (practical when a component has few units) or written as <strong>separate unit documents</strong> (better when units are complex enough to warrant their own file). Both approaches are equally valid for compliance.</p>
+
+    <!-- ---- Document Format ---- -->
+    <h3>Document Format</h3>
+    <p>Detailed designs are <strong>Markdown files</strong> (<code>.md</code>) with YAML frontmatter. This makes them readable by humans and assessors while remaining parseable by agents and the traceability engine.</p>
+
+    <h4>Frontmatter</h4>
+    <table class="field-table">
+      <thead>
+        <tr><th>Field</th><th></th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="field-name">artifact_id</td><td><span class="required">required</span></td><td><code>CD-nnn</code> for component designs, <code>DD-nnn</code> for standalone unit designs</td></tr>
+        <tr><td class="field-name">artifact_type</td><td><span class="required">required</span></td><td>Always <code>detailed-design</code></td></tr>
+        <tr><td class="field-name">version</td><td><span class="required">required</span></td><td>Semantic version (e.g., <code>1.0.0</code>)</td></tr>
+        <tr><td class="field-name">status</td><td><span class="required">required</span></td><td><code>draft</code> | <code>in_review</code> | <code>approved</code> | <code>baselined</code> | <code>superseded</code></td></tr>
+        <tr><td class="field-name">component</td><td><span class="required">required</span></td><td>Architecture component ID (e.g., <code>fuel-control</code>)</td></tr>
+        <tr><td class="field-name">layer</td><td><span class="required">required</span></td><td>Highest layer in this document: <code>1</code>, <code>2</code>, or <code>3</code></td></tr>
+        <tr><td class="field-name">trace_from</td><td><span class="required">required</span></td><td>List of architecture/requirement IDs this design traces from</td></tr>
+        <tr><td class="field-name">unit_id</td><td><span class="optional">optional</span></td><td>Required only for standalone unit documents (<code>DD-nnn</code>)</td></tr>
+        <tr><td class="field-name">assurance_level</td><td><span class="optional">optional</span></td><td>1 (highest, DAL A / ASIL D) to 5 (lowest, QM)</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ---- Layer 1 Sections ---- -->
+    <h3>Layer 1 Sections: Component Design</h3>
+    <p>Every detailed design document starts with these sections. They provide the component-level overview &mdash; the map that gives context to any unit-level detail below.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Section</th><th>What To Write</th><th>Common Mistakes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="field-name">## Purpose</td>
+          <td>What this component does and why it exists in the architecture. Ask yourself: <em>&ldquo;If this component were deleted, what would break?&rdquo;</em> 1&ndash;3 paragraphs. Not a restatement of the architecture description &mdash; focus on this component&rsquo;s specific role.</td>
+          <td>Copying the architecture description verbatim. Too vague (&ldquo;handles fuel stuff&rdquo;). Too long (implementation details leaking in).</td>
+        </tr>
+        <tr>
+          <td class="field-name">## External Interfaces</td>
+          <td>How this component communicates with <em>other</em> components. Table with columns: <code>Direction | Partner Component | Mechanism | Data | Description</code>. This is the component&rsquo;s boundary as seen from outside &mdash; not internal unit-to-unit calls.</td>
+          <td>Listing internal interfaces. Missing the mechanism (function call? message queue? shared memory?). Describing data format instead of data meaning.</td>
+        </tr>
+        <tr>
+          <td class="field-name">## Unit Inventory</td>
+          <td>All units in this component, each with its design layer and a one-line description. Table with columns: <code>Unit ID | Layer | Brief Description</code>. This is the table of contents for the component&rsquo;s internals. <strong>Every</strong> unit must appear &mdash; even trivial ones.</td>
+          <td>Forgetting trivial units (DTOs, config holders). Layer column missing or wrong. Descriptions that are too vague to distinguish units.</td>
+        </tr>
+        <tr>
+          <td class="field-name">## Shared Patterns</td>
+          <td>Design decisions that apply across <em>multiple units</em> in this component. Document once here instead of repeating in every unit. Typical patterns:
+            <ul>
+              <li><strong>Error strategy</strong> &mdash; How do units report errors? Exceptions? Result types? Error codes?</li>
+              <li><strong>Threading model</strong> &mdash; Single-threaded? Thread-per-request? What about shared state?</li>
+              <li><strong>Resource management</strong> &mdash; Who owns lifecycle of shared resources (connections, file handles)?</li>
+              <li><strong>Common data types</strong> &mdash; Shared enums, value objects, or structs used across units.</li>
+            </ul>
+            If a unit <em>deviates</em> from a shared pattern, document the deviation in that unit&rsquo;s section, not here.</td>
+          <td>Writing generic best practices (&ldquo;we use clean code&rdquo;) instead of concrete component decisions. Omitting this section because &ldquo;it&rsquo;s obvious&rdquo; &mdash; assessors can&rsquo;t verify what isn&rsquo;t written. Putting unit-specific decisions here.</td>
+        </tr>
+        <tr>
+          <td class="field-name">## Constraints</td>
+          <td>Non-functional requirements that apply to the component as a whole: performance budgets, memory limits, certification requirements, deployment constraints. Only component-wide constraints &mdash; unit-specific constraints go in the unit&rsquo;s section.</td>
+          <td>Mixing functional and non-functional. Listing constraints that only apply to one unit.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ---- Layer 2 Sections ---- -->
+    <h3>Layer 2 Sections: Unit Interface Contracts</h3>
+    <p>Added per unit that needs detailed specification. When embedded in the component document, use <code>## Unit Name (UnitId)</code> as the heading with <code>###</code> for subsections. When in a separate file, the unit name is the document title and subsections use <code>##</code>.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Section</th><th>What To Write</th><th>ID Convention</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="field-name">### Purpose</td>
+          <td>What this specific unit does. 1&ndash;2 sentences. Clear enough that someone can decide whether a given code change belongs in this unit or not.</td>
+          <td>&mdash;</td>
+        </tr>
+        <tr>
+          <td class="field-name">### Interfaces<br>&ensp;#### Inputs</td>
+          <td>Table: <code>ID | Name | Type | Unit | Constraints | Description</code>. Type uses language-agnostic names (float, integer, enum, etc.). Constraints column: valid ranges, enum values, lengths.</td>
+          <td><code>I1, I2, I3...</code></td>
+        </tr>
+        <tr>
+          <td class="field-name">&ensp;#### Outputs</td>
+          <td>Same table format. For union/variant outputs, add a row per variant with the variant name in Description.</td>
+          <td><code>O1, O2, O3...</code></td>
+        </tr>
+        <tr>
+          <td class="field-name">### Behavior</td>
+          <td>Table: <code>ID | Condition | Result</code>. Each row is one testable rule. Be specific enough to write an assertion: &ldquo;Returns error&rdquo; is too vague; &ldquo;Returns Error(INVALID_SYNC, offset 0)&rdquo; is testable. For sequential algorithms, use &ldquo;after B1&rdquo;, &ldquo;after B2 succeeds&rdquo; in Condition.</td>
+          <td><code>B1, B2, B3...</code></td>
+        </tr>
+        <tr>
+          <td class="field-name">### Error Handling</td>
+          <td>Table: <code>ID | Condition | Response</code>. Every foreseeable error condition. If the unit has no error cases, state that explicitly with one row.</td>
+          <td><code>E1, E2, E3...</code></td>
+        </tr>
+        <tr>
+          <td class="field-name">### Configuration</td>
+          <td>Table: <code>Name | Type | Default | Description</code>. Parameters set at init/deployment time. Only present if the unit has configurable parameters.</td>
+          <td>&mdash;</td>
+        </tr>
+        <tr>
+          <td class="field-name">### Internal State</td>
+          <td>Table: <code>Name | Type | Description</code>. State retained between invocations. Omit entirely for stateless units.</td>
+          <td>&mdash;</td>
+        </tr>
+        <tr>
+          <td class="field-name">### Constraints</td>
+          <td>Unit-specific non-functional requirements (thread-safety, timing, determinism). Only what&rsquo;s specific to this unit &mdash; component-wide constraints stay in Layer 1.</td>
+          <td>&mdash;</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ---- Layer 3 Sections ---- -->
+    <h3>Layer 3 Sections: Deep Design Evidence</h3>
+    <p>Added for safety-critical or highly complex units. Required at ASIL C-D / DAL A-C / IEC 62304 Class C.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Section</th><th>What To Write</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="field-name">### Design Rationale</td>
+          <td><strong>WHY</strong> this design, not just what it is. For each significant decision: what was decided, what alternatives were considered, why this approach was chosen. This is what separates design from code paraphrase. Can be a table (<code>Decision | Alternatives | Justification</code>) or structured prose.</td>
+        </tr>
+        <tr>
+          <td class="field-name">### Dynamic Behavior</td>
+          <td>State machines, sequence diagrams, timing diagrams for units with complex runtime behavior. Use Mermaid or PlantUML code blocks. Only needed when the Behavior table alone doesn&rsquo;t capture temporal or state aspects.</td>
+        </tr>
+        <tr>
+          <td class="field-name">### Concurrency Model</td>
+          <td>Thread-safety guarantees, synchronization mechanisms, shared state access patterns. Required when the unit may be accessed from multiple threads or contexts.</td>
+        </tr>
+        <tr>
+          <td class="field-name">### Negative Requirements</td>
+          <td>What this unit explicitly must NOT do. Prevents scope creep and clarifies responsibility boundaries. Examples: &ldquo;Must not allocate heap memory&rdquo;, &ldquo;Must not perform I/O&rdquo;, &ldquo;Must not modify input parameters.&rdquo;</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ---- Traceability IDs ---- -->
+    <h3>Traceability IDs</h3>
+    <p>Every table row has an ID column. These IDs enable fine-grained traceability between design elements and test cases:</p>
     <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code>artifact_id: "DD-001"
-artifact_type: "detailed-design"
-version: "1.0.0"
-status: "draft"
-
-body:
-  title: "Arithmetic Engine"
-  description: >
-    Performs basic arithmetic operations on two numerical operands.
-    Stateless — each computation is independent.
-  unit_id: "ArithmeticEngine"
-  component: "arithmetic-engine"
-
-  responsibilities:
-    - "Execute the requested arithmetic operation on two operands"
-    - "Detect and report division by zero"
-    - "Detect and report numeric overflow"
-
-  interfaces:
-    inputs:
-      - name: "left"
-        type: "float"
-        description: "Left operand"
-      - name: "right"
-        type: "float"
-        description: "Right operand"
-      - name: "operator"
-        type: "enum"
-        values: ["add", "subtract", "multiply", "divide"]
-        description: "Arithmetic operation to perform"
-    outputs:
-      - name: "result"
-        type: "union"
-        description: "Either a successful value or an error"
-        variants:
-          - name: "success"
-            fields:
-              - { name: "value", type: "float" }
-              - { name: "operation", type: "string" }
-          - name: "error"
-            fields:
-              - { name: "code", type: "string" }
-              - { name: "message", type: "string" }
-
-  behavior:
-    - condition: "operator is add"
-      step: "Return left + right"
-    - condition: "operator is subtract"
-      step: "Return left - right"
-    - condition: "operator is multiply"
-      step: "Return left * right"
-    - condition: "operator is divide AND right != 0"
-      step: "Return left / right"
-
-  error_handling:
-    - condition: "operator is divide AND right is 0"
-      behavior: "Return error with code 'DIVISION_BY_ZERO'"
-    - condition: "Result exceeds representable range"
-      behavior: "Return error with code 'OVERFLOW'"
-
-  constraints:
-    - "Must be stateless — no state retained between calls"
-    - "Must not throw exceptions — all errors returned in result union"</code>
+      <span class="lang-label">traceability</span>
+      <code>DD-001.B3  &rarr; Behavior rule 3 in unit design DD-001
+DD-001.E1  &rarr; Error handling rule 1
+DD-001.I2  &rarr; Input #2 (for interface tracing)
+CD-001.FuelRateLimiter.B3  &rarr; When unit is embedded in component doc</code>
     </div>
 
+    <!-- ---- Example ---- -->
+    <h3>Example: Arithmetic Engine (Component with Embedded Unit)</h3>
+    <div class="code-block">
+      <span class="lang-label">markdown</span>
+      <code>---
+artifact_id: CD-010
+artifact_type: detailed-design
+version: 1.0.0
+status: draft
+component: arithmetic-engine
+layer: 2
+trace_from: [ARCH-007]
+---
+
+# Arithmetic Engine
+
+## Purpose
+
+Performs basic arithmetic operations on two numerical operands.
+The system&rsquo;s only computation component &mdash; all other components
+delegate arithmetic to this one rather than implementing their own.
+
+## External Interfaces
+
+| Direction | Partner Component | Mechanism | Data | Description |
+|-----------|-------------------|-----------|------|-------------|
+| Receives | expression-parser | function call | OperationRequest | Two operands + operator |
+| Provides | expression-parser | return value | OperationResult | Computed value or error |
+
+## Unit Inventory
+
+| Unit ID | Layer | Brief Description |
+|---------|-------|-------------------|
+| ArithmeticEngine | 2 | Executes arithmetic ops, detects division-by-zero and overflow |
+
+## Shared Patterns
+
+### Error Strategy
+
+All units return result unions (success | error) &mdash; no exceptions thrown.
+Error codes are domain-specific strings (e.g., DIVISION_BY_ZERO, OVERFLOW).
+
+## Constraints
+
+- Must be stateless &mdash; no state retained between calls
+- Must complete in constant time
+
+---
+
+## Arithmetic Engine (ArithmeticEngine)
+
+### Purpose
+
+Executes a single arithmetic operation on two float operands.
+
+### Interfaces
+
+#### Inputs
+
+| ID | Name | Type | Unit | Constraints | Description |
+|----|------|------|------|-------------|-------------|
+| I1 | left | float | &mdash; | &mdash; | Left operand |
+| I2 | right | float | &mdash; | &mdash; | Right operand |
+| I3 | operator | enum | &mdash; | add, subtract, multiply, divide | Operation to perform |
+
+#### Outputs
+
+| ID | Name | Type | Unit | Constraints | Description |
+|----|------|------|------|-------------|-------------|
+| O1 | result.value | float | &mdash; | &mdash; | Success: computed result |
+| O2 | result.operation | string | &mdash; | &mdash; | Success: operation performed |
+| O3 | result.code | string | &mdash; | &mdash; | Error: error code |
+| O4 | result.message | string | &mdash; | &mdash; | Error: human-readable message |
+
+### Behavior
+
+| ID | Condition | Result |
+|----|-----------|--------|
+| B1 | operator is add | Return success: left + right |
+| B2 | operator is subtract | Return success: left - right |
+| B3 | operator is multiply | Return success: left * right |
+| B4 | operator is divide AND right != 0 | Return success: left / right |
+
+### Error Handling
+
+| ID | Condition | Response |
+|----|-----------|----------|
+| E1 | operator is divide AND right is 0 | Return error: code DIVISION_BY_ZERO |
+| E2 | result exceeds representable range | Return error: code OVERFLOW |</code>
+    </div>
+
+    <!-- ---- Trace Connections ---- -->
     <h3>Trace Connections</h3>
     <div class="trace-flow">
       <span class="artifact-ref">SWREQ-nnn</span>
       <span class="arrow">&rarr; derived-from &rarr;</span>
-      <span class="artifact-ref">DD-nnn</span>
+      <span class="artifact-ref">CD-nnn / DD-nnn</span>
       <span class="arrow">&rarr; implemented-by &rarr;</span>
       <span class="artifact-ref">source file</span>
     </div>
     <div class="trace-flow">
-      <span class="artifact-ref">DD-nnn</span>
+      <span class="artifact-ref">DD-nnn.B3</span>
       <span class="arrow">&rarr; verified-by &rarr;</span>
-      <span class="artifact-ref">test file</span>
+      <span class="artifact-ref">test case</span>
     </div>
+    <p>Fine-grained trace: each behavior rule (B1, B2...) and error condition (E1, E2...) links directly to the test case that verifies it.</p>
   </section>
 
   <!-- ===================== SYSTEM REQUIREMENT ===================== -->

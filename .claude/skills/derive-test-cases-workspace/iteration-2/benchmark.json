@@ -1,0 +1,122 @@
+{
+  "metadata": {
+    "skill_name": "derive-test-cases",
+    "skill_path": "/home/stefanus/repos/DoWorkflow/.claude/skills/derive-test-cases",
+    "executor_model": "claude-haiku-4-5",
+    "analyzer_model": "claude-opus-4-6",
+    "timestamp": "2026-03-31T21:30:00Z",
+    "evals_run": [1, 2, 3],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1, "eval_name": "FuelRateLimiter-pytest", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 0.75, "passed": 6, "failed": 2, "total": 8, "time_seconds": 123.0, "tokens": 40516, "tool_calls": 9, "errors": 0},
+      "expectations": [
+        {"text": "Coverage matrix present", "passed": true, "evidence": "coverage_matrix.md written"},
+        {"text": "All behavior rules tested", "passed": true, "evidence": "Startup, cruise, emergency, was_clamped all have tests"},
+        {"text": "All error_handling entries tested", "passed": false, "evidence": "Unrecognized mode test passes EMERGENCY_SHUTDOWN instead of an actual invalid value"},
+        {"text": "Boundary values for requested_rate", "passed": true, "evidence": "0.0, negative, STARTUP_MIN, STARTUP_MAX, CRUISE_MAX boundaries tested"},
+        {"text": "No assert-does-not-raise as only assertion", "passed": true, "evidence": "All tests have concrete assertions"},
+        {"text": "Descriptive test names", "passed": true, "evidence": "Scenario-based names throughout"},
+        {"text": "Stateful multi-call tests", "passed": true, "evidence": "Sequential calls verify previous_rate tracking"},
+        {"text": "Non-default config variants", "passed": false, "evidence": "No tests with non-default configuration values"}
+      ]
+    },
+    {
+      "eval_id": 1, "eval_name": "FuelRateLimiter-pytest", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.875, "passed": 7, "failed": 1, "total": 8, "time_seconds": 60.8, "tokens": 25878, "tool_calls": 3, "errors": 0},
+      "expectations": [
+        {"text": "Coverage matrix present", "passed": false, "evidence": "No coverage matrix file"},
+        {"text": "All behavior rules tested", "passed": true, "evidence": "All modes and was_clamped tested"},
+        {"text": "All error_handling entries tested", "passed": true, "evidence": "Negative rate, negative elapsed, unrecognized mode tested"},
+        {"text": "Boundary values for requested_rate", "passed": true, "evidence": "Boundary tests present"},
+        {"text": "No assert-does-not-raise as only assertion", "passed": true, "evidence": "Concrete assertions throughout"},
+        {"text": "Descriptive test names", "passed": true, "evidence": "Scenario-based names"},
+        {"text": "Stateful multi-call tests", "passed": true, "evidence": "Sequential state tests present"},
+        {"text": "Non-default config variants", "passed": true, "evidence": "Custom config values tested"}
+      ]
+    },
+    {
+      "eval_id": 2, "eval_name": "MessageParser-JUnit5", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 0.75, "passed": 6, "failed": 2, "total": 8, "time_seconds": 90.6, "tokens": 34614, "tool_calls": 6, "errors": 0},
+      "expectations": [
+        {"text": "Coverage matrix present", "passed": true, "evidence": "coverage_matrix.md with anti-pattern audit"},
+        {"text": "All on_failure paths tested", "passed": true, "evidence": "invalid_sync, unsupported_version, length_mismatch, checksum_failed, unknown_type all tested"},
+        {"text": "All error_handling entries tested", "passed": true, "evidence": "Null/empty and too-short tests present"},
+        {"text": "Boundary values for raw_data length (4, 1024, 3, 1025)", "passed": false, "evidence": "Uses 12/11 bytes (HEADER+CHECKSUM) not 4/3 as specified"},
+        {"text": "Union return type with specific variant assertions", "passed": true, "evidence": "Asserts on specific error_code, byte_offset, Success fields"},
+        {"text": "No assertDoesNotThrow/assertNotNull as sole assertion", "passed": true, "evidence": "All tests have specific value assertions"},
+        {"text": "Descriptive test names", "passed": true, "evidence": "Scenario-based nested class and method names"},
+        {"text": "Happy path with verified payload fields", "passed": false, "evidence": "Stub helper cannot actually encode payload fields"}
+      ]
+    },
+    {
+      "eval_id": 2, "eval_name": "MessageParser-JUnit5", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.50, "passed": 4, "failed": 4, "total": 8, "time_seconds": 49.7, "tokens": 23699, "tool_calls": 2, "errors": 0},
+      "expectations": [
+        {"text": "Coverage matrix present", "passed": false, "evidence": "No coverage matrix"},
+        {"text": "All on_failure paths tested", "passed": true, "evidence": "Error paths covered"},
+        {"text": "All error_handling entries tested", "passed": true, "evidence": "Null/empty and too-short tested"},
+        {"text": "Boundary values for raw_data length (4, 1024, 3, 1025)", "passed": false, "evidence": "Doesn't match specified boundary values"},
+        {"text": "Union return type with specific variant assertions", "passed": false, "evidence": "Conditional if(result.isError()) silently passes on wrong variant"},
+        {"text": "No assertDoesNotThrow/assertNotNull as sole assertion", "passed": false, "evidence": "unknown_type test uses conditional that can silently pass"},
+        {"text": "Descriptive test names", "passed": true, "evidence": "Descriptive names"},
+        {"text": "Happy path with verified payload fields", "passed": true, "evidence": "Payload field values verified"}
+      ]
+    },
+    {
+      "eval_id": 3, "eval_name": "FuelRateLimiter-Go", "configuration": "with_skill", "run_number": 1,
+      "result": {"pass_rate": 0.625, "passed": 5, "failed": 3, "total": 8, "time_seconds": 91.8, "tokens": 35843, "tool_calls": 6, "errors": 0},
+      "expectations": [
+        {"text": "Coverage matrix present", "passed": true, "evidence": "coverage_matrix.md written"},
+        {"text": "Go table-driven test pattern", "passed": false, "evidence": "Standalone functions, no []struct or range"},
+        {"text": "Rate-of-change multiple scenarios", "passed": true, "evidence": "Multiple roc tests with varying elapsed times"},
+        {"text": "Stateful multi-call tests", "passed": true, "evidence": "Sequential calls verify state tracking"},
+        {"text": "All error_handling entries tested", "passed": true, "evidence": "Negative rate, negative elapsed, unrecognized mode tested"},
+        {"text": "No panic-only assertions", "passed": true, "evidence": "All tests assert specific values"},
+        {"text": "Go subtest conventions (t.Run)", "passed": false, "evidence": "Zero t.Run calls"},
+        {"text": "Boundary values for elapsed_time_ms (0, very large)", "passed": false, "evidence": "No very large elapsed_time_ms tested"}
+      ]
+    },
+    {
+      "eval_id": 3, "eval_name": "FuelRateLimiter-Go", "configuration": "without_skill", "run_number": 1,
+      "result": {"pass_rate": 0.875, "passed": 7, "failed": 1, "total": 8, "time_seconds": 59.6, "tokens": 26100, "tool_calls": 2, "errors": 0},
+      "expectations": [
+        {"text": "Coverage matrix present", "passed": false, "evidence": "No coverage matrix"},
+        {"text": "Go table-driven test pattern", "passed": true, "evidence": "Uses []struct with test cases iterated via range"},
+        {"text": "Rate-of-change multiple scenarios", "passed": true, "evidence": "Multiple roc scenarios"},
+        {"text": "Stateful multi-call tests", "passed": true, "evidence": "Sequential state tests"},
+        {"text": "All error_handling entries tested", "passed": true, "evidence": "All error conditions covered"},
+        {"text": "No panic-only assertions", "passed": true, "evidence": "Value assertions throughout"},
+        {"text": "Go subtest conventions (t.Run)", "passed": true, "evidence": "Uses t.Run for subtests"},
+        {"text": "Boundary values for elapsed_time_ms (0, very large)", "passed": true, "evidence": "2000ms used as large value"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 0.708, "stddev": 0.059, "min": 0.625, "max": 0.75},
+      "time_seconds": {"mean": 101.8, "stddev": 15.0, "min": 90.6, "max": 123.0},
+      "tokens": {"mean": 36991, "stddev": 2570, "min": 34614, "max": 40516}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.75, "stddev": 0.177, "min": 0.50, "max": 0.875},
+      "time_seconds": {"mean": 56.7, "stddev": 5.3, "min": 49.7, "max": 60.8},
+      "tokens": {"mean": 25226, "stddev": 1001, "min": 23699, "max": 26100}
+    },
+    "delta": {
+      "pass_rate": "-0.042",
+      "time_seconds": "+45.1",
+      "tokens": "+11765"
+    }
+  },
+  "notes": [
+    "CRITICAL: On Haiku, the skill HURTS average pass rate (-4.2%) while adding 45s and 11.7k tokens per run",
+    "Coverage matrix is the only consistently discriminating assertion (3/3 with-skill pass, 0/3 baseline pass)",
+    "Go eval: baseline Haiku naturally uses table-driven tests and t.Run (7/8), with-skill Haiku does NOT (5/8) — skill complexity appears to override Haiku's natural Go idioms",
+    "Pytest eval: baseline gets config testing right (7/8), with-skill gets confused about unrecognized mode and config (6/8)",
+    "JUnit5 eval: skill helps most here (+25%) by improving union type assertions, but still misses boundary values",
+    "Skill instructions may be too complex for Haiku — model gets lost following multi-step process and makes mistakes it avoids without the skill"
+  ]
+}

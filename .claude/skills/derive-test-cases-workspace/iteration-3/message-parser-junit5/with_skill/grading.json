@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": true,
+      "evidence": "coverage_matrix.md contains detailed tables organized by strategy (Requirement-Based, Equivalence Class, Boundary Value, Error Handling) mapping each design rule/element to specific test IDs (RB-001 through RB-013, EC-001 through EC-008, BV-001 through BV-008, EH-001 through EH-010)."
+    },
+    {
+      "text": "Every sequential behavior step's on_failure path has a dedicated test (invalid_sync, unsupported_version, length_mismatch, checksum_failed, unknown_type)",
+      "passed": true,
+      "evidence": "invalid_sync: testInvalidSyncByte0 (RB-002), testInvalidSyncByte1 (RB-003). unsupported_version: testUnsupportedVersion (RB-005). length_mismatch: testLengthMismatchTooShort (RB-007), testLengthMismatchTooLong (RB-008). checksum_failed: testCorruptedChecksum (RB-010). unknown_type: testUnknownMessageType (RB-012)."
+    },
+    {
+      "text": "Every error_handling entry (null/empty raw_data, too-short raw_data) has a dedicated test",
+      "passed": true,
+      "evidence": "Null: testNullInput (EH-001) using assertThrows(NullPointerException.class). Empty: testEmptyArray (EH-002) asserting error_code='length_mismatch'. Too-short: testUnderMinimumLength (EH-003) iterating over lengths 1 to MIN_MESSAGE_SIZE-1."
+    },
+    {
+      "text": "Boundary values tested for raw_data length (4 bytes minimum, 1024 bytes maximum, 3 bytes too short, 1025 bytes too long)",
+      "passed": false,
+      "evidence": "The design specifies raw_data length 4..1024. Tests cover: minimum valid message at 12 bytes (EC-003), just below minimum at 11 bytes (EC-004), maximum at 1024 bytes (EC-007), and oversized (EC-008). However, the assertion asks for 4-byte minimum and 3-byte too-short specifically. The test uses MIN_MESSAGE_SIZE=12 as the minimum, not 4. There is no test specifically at 4 bytes or 3 bytes as boundary values for raw_data length."
+    },
+    {
+      "text": "Union return type handled: tests assert on specific Success or Error variant fields, not just non-null",
+      "passed": true,
+      "evidence": "Tests use sealed interface MessageParseResult with Success and Error records. Tests assert result.isSuccess()/isError(), then access variant-specific fields: result.getSuccess().messageType(), result.getSuccess().payload().size(), result.getSuccess().sequenceNumber(), result.getError().errorCode(), result.getError().byteOffset(). E.g., RB-001: assertEquals(1, result.getSuccess().messageType())."
+    },
+    {
+      "text": "No test uses only 'assertDoesNotThrow' or 'assertNotNull' as its sole assertion",
+      "passed": true,
+      "evidence": "All tests include specific assertions on error codes, byte offsets, message types, payload sizes, or sequence numbers. While some tests include assertNotNull (e.g., RB-011), it is never the sole assertion - they also check isSuccess(), messageType, etc."
+    },
+    {
+      "text": "Test names describe the scenario being tested, not just the method name",
+      "passed": true,
+      "evidence": "Tests use @DisplayName annotations describing scenarios: 'RB-002: Invalid sync byte 0 returns invalid_sync error at offset 0', 'RB-005: Unsupported version returns unsupported_version error at offset 2', 'EC-003: Minimum valid message (12 bytes: header + checksum) succeeds'. Method names also descriptive: testInvalidSyncByte0, testUnsupportedVersion, testMinimumValidMessage."
+    },
+    {
+      "text": "Happy path test: valid message parsed correctly with verified payload fields",
+      "passed": true,
+      "evidence": "testValidSyncBytes (RB-001): builds a valid message, asserts result.isSuccess() and assertEquals(1, result.getSuccess().messageType()). testLengthFieldMatches (RB-006): verifies payload.size() equals expected payload length. testSequenceNumberExtracted (RB-013): verifies sequenceNumber >= 0."
+    }
+  ],
+  "summary": {"passed": 7, "failed": 1, "total": 8, "pass_rate": 0.875}
+}

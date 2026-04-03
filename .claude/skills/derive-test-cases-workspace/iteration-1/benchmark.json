@@ -1,0 +1,193 @@
+{
+  "metadata": {
+    "skill_name": "derive-test-cases",
+    "skill_path": "/home/stefanus/repos/DoWorkflow/.claude/skills/derive-test-cases",
+    "executor_model": "claude-opus-4-6",
+    "analyzer_model": "claude-opus-4-6",
+    "timestamp": "2026-03-31T21:00:00Z",
+    "evals_run": [1, 2, 3],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "eval_name": "FuelRateLimiter-pytest",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 151.9,
+        "tokens": 29391,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Output includes a coverage matrix mapping design elements to test cases", "passed": true, "evidence": "coverage_matrix.md file present with full design-to-test mapping"},
+        {"text": "Every behavior rule has at least one test", "passed": true, "evidence": "All 4 behavior entries (startup, cruise, emergency, was_clamped) have dedicated tests"},
+        {"text": "Every error_handling entry has a dedicated test", "passed": true, "evidence": "Tests for negative rate, negative elapsed_time, unrecognized mode all present"},
+        {"text": "Boundary values tested for requested_rate", "passed": true, "evidence": "Tests at 0.0, negative, STARTUP_MIN, STARTUP_MAX, CRUISE_MAX boundaries"},
+        {"text": "No assert-does-not-raise as only assertion", "passed": true, "evidence": "Every test has concrete assertions on output values"},
+        {"text": "Test names describe scenarios", "passed": true, "evidence": "Names like test_startup_mode_clamps_below_min, test_cruise_rate_of_change_exceeded"},
+        {"text": "Stateful behavior tested with multiple sequential calls", "passed": true, "evidence": "Multi-call tests verify previous_rate tracking and accumulation"},
+        {"text": "Configuration variants tested with non-default values", "passed": true, "evidence": "All 4 config params tested with non-default values"}
+      ]
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "FuelRateLimiter-pytest",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.875,
+        "passed": 7,
+        "failed": 1,
+        "total": 8,
+        "time_seconds": 82.4,
+        "tokens": 20036,
+        "tool_calls": 3,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Output includes a coverage matrix mapping design elements to test cases", "passed": false, "evidence": "No coverage matrix or traceability mapping in the output"},
+        {"text": "Every behavior rule has at least one test", "passed": true, "evidence": "All behavior rules covered across test classes"},
+        {"text": "Every error_handling entry has a dedicated test", "passed": true, "evidence": "Negative rate, negative elapsed, unrecognized mode all tested"},
+        {"text": "Boundary values tested for requested_rate", "passed": true, "evidence": "Boundary tests present for startup and cruise ranges"},
+        {"text": "No assert-does-not-raise as only assertion", "passed": true, "evidence": "All tests have concrete value assertions"},
+        {"text": "Test names describe scenarios", "passed": true, "evidence": "Descriptive names in test classes with docstrings"},
+        {"text": "Stateful behavior tested with multiple sequential calls", "passed": true, "evidence": "Multi-call rate-of-change and mode transition tests present"},
+        {"text": "Configuration variants tested with non-default values", "passed": true, "evidence": "4 tests with independently varied config parameters"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "MessageParser-JUnit5",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 2,
+        "total": 8,
+        "time_seconds": 162.5,
+        "tokens": 30669,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Output includes a coverage matrix mapping design elements to test cases", "passed": true, "evidence": "coverage_matrix.md with full traceability"},
+        {"text": "Every on_failure path has a dedicated test", "passed": true, "evidence": "Tests for invalid_sync, unsupported_version, length_mismatch, checksum_failed, unknown_type"},
+        {"text": "Every error_handling entry has a dedicated test", "passed": true, "evidence": "Null/empty and too-short tests present"},
+        {"text": "Boundary values tested for raw_data length", "passed": true, "evidence": "Tests at 4, 12, 1024 byte boundaries"},
+        {"text": "Union return type handled with specific variant assertions", "passed": true, "evidence": "Tests assert on Success/Error variant fields"},
+        {"text": "No assertDoesNotThrow or assertNotNull as sole assertion", "passed": false, "evidence": "messageTypeMax test can pass with only assertNotNull as triggered assertion"},
+        {"text": "Test names describe scenarios", "passed": true, "evidence": "Descriptive nested test class and method names"},
+        {"text": "Happy path test with verified payload fields", "passed": false, "evidence": "parsesPayloadIntoMap only checks non-null and non-empty, no specific field values verified"}
+      ]
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "MessageParser-JUnit5",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 2,
+        "total": 8,
+        "time_seconds": 102.4,
+        "tokens": 21213,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Output includes a coverage matrix mapping design elements to test cases", "passed": false, "evidence": "No coverage matrix — purely test code"},
+        {"text": "Every on_failure path has a dedicated test", "passed": true, "evidence": "All error paths covered"},
+        {"text": "Every error_handling entry has a dedicated test", "passed": true, "evidence": "Null/empty and too-short raw_data tests present"},
+        {"text": "Boundary values tested for raw_data length", "passed": false, "evidence": "Tests 4 and 1024 bytes but omits 3-byte and 1025-byte boundary values"},
+        {"text": "Union return type handled with specific variant assertions", "passed": true, "evidence": "Asserts on specific error_code and Success fields"},
+        {"text": "No assertDoesNotThrow or assertNotNull as sole assertion", "passed": true, "evidence": "All tests have specific value assertions"},
+        {"text": "Test names describe scenarios", "passed": true, "evidence": "Descriptive nested class and method names"},
+        {"text": "Happy path test with verified payload fields", "passed": true, "evidence": "Tests verify message_type, sequence_number, and payload contents"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "FuelRateLimiter-Go",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.75,
+        "passed": 6,
+        "failed": 2,
+        "total": 8,
+        "time_seconds": 184.6,
+        "tokens": 34039,
+        "tool_calls": 7,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Output includes a coverage matrix mapping design elements to test cases", "passed": true, "evidence": "coverage_matrix.md with 7 tables mapping design elements to test names"},
+        {"text": "Uses Go table-driven test pattern", "passed": false, "evidence": "37 individual top-level test functions, no []struct slices or range iteration"},
+        {"text": "Rate-of-change has multiple test scenarios with varying elapsed_time_ms", "passed": true, "evidence": "Tests with 0ms, 500ms, 1000ms, 5000ms, 10000ms elapsed times"},
+        {"text": "Stateful behavior tested with multiple sequential calls", "passed": true, "evidence": "5 dedicated tests with sequential calls verifying previous_rate tracking"},
+        {"text": "Every error_handling entry has a dedicated test", "passed": true, "evidence": "Negative rate, negative elapsed_time, unrecognized mode all tested"},
+        {"text": "No panic-only assertions", "passed": true, "evidence": "Every test asserts specific output values"},
+        {"text": "Test names use Go subtest conventions (t.Run)", "passed": false, "evidence": "Zero t.Run calls, all standalone functions"},
+        {"text": "Boundary values tested for rate-of-change elapsed_time_ms", "passed": true, "evidence": "0ms and 10000ms tested"}
+      ]
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "FuelRateLimiter-Go",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.625,
+        "passed": 5,
+        "failed": 3,
+        "total": 8,
+        "time_seconds": 95.0,
+        "tokens": 20750,
+        "tool_calls": 2,
+        "errors": 0
+      },
+      "expectations": [
+        {"text": "Output includes a coverage matrix mapping design elements to test cases", "passed": false, "evidence": "No traceability matrix, only section comment headers"},
+        {"text": "Uses Go table-driven test pattern", "passed": false, "evidence": "All individual top-level functions, no []struct or range"},
+        {"text": "Rate-of-change has multiple test scenarios with varying elapsed_time_ms", "passed": true, "evidence": "Multiple roc tests with different elapsed values"},
+        {"text": "Stateful behavior tested with multiple sequential calls", "passed": true, "evidence": "Multi-call tests for state tracking"},
+        {"text": "Every error_handling entry has a dedicated test", "passed": true, "evidence": "Negative rate, negative elapsed, unrecognized mode tested"},
+        {"text": "No panic-only assertions", "passed": true, "evidence": "All tests have value assertions"},
+        {"text": "Test names use Go subtest conventions (t.Run)", "passed": false, "evidence": "Zero t.Run calls in file"},
+        {"text": "Boundary values tested for rate-of-change elapsed_time_ms", "passed": true, "evidence": "0 and large elapsed values tested"}
+      ]
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 0.833, "stddev": 0.118, "min": 0.75, "max": 1.0},
+      "time_seconds": {"mean": 166.3, "stddev": 13.5, "min": 151.9, "max": 184.6},
+      "tokens": {"mean": 31366, "stddev": 1980, "min": 29391, "max": 34039}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.75, "stddev": 0.102, "min": 0.625, "max": 0.875},
+      "time_seconds": {"mean": 93.3, "stddev": 8.2, "min": 82.4, "max": 102.4},
+      "tokens": {"mean": 20666, "stddev": 482, "min": 20036, "max": 21213}
+    },
+    "delta": {
+      "pass_rate": "+0.083",
+      "time_seconds": "+73.0",
+      "tokens": "+10700"
+    }
+  },
+  "notes": [
+    "Coverage matrix assertion always passes with_skill (3/3) and always fails without_skill (0/3) — this is the most discriminating assertion and a clear skill benefit",
+    "Go table-driven test pattern fails for BOTH configurations — the skill does not specifically instruct Go idioms, improvement opportunity",
+    "Eval 2 (MessageParser) shows identical pass rate (75%) for both configurations but with different failures — skill adds matrix but misses payload verification",
+    "Skill adds ~73s average execution time and ~10.7k tokens per run for a +8.3% pass rate improvement",
+    "Anti-pattern assertions (no assert-does-not-throw) pass in 5/6 runs — one with_skill JUnit5 test had a weak assertNotNull"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": false,
+      "evidence": "No coverage_matrix.md file exists in the without_skill/outputs directory. The test file itself contains no coverage matrix or mapping table."
+    },
+    {
+      "text": "Every behavior rule (startup clamping, cruise rate-of-change, emergency shutdown, was_clamped flag) has at least one test",
+      "passed": true,
+      "evidence": "Startup clamping: TestStartupMode class with test_startup_below_minimum, test_startup_above_maximum, etc. Cruise rate-of-change: TestRateOfChange class with test_roc_increase_exceeds_limit, test_roc_decrease_exceeds_limit, etc. Emergency shutdown: TestEmergencyShutdown with test_emergency_any_requested_rate, test_emergency_zero_requested. was_clamped flag: TestClampingFlag class with test_was_clamped_consistency_when_changed, test_was_clamped_consistency_when_unchanged."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "Negative rate: test_negative_requested_rate and test_negative_requested_rate_startup in TestErrorHandling. Negative elapsed_time: test_negative_elapsed_time_startup and test_negative_elapsed_time_cruise. Unrecognized mode: test_invalid_operational_mode (passes 'invalid_mode' string) and test_invalid_mode_with_none (passes None)."
+    },
+    {
+      "text": "Boundary values tested for requested_rate (0.0, negative, at STARTUP_MIN, at STARTUP_MAX, at CRUISE_MAX)",
+      "passed": true,
+      "evidence": "0.0: test_cruise_zero_rate and test_startup_zero_requested. Negative: test_negative_requested_rate (-10.0). At STARTUP_MIN (10.0): test_startup_at_minimum. At STARTUP_MAX (50.0): test_startup_at_maximum. At CRUISE_MAX (200.0): test_cruise_at_maximum."
+    },
+    {
+      "text": "No test uses 'assert does not raise' or 'assert no exception' as its only assertion",
+      "passed": true,
+      "evidence": "All tests include concrete assertions on actual rate, was_clamped, and/or reason values. No test relies solely on absence-of-exception."
+    },
+    {
+      "text": "Test names describe the scenario being tested, not just the method name",
+      "passed": true,
+      "evidence": "Test names are descriptive: test_startup_below_minimum, test_roc_increase_exceeds_limit, test_emergency_any_requested_rate, test_negative_elapsed_time_cruise, test_mode_transition_startup_to_cruise. None are just test_limit or test_call."
+    },
+    {
+      "text": "Stateful behavior tested: rate-of-change limiting requires multiple sequential calls",
+      "passed": true,
+      "evidence": "TestRateOfChange class uses multiple sequential calls extensively (e.g., test_roc_increase_within_limit sets previous_rate via first call then tests second call). TestStateAndSequencing class has test_previous_rate_updates (3 sequential calls), test_mode_transition_startup_to_cruise (2 calls), test_recovery_after_emergency (3 calls)."
+    },
+    {
+      "text": "Configuration variants tested: at least one test with non-default config values",
+      "passed": true,
+      "evidence": "TestConfiguration class uses limiter_custom fixture with non-default values (startup_min_rate=5.0, startup_max_rate=25.0, cruise_max_rate=100.0, max_rate_change=50.0). Tests: test_custom_startup_min, test_custom_startup_max, test_custom_cruise_max, test_custom_max_rate_change all verify behavior with these non-default values."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 1,
+    "total": 8,
+    "pass_rate": 0.88
+  }
+}

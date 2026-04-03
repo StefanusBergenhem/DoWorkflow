@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": true,
+      "evidence": "coverage_matrix.md exists with detailed tables across 4 strategies: Requirement-Based (10 behavior rules, 13 tests), Equivalence Class (14 classes), Boundary Value (6 constraints), Error Handling (3 explicit + 3 implicit). Includes handoff checklist, anti-pattern review, and design ambiguity resolutions."
+    },
+    {
+      "text": "Uses Go table-driven test pattern ([]struct with test cases iterated via range)",
+      "passed": false,
+      "evidence": "The test file uses individual top-level test functions (TestFuelRateLimiter_StartupModeLowerBound, TestFuelRateLimiter_CruiseModeRateOfChangeViolation, etc.) without using the []struct table-driven pattern. Only TestFuelRateLimiter_ActualRateAlwaysNonNegative uses a table-driven pattern with []struct and t.Run. The majority of tests are standalone functions with inline assertions, not table-driven."
+    },
+    {
+      "text": "Rate-of-change limiting has multiple test scenarios: within limit, exceeding limit, with varying elapsed_time_ms",
+      "passed": true,
+      "evidence": "TestFuelRateLimiter_CruiseModeRateOfChangeWithinLimit (within limit, exactly at boundary with 1000ms), TestFuelRateLimiter_CruiseModeRateOfChangeViolation (exceeding limit with 1000ms), TestFuelRateLimiter_CruiseModeRateOfChangeDecreasing (exceeding limit, decrease direction), TestFuelRateLimiter_CruiseModeShortElapsedTime (varying elapsed: 100ms), TestFuelRateLimiter_CruiseModeZeroElapsedTime (zero elapsed)."
+    },
+    {
+      "text": "Stateful behavior tested: multiple sequential calls to verify previous_rate tracking",
+      "passed": true,
+      "evidence": "TestFuelRateLimiter_StatePreservation makes 3 sequential calls verifying previous_rate tracking (50->100->200 with rate-of-change limiting). TestFuelRateLimiter_StatePreservationOnModeSwitch makes 2 sequential calls across mode switch (startup 40 -> cruise 200, clamped to 140)."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "Negative rate: TestFuelRateLimiter_NegativeRequestedRate tests -10.0, asserts actual=10.0, was_clamped=true, reason=mode_min. Negative elapsed_time: TestFuelRateLimiter_NegativeElapsedTime tests -500ms, asserts actual=100.0 (treated as 0). Unrecognized mode: TestFuelRateLimiter_UnrecognizedMode tests 'unknown_mode' string, asserts actual=0.0, reason=emergency."
+    },
+    {
+      "text": "No test checks only that a function 'does not panic' without asserting output values",
+      "passed": true,
+      "evidence": "Every test includes specific assertions on result.ActualRate, result.WasClamped, and/or result.ClampingReason with concrete expected values. No test uses recover() or only checks for panic absence."
+    },
+    {
+      "text": "Test names describe the scenario being tested using Go subtest naming conventions (t.Run)",
+      "passed": false,
+      "evidence": "Test functions use descriptive top-level names (TestFuelRateLimiter_StartupModeLowerBound, TestFuelRateLimiter_CruiseModeRateOfChangeViolation), which is fine Go convention. However, the assertion specifically requires Go subtest naming via t.Run. Only TestFuelRateLimiter_ActualRateAlwaysNonNegative uses t.Run with subtests. The vast majority of tests are standalone functions without t.Run subtests."
+    },
+    {
+      "text": "Boundary values tested for rate-of-change: elapsed_time_ms = 0, very large elapsed_time_ms",
+      "passed": false,
+      "evidence": "elapsed_time_ms = 0: TestFuelRateLimiter_CruiseModeZeroElapsedTime tests this boundary. Very large elapsed_time_ms: No test uses a very large elapsed_time_ms value. The largest elapsed_time_ms used is 1000ms (1 second) in multiple tests. There is no test with values like 10000ms, 100000ms, or similar large values to test the boundary behavior."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 3,
+    "total": 8,
+    "pass_rate": 0.63
+  }
+}

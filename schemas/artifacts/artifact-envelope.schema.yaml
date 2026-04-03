@@ -139,8 +139,13 @@ content_hash:
 
 # --- File Convention ---
 #
-# Each artifact is stored as one YAML file:
+# Most artifacts are stored as one YAML file:
 #   {artifact_id}.yaml
+#
+# Exception: detailed-design artifacts use Markdown with YAML frontmatter:
+#   {artifact_id}.md
+#   Component designs: CD-001.md, CD-002.md
+#   Unit designs (standalone): DD-017.md, DD-018.md
 #
 # Example: SWREQ-042.yaml
 #
@@ -149,5 +154,7 @@ content_hash:
 #   docs/artifacts/system-requirements/SYSREQ-001.yaml
 #   docs/artifacts/system-test-cases/SYSTEST-001.yaml
 #   docs/artifacts/sw-requirements/SWREQ-042.yaml
+#   docs/artifacts/detailed-design/CD-001.md
+#   docs/artifacts/detailed-design/DD-017.md
 #   docs/artifacts/test-specifications/TS-042-01.yaml
 #   docs/artifacts/review-records/RR-042-001.yaml

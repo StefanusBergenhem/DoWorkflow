@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": false,
+      "evidence": "No coverage matrix file was produced. The test file contains only code with no accompanying coverage matrix document."
+    },
+    {
+      "text": "Every behavior rule (startup clamping, cruise rate-of-change, emergency shutdown, was_clamped flag) has at least one test",
+      "passed": true,
+      "evidence": "Startup clamping: test_startup_below_minimum_clamps_to_min, test_startup_above_maximum_clamps_to_max. Cruise ROC: TestFuelRateLimiterRateOfChange class with 6 tests. Emergency: test_emergency_shutdown_forces_zero_rate. was_clamped: TestFuelRateLimiterInvariant class with 7 tests."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "Negative rate: test_negative_requested_rate_treated_as_zero (line 364). Negative elapsed_time: test_negative_elapsed_time_treated_as_zero (line 375). Unrecognized mode: test_invalid_operational_mode_treated_as_emergency (line 388) using 'invalid_mode' string."
+    },
+    {
+      "text": "Boundary values tested for requested_rate (0.0, negative, at STARTUP_MIN, at STARTUP_MAX, at CRUISE_MAX)",
+      "passed": true,
+      "evidence": "0.0: test_cruise_zero_rate_allowed (line 211). Negative: test_negative_requested_rate_treated_as_zero (line 364). At STARTUP_MIN (10.0): test_startup_at_minimum_boundary (line 163). At STARTUP_MAX (50.0): test_startup_at_maximum_boundary (line 174). At CRUISE_MAX (200.0): test_cruise_at_maximum_boundary (line 222)."
+    },
+    {
+      "text": "No test uses 'assert does not raise' or 'assert no exception' as its only assertion",
+      "passed": true,
+      "evidence": "All tests assert specific values for actual_rate, was_clamped, and reason. No test relies solely on 'does not raise' or 'no exception' patterns."
+    },
+    {
+      "text": "Test names describe the scenario being tested, not just the method name",
+      "passed": true,
+      "evidence": "Test names describe scenarios: test_startup_below_minimum_clamps_to_min, test_cruise_above_maximum_clamps_to_max, test_rate_of_change_increase_within_limit, test_negative_requested_rate_treated_as_zero, test_state_persists_across_mode_transitions."
+    },
+    {
+      "text": "Stateful behavior tested: rate-of-change limiting requires multiple sequential calls",
+      "passed": true,
+      "evidence": "test_rate_of_change_increase_within_limit (line 236): first call sets rate to 50, second call requests 60. test_previous_rate_updated_after_call (line 404): two sequential calls verifying state. test_state_persists_across_mode_transitions (line 413): three sequential calls across mode changes."
+    },
+    {
+      "text": "Configuration variants tested: at least one test with non-default config values",
+      "passed": false,
+      "evidence": "All tests use the default FuelRateLimiter() constructor with hardcoded class constants (STARTUP_MIN_RATE=10.0, STARTUP_MAX_RATE=50.0, CRUISE_MAX_RATE=200.0, MAX_RATE_CHANGE=100.0). No test instantiates with non-default configuration values."
+    }
+  ],
+  "summary": {"passed": 6, "failed": 2, "total": 8, "pass_rate": 0.75}
+}

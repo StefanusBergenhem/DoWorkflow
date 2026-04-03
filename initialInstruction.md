@@ -70,3 +70,20 @@ First off, I called this "skills". But that might not be the complee truth. I kn
 Then on the topic off skills, i think there are actual skills about creating skills/commands/agents. Please look into this also and recommend some for me to install. Also, one specific source of info i want you to look into is this repo: https://github.com/humanlayer/humanlayer/tree/main/.claude . It contains a workflow that seems to be really interesting to take inspiration from
 Then I again, i want to have a seperatation of concern, we have some skills/commands/agents that are speciallised only for the individual topic (build, review, requirements, architecture and so on.) So completely independent of pillar 2, just provide the best practice for the craft itself. Then we have some skills/commands/agents about how to work with Pillar 1 and 2. The final set of skills/commands/agents relates to how we can create the Pillar 1 and 2 artifacts and linking in an already existing repo (my pilot).
 Then there might be other things to think about for this pillar, what are we missing?
+
+we need to reconcider. first off, the skills that we creaet shall follow mgevchev schema. 
+i want to completely drop thoughts of anorchistration pipe for now. first we build individual skills, then in the future we can cocider ocistration again when we have proven the individual in practice.
+We should have pure craft skills. 
+then we have some "pillar1+2 integration skills". those should basically only hold output template, and some info about the framework.  prehaps some custom sctipts that will be related to pillar 2b.
+then we have the repo investegation relaing to how we can create the Pillar 1 and 2 artifacts and linking in an already existing repo. Here i think we can make use of some of the paterns from humalayer.
+
+I think i want to go from bottom up again and start by focusing only on the "craft skills"
+
+To start with the lowest level of the V. Let me tell you what I invision:
+* Skill for deriving testcases. This should contain best practices for deriving testcases as is required by most V model standars. Requirement based testing (or detailed design based testing), interface testing (or eqivlance class), fault injection. Then we also have some agentic things to concider to avoid laziness. "just testing does not throw is not a valid test, you should test actual logic". "dont mock without understanding what you are mocking", and so on.
+* Skill for software development. follow TDD (with the the assumption that requirements exists). Clean code assumptions like (but not limited to) DRY, use coments sparingly, small functions, avoid deep nesting, no hidden control flow or data flow, kiss. Also strict pre-handof checklist. Lint, static code analysis, code coverate/branch coverage, integration tests. No undocumented features, and clear HALT conditions when something goes wrong
+* Code review. Basically a checklist verifying that above is followed and that no weired desitions have been taken, no undocumented features and so n
+* Then we have the schaffolding skill for making sure that the PILLAR 1 and 2 patterns are enforced
+* Then in the layer above there should be individual skills for ceating detailed design. these skills we talk about now should assume that detailed design already exists.
+* Then for agentic orchistration and keeping context window seperate i also want to have anoter skill between detailed design and coding level to basically scope the work (tell which files to touch or not)
+* Finally, we need to concider how many skills are loded at a single time. Too many skills loaded will mean to many instructions and that will mean that instructions get lost. 

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": false,
+      "evidence": "No coverage_matrix.md file exists in the without_skill/outputs directory. The test file itself contains no coverage matrix or mapping table."
+    },
+    {
+      "text": "Uses Go table-driven test pattern ([]struct with test cases iterated via range)",
+      "passed": true,
+      "evidence": "Multiple test functions use the table-driven pattern with []struct and range iteration: TestStartupModeMinimumRate, TestStartupModeMaximumRate, TestStartupModeInRange, TestEmergencyShutdownMode, TestCruiseModeMaximumRate, TestCruiseRateOfChangeIncrease, TestCruiseRateOfChangeDecrease, TestNegativeElapsedTime, TestStatefulBehaviorSequence, TestRateOfChangeWithVariableTimeStep, TestWasClampedInvariant, TestZeroElapsedTime, TestMultipleClampingConstraints."
+    },
+    {
+      "text": "Rate-of-change limiting has multiple test scenarios: within limit, exceeding limit, with varying elapsed_time_ms",
+      "passed": true,
+      "evidence": "TestCruiseRateOfChangeIncrease has 5 subtests including within-limit (51.0 in 100ms), exceeding-limit (60.0 in 100ms), and varying elapsed times (100ms, 500ms, 1000ms). TestCruiseRateOfChangeDecrease has 5 subtests with similar variety. TestRateOfChangeWithVariableTimeStep tests 10ms, 250ms, and 2000ms."
+    },
+    {
+      "text": "Stateful behavior tested: multiple sequential calls to verify previous_rate tracking",
+      "passed": true,
+      "evidence": "TestStatefulBehaviorSequence has two multi-call scenarios: 'Gradual increase in cruise mode' with 4 sequential calls tracking rate changes, and 'Mode transition preserves state' with 3 sequential calls across startup-to-cruise mode switch. Both verify previous_rate tracking across calls."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "Negative rate: TestNegativeRequestedRate tests -5.0, asserts ActualRate=0.0, WasClamped=true, ClampingReason=ModeMinReason. Negative elapsed_time: TestNegativeElapsedTime tests -100ms. Unrecognized mode: TestUnrecognizedMode tests OperationalMode('invalid_mode'), asserts ActualRate=0.0, ClampingReason=EmergencyReason."
+    },
+    {
+      "text": "No test checks only that a function 'does not panic' without asserting output values",
+      "passed": true,
+      "evidence": "All tests assert specific output values (ActualRate, WasClamped, ClampingReason) using t.Errorf. No test uses recover() or checks only for panic absence."
+    },
+    {
+      "text": "Test names describe the scenario being tested using Go subtest naming conventions (t.Run)",
+      "passed": true,
+      "evidence": "Tests use t.Run extensively with descriptive subtest names: 'Below minimum, clamp to min', 'Slow increase within limit (100ms, 10 lph/s max)', 'Fast decrease exceeds limit (100ms)', 'Gradual increase in cruise mode', 'Mode transition preserves state', 'Zero elapsed time allows any increase within mode max'. Top-level test names are also descriptive: TestStartupModeMinimumRate, TestCruiseRateOfChangeIncrease."
+    },
+    {
+      "text": "Boundary values tested for rate-of-change: elapsed_time_ms = 0, very large elapsed_time_ms",
+      "passed": true,
+      "evidence": "elapsed_time_ms = 0: TestZeroElapsedTime tests this boundary with two subtests. Very large elapsed_time_ms: TestRateOfChangeWithVariableTimeStep includes 'Long time step (2000ms, max change = 200.0 lph)' subtest with 2000ms elapsed time, testing how large elapsed time affects the rate-of-change budget."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 1,
+    "total": 8,
+    "pass_rate": 0.88
+  }
+}

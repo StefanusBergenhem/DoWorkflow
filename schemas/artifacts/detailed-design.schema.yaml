@@ -1,280 +1,378 @@
-# Detailed Design Schema
+# Detailed Design — Markdown Format Specification
 #
-# Defines the `body` structure for artifacts of type: detailed-design
+# Defines the conventions for detailed design artifacts written as Markdown.
 #
-# A detailed design describes a single unit (class, function, module)
-# at a level of detail sufficient for implementation and test derivation.
-# It lives inside exactly one architecture component.
+# Detailed designs use Markdown (.md) with YAML frontmatter instead of pure YAML.
+# This makes them readable/editable by humans and assessors while remaining
+# parseable by agents and the traceability engine (Pillar 2).
 #
 # This schema is part of Pillar 1 (V-Model Compliance).
 # It has no dependency on Pillar 2 (Traceability) or Pillar 3 (Agentic Skills).
 
-schema_version: "1.0"
+schema_version: "2.0"
 schema_id: detailed-design
 
-fields:
+file_format: markdown    # .md files with YAML frontmatter
+previous_version: "1.0"  # was pure YAML; migrated to markdown for human/assessor usability
 
-  title:
-    type: string
-    required: true
-    description: "Short descriptive name for this unit design"
+# =============================================================================
+# DESIGN LAYERS
+# =============================================================================
+#
+# Detailed design uses an additive layering model. Higher layers build on lower
+# layers — you never skip a layer.
+#
+#   Layer 1 — Component Design (always present)
+#     The map. Purpose, external interfaces, unit inventory, shared patterns.
+#     Sufficient for QM / ASIL A / IEC 62304 Class A.
+#
+#   Layer 2 — Unit Interface Contracts (added per unit as needed)
+#     Per-unit interfaces, behavior rules, error handling.
+#     Required for ASIL A-B / IEC 62304 Class B / DO-178C DAL D-E.
+#
+#   Layer 3 — Deep Design Evidence (added for critical/complex units)
+#     Rationale, state machines, concurrency model, negative requirements.
+#     Required for ASIL C-D / DO-178C DAL A-C / IEC 62304 Class C.
+#
+# Layer 2/3 units can be embedded in the component document or split into
+# separate files — the choice is based on practical document size.
 
-  description:
+# =============================================================================
+# FRONTMATTER (YAML between --- delimiters)
+# =============================================================================
+
+frontmatter:
+
+  # --- Required for all documents ---
+
+  artifact_id:
     type: string
     required: true
     description: >
-      What this unit does and why it exists. Should give a reader enough
-      context to understand the purpose without reading the full behavior
-      section.
-
-  unit_id:
-    type: string
-    required: true
-    description: >
-      Logical identifier for the unit being designed. Language-agnostic —
-      could map to a class name, function name, module name, etc.
-      Must be unique within its component.
+      Human-readable identifier. Component designs: CD-nnn.
+      Unit designs (when separate): DD-nnn.
+    pattern: "^(CD|DD)-\\d{3,}$"
     examples:
-      - "FuelRateLimiter"
-      - "SensorDataParser"
-      - "RateLimitRetryHandler"
+      - "CD-001"
+      - "DD-017"
+
+  artifact_type:
+    type: string
+    required: true
+    value: "detailed-design"
+
+  version:
+    type: string
+    required: true
+    pattern: "^\\d+\\.\\d+\\.\\d+$"
+
+  status:
+    type: enum
+    required: true
+    values: [draft, in_review, approved, baselined, superseded]
 
   component:
     type: string
     required: true
     description: >
-      Which architecture component this unit belongs to. References a
-      component defined in an sw-architecture artifact. A unit belongs
-      to exactly one component.
+      Which architecture component this document covers.
+      References a component id from an sw-architecture artifact.
     examples:
       - "fuel-control"
-      - "sensor-interface"
-      - "external-api-client"
+      - "comm-protocol"
 
-  responsibilities:
+  layer:
+    type: integer
+    required: true
+    values: [1, 2, 3]
+    description: >
+      Highest layer present in this document. A Layer 3 document
+      implicitly includes Layer 1 and 2 content.
+
+  trace_from:
     type: list<string>
     required: true
     description: >
-      What this unit is responsible for. Each entry is one discrete
-      responsibility. Together they form the unit's contract — what it
-      must do, and implicitly what it must NOT do (anything not listed).
-    min_items: 1
+      Artifact IDs this design traces from (architecture requirements,
+      SW requirements). Enables Pillar 2 traceability.
+    examples:
+      - ["ARCH-004", "ARCH-005"]
 
-  interfaces:
-    type: object
-    required: true
-    description: >
-      The unit's boundary — what goes in and what comes out.
-      Defines the testable surface.
+  # --- Required for separate unit documents (DD-nnn) ---
 
-    fields:
-
-      inputs:
-        type: list<object>
-        required: true
-        description: "Data the unit receives"
-        item_fields:
-          name:
-            type: string
-            required: true
-          type:
-            type: string
-            required: true
-            description: "Language-agnostic type (float, integer, string, boolean, enum, byte_array, object, union, list, map)"
-          unit:
-            type: string
-            required: false
-            description: "Physical or logical unit of measure (e.g., liters_per_hour, celsius, milliseconds)"
-          constraints:
-            type: string
-            required: false
-            description: "Value constraints (e.g., '>= 0.0', 'length 0..1024')"
-          values:
-            type: list<string>
-            required: false
-            description: "Allowed values for enum types"
-          description:
-            type: string
-            required: false
-
-      outputs:
-        type: list<object>
-        required: true
-        description: "Data the unit produces"
-        item_fields:
-          name:
-            type: string
-            required: true
-          type:
-            type: string
-            required: true
-          unit:
-            type: string
-            required: false
-          constraints:
-            type: string
-            required: false
-          values:
-            type: list<string>
-            required: false
-          variants:
-            type: list<object>
-            required: false
-            description: >
-              For union types — the possible shapes of the output.
-              Each variant has a name and its own fields.
-            item_fields:
-              name:
-                type: string
-                required: true
-              fields:
-                type: list<object>
-                required: true
-                item_fields:
-                  name:
-                    type: string
-                    required: true
-                  type:
-                    type: string
-                    required: true
-                  unit:
-                    type: string
-                    required: false
-          description:
-            type: string
-            required: false
-
-  behavior:
-    type: list<object>
-    required: true
-    description: >
-      How the unit transforms inputs to outputs. Each entry describes
-      one rule, condition, or processing step. Together they form both
-      the implementation guide and the source for test case derivation.
-      Can be structured as condition/result pairs, sequential steps,
-      or a mix of both.
-    item_fields:
-      condition:
-        type: string
-        required: false
-        description: "When this rule applies (e.g., 'operational_mode is startup')"
-      step:
-        type: string
-        required: false
-        description: "A processing step to execute (for sequential algorithms)"
-      steps:
-        type: list<string>
-        required: false
-        description: "Multiple sequential steps under one condition"
-      rule:
-        type: string
-        required: false
-        description: "General behavioral rule (when condition/step structure doesn't fit)"
-      on_failure:
-        type: string
-        required: false
-        description: "What to do if this step fails"
-    # At least one of condition, step, steps, or rule must be present per entry
-
-  error_handling:
-    type: list<object>
-    required: true
-    description: >
-      Explicit handling for error conditions and edge cases.
-      Every foreseeable failure mode should be listed. If the unit
-      has no error cases, state that explicitly with a single entry.
-    min_items: 1
-    item_fields:
-      condition:
-        type: string
-        required: true
-        description: "The error condition (e.g., 'requested_rate is negative')"
-      behavior:
-        type: string
-        required: true
-        description: "What the unit does in response"
-
-  # --- Optional Fields ---
-
-  internal_state:
-    type: list<object>
-    required: false
-    description: >
-      State retained between invocations. Only present for stateful units.
-      Omit entirely for stateless units.
-    item_fields:
-      name:
-        type: string
-        required: true
-      type:
-        type: string
-        required: true
-      description:
-        type: string
-        required: true
-
-  configuration:
-    type: list<object>
-    required: false
-    description: >
-      Configurable parameters that affect behavior but are not per-call
-      inputs. These are set at initialization or deployment time.
-    item_fields:
-      name:
-        type: string
-        required: true
-      type:
-        type: string
-        required: true
-      unit:
-        type: string
-        required: false
-      default:
-        type: any
-        required: false
-        description: "Default value if not explicitly configured"
-      description:
-        type: string
-        required: false
-
-  realization:
-    type: object
-    required: false
-    description: >
-      Points to where this design is realized in code and tests.
-      Provides a quick "where did this end up?" without duplicating
-      Pillar 2 traceability. Detailed mappings (which test verifies
-      which behavior, tool output links) belong in Pillar 2 trace files.
-    fields:
-      source_files:
-        type: list<string>
-        required: false
-        description: >
-          Paths to source files that implement this design, relative
-          to the project root.
-        examples:
-          - "src/main/java/com/example/fuel/FuelRateLimiter.java"
-      test_files:
-        type: list<string>
-        required: false
-        description: >
-          Paths to test files that verify this design, relative
-          to the project root.
-        examples:
-          - "src/test/java/com/example/fuel/FuelRateLimiterTest.java"
-
-  constraints:
-    type: list<string>
-    required: false
-    description: >
-      Non-functional requirements and design constraints that apply to
-      this unit. These are verifiable during review (e.g., 'must be
-      stateless', 'must be thread-safe', 'must execute in constant time').
-
-  notes:
+  unit_id:
     type: string
     required: false
     description: >
-      Free-form additional context. Use for information that doesn't
-      fit elsewhere — references to external documents, historical
-      context, known limitations, etc.
+      Required when this is a standalone unit design document (DD-nnn).
+      Not present on component-level documents (CD-nnn) — those list
+      units in the Unit Inventory section.
+    examples:
+      - "FuelRateLimiter"
+      - "MessageParser"
+
+  # --- Optional ---
+
+  assurance_level:
+    type: integer
+    required: false
+    range: 1-5
+    description: "1 = highest rigor (DAL A / ASIL D), 5 = lowest (DAL E / QM)"
+
+# =============================================================================
+# DOCUMENT STRUCTURE — LAYER 1 (Component Design)
+# =============================================================================
+#
+# Required headings for every detailed design document.
+
+layer_1:
+  description: >
+    Component-level design. The map of what exists, why, and how
+    it connects. Always present regardless of criticality level.
+
+  required_headings:
+
+    - heading: "# {Component Name}"
+      description: "Document title — the component's human-readable name"
+
+    - heading: "## Purpose"
+      content: >
+        What this component does and why it exists in the architecture.
+        Should answer: if this component were deleted, what would break?
+        1-3 paragraphs. Not a restatement of the architecture description —
+        focus on this component's specific role and responsibilities.
+
+    - heading: "## External Interfaces"
+      content: >
+        How this component communicates with OTHER components. Not internal
+        unit-to-unit interfaces — those go in Layer 2. This is the component's
+        boundary as seen from the outside.
+      format: table
+      columns: [Direction, Partner Component, Mechanism, Data, Description]
+      example_row: "| Provides | engine-control | function call | FuelRate | Computed fuel rate after clamping |"
+
+    - heading: "## Unit Inventory"
+      content: >
+        All units in this component listed with their design layer.
+        This is the table of contents for the component's internals.
+        Every unit must appear here — even trivial ones.
+      format: table
+      columns: [Unit ID, Layer, Brief Description]
+      example_row: "| FuelRateLimiter | 2 | Clamps fuel rate to mode-specific bounds |"
+
+    - heading: "## Shared Patterns"
+      content: >
+        Design decisions that apply across multiple units in this component.
+        Document these ONCE here rather than repeating in every unit.
+        Typical shared patterns include:
+        - Error strategy: How do units in this component report errors?
+          (exceptions, result types, error codes, logging)
+        - Threading model: Single-threaded? Thread-per-request? Shared state?
+        - Resource management: Who owns lifecycle of shared resources?
+        - Naming conventions: Domain-specific naming rules if any.
+        - Common data types: Shared enums, structs, or value objects.
+        If a unit deviates from a shared pattern, document the deviation
+        in that unit's section, not here.
+
+    - heading: "## Constraints"
+      content: >
+        Non-functional requirements that apply to the component as a whole.
+        Performance budgets, memory limits, certification requirements,
+        deployment constraints. Only component-wide constraints — unit-specific
+        constraints go in the unit's section.
+
+# =============================================================================
+# DOCUMENT STRUCTURE — LAYER 2 (Unit Interface Contracts)
+# =============================================================================
+#
+# Added per unit. Can appear as sections within the component document
+# or as separate DD-nnn.md files that reference the component document.
+
+layer_2:
+  description: >
+    Per-unit design: interfaces, behavior rules, error handling.
+    The level of detail from which unit tests can be derived.
+
+  embedding_rules: >
+    Layer 2 content can be embedded in the component document (under a
+    ## {Unit Name} heading) or split into a separate DD-nnn.md file.
+    Use embedded when the component has few units or units are small.
+    Use separate files when units are complex enough to warrant their
+    own document. Both are equally valid for compliance.
+
+  required_headings:
+    # When embedded: use ### headings under ## {Unit Name}
+    # When separate: use ## headings (the unit name is the document title)
+
+    - heading: "## {Unit Name}"
+      description: >
+        When embedded in component doc. Includes unit_id in parentheses
+        after the name for traceability: ## Fuel Rate Limiter (FuelRateLimiter)
+
+    - heading: "### Purpose"
+      content: >
+        What this specific unit does. 1-2 sentences. Should be clear
+        enough that someone can decide whether a given code change
+        belongs in this unit or not.
+
+    - heading: "### Interfaces"
+      content: >
+        The unit's inputs and outputs with full type information.
+        This is the testable surface — every input/output here must
+        appear in at least one test case.
+
+      subheadings:
+        - heading: "#### Inputs"
+          format: table
+          columns: [ID, Name, Type, Unit, Constraints, Description]
+          id_convention: "I{n} — e.g., I1, I2, I3"
+          notes: >
+            Type uses language-agnostic names: float, integer, string,
+            boolean, enum, byte_array, object, list, map.
+            Constraints column: valid ranges, lengths, allowed values.
+            For enums, list values in Constraints column.
+
+        - heading: "#### Outputs"
+          format: table
+          columns: [ID, Name, Type, Unit, Constraints, Description]
+          id_convention: "O{n} — e.g., O1, O2, O3"
+          notes: >
+            For union/variant outputs, add a row per variant and note
+            the variant name in Description.
+
+    - heading: "### Behavior"
+      content: >
+        How the unit transforms inputs to outputs. Each row is one
+        testable rule. Together these form both the implementation
+        guide and the test derivation source.
+      format: table
+      columns: [ID, Condition, Result]
+      id_convention: "B{n} — e.g., B1, B2, B3"
+      notes: >
+        Condition: When this rule applies (or "always" / "default").
+        Result: What the unit produces. Be specific enough to write
+        an assertion against. "Returns error" is too vague.
+        "Returns error_code INVALID_INPUT with byte_offset 0" is testable.
+        For sequential algorithms, number the steps and use Condition
+        to indicate ordering: "after B1", "after B2 succeeds".
+
+    - heading: "### Error Handling"
+      content: >
+        Every foreseeable error condition and the unit's response.
+        If the unit truly has no error cases, state that explicitly
+        with a single row.
+      format: table
+      columns: [ID, Condition, Response]
+      id_convention: "E{n} — e.g., E1, E2, E3"
+
+    - heading: "### Configuration"
+      required: false
+      content: >
+        Parameters set at initialization/deployment time that affect
+        behavior. Only present if the unit has configurable parameters.
+      format: table
+      columns: [Name, Type, Default, Description]
+
+    - heading: "### Internal State"
+      required: false
+      content: >
+        State retained between invocations. Only present for stateful
+        units. Omit entirely for stateless units.
+      format: table
+      columns: [Name, Type, Description]
+
+    - heading: "### Constraints"
+      required: false
+      content: >
+        Unit-specific non-functional requirements (thread-safety, timing,
+        memory, determinism). Only constraints specific to THIS unit —
+        component-wide constraints are in the Layer 1 section.
+
+# =============================================================================
+# DOCUMENT STRUCTURE — LAYER 3 (Deep Design Evidence)
+# =============================================================================
+
+layer_3:
+  description: >
+    Additional design evidence for safety-critical or high-complexity units.
+    Adds rationale, semi-formal notation, concurrency details, and
+    explicit negative requirements. Required for ASIL C-D / DAL A-C.
+
+  required_headings:
+
+    - heading: "### Design Rationale"
+      content: >
+        WHY this design, not just WHAT it is. For each significant
+        decision: what was decided, what alternatives were considered,
+        and why this approach was chosen. This is what separates design
+        from code paraphrase.
+      format: table_or_prose
+      columns: [Decision, Alternatives Considered, Justification]
+
+    - heading: "### Dynamic Behavior"
+      required: false
+      content: >
+        State machines, sequence diagrams, timing diagrams for units
+        with complex runtime behavior. Use Mermaid or PlantUML code
+        blocks. Only needed when behavior table alone doesn't capture
+        the temporal/state aspects.
+      format: "mermaid or plantuml code block"
+
+    - heading: "### Concurrency Model"
+      required: false
+      content: >
+        Thread-safety guarantees, synchronization mechanisms, shared
+        state access patterns, reentrancy properties. Required when
+        the unit may be accessed from multiple threads or contexts.
+      fields:
+        - thread_safety: "none | immutable | synchronized | lock-free"
+        - shared_state: "list of shared state variables and their protection"
+        - synchronization: "mechanisms used (mutexes, atomics, message passing)"
+
+    - heading: "### Negative Requirements"
+      required: false
+      content: >
+        What this unit explicitly must NOT do. Boundaries that
+        prevent scope creep and clarify responsibility splits.
+        Examples: "Must not allocate heap memory", "Must not
+        perform I/O", "Must not modify input parameters".
+      format: "bulleted list"
+
+# =============================================================================
+# TRACEABILITY ID CONVENTIONS
+# =============================================================================
+
+traceability:
+  description: >
+    Every table row has an ID column. These IDs enable fine-grained
+    traceability between design elements and test cases / code.
+
+  id_format:
+    component_design: "CD-{nnn}"
+    unit_design: "DD-{nnn}"
+    input: "I{n}"
+    output: "O{n}"
+    behavior: "B{n}"
+    error: "E{n}"
+
+  trace_references: >
+    Use dot notation to reference specific elements:
+      DD-001.B3 → Behavior rule 3 in design DD-001
+      DD-001.E1 → Error handling rule 1
+      CD-001.FuelRateLimiter.B3 → When unit is embedded in component doc
+    These references are used by Pillar 2 trace links and test case mappings.
+
+# =============================================================================
+# FILE CONVENTIONS
+# =============================================================================
+
+file_convention:
+  extension: ".md"
+  naming:
+    component_design: "{artifact_id}.md (e.g., CD-001.md)"
+    unit_design: "{artifact_id}.md (e.g., DD-017.md)"
+  organization: "docs/artifacts/detailed-design/"
+  note: >
+    When units are embedded in the component document, no separate
+    DD-nnn.md files are needed. The component document (CD-nnn.md)
+    contains all layers for all its units.

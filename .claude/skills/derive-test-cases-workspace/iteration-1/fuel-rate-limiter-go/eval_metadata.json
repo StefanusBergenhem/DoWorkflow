@@ -1,0 +1,15 @@
+{
+  "eval_id": 3,
+  "eval_name": "fuel-rate-limiter-go",
+  "prompt": "Write test cases for the FuelRateLimiter from the design in evals/files/fuel-rate-limiter-design.yaml. Use Go with the standard testing package. Focus especially on the rate-of-change limiting in cruise mode and the stateful behavior.",
+  "assertions": [
+    "Output includes a coverage matrix mapping design elements to test cases",
+    "Uses Go table-driven test pattern ([]struct with test cases iterated via range)",
+    "Rate-of-change limiting has multiple test scenarios: within limit, exceeding limit, with varying elapsed_time_ms",
+    "Stateful behavior tested: multiple sequential calls to verify previous_rate tracking",
+    "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+    "No test checks only that a function 'does not panic' without asserting output values",
+    "Test names describe the scenario being tested using Go subtest naming conventions (t.Run)",
+    "Boundary values tested for rate-of-change: elapsed_time_ms = 0, very large elapsed_time_ms"
+  ]
+}

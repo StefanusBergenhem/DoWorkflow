@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": false,
+      "evidence": "The file contains no coverage matrix, traceability table, or mapping of design elements to test cases. There are only class/test docstrings grouping tests by topic, but no explicit matrix artifact."
+    },
+    {
+      "text": "Every behavior rule (startup clamping, cruise rate-of-change, emergency shutdown, was_clamped flag) has at least one test",
+      "passed": true,
+      "evidence": "Startup clamping: TestStartupMode (lines 129-165) with min/max clamping tests. Cruise rate-of-change: TestRateOfChangeLimiting (lines 203-258) with multiple ROC tests. Emergency shutdown: TestEmergencyShutdownMode (lines 264-287). was_clamped flag: TestWasClampedFlag (lines 327-342)."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "Negative rate: test_negative_requested_rate_treated_as_zero (line 296) and test_negative_requested_rate_in_startup_clamped_to_min (line 301). Negative elapsed_time: test_negative_elapsed_time_skips_roc (line 308). Unrecognized mode: test_unrecognised_mode_treated_as_emergency (line 315)."
+    },
+    {
+      "text": "Boundary values tested for requested_rate (0.0, negative, at STARTUP_MIN, at STARTUP_MAX, at CRUISE_MAX)",
+      "passed": true,
+      "evidence": "0.0: test_rate_zero_clamped_to_minimum (line 160), test_rate_at_zero_passes_through (line 180). Negative: test_negative_requested_rate_treated_as_zero (line 296). At STARTUP_MIN (10.0): test_rate_at_minimum_boundary (line 138). At STARTUP_MAX (50.0): test_rate_at_maximum_boundary (line 143). At CRUISE_MAX (200.0): test_rate_at_maximum_boundary in TestCruiseMode (line 185)."
+    },
+    {
+      "text": "No test uses 'assert does not raise' or 'assert no exception' as its only assertion",
+      "passed": true,
+      "evidence": "Every test in the file asserts on concrete values (actual_rate, was_clamped, clamping_reason). No test uses 'assert does not raise', 'assert no exception', or pytest.raises as its only assertion."
+    },
+    {
+      "text": "Test names describe the scenario being tested, not just the method name",
+      "passed": true,
+      "evidence": "Test names are descriptive scenarios: test_rate_below_minimum_is_clamped_up, test_large_increase_is_limited, test_negative_requested_rate_treated_as_zero, test_emergency_resets_previous_rate_to_zero, test_roc_across_multiple_steps, etc. No test is named after a method like 'test_limit'."
+    },
+    {
+      "text": "Stateful behavior tested: rate-of-change limiting requires multiple sequential calls",
+      "passed": true,
+      "evidence": "test_roc_across_multiple_steps (line 231) makes two sequential calls verifying ramp-up behavior. test_decrease_rate_of_change_limited (line 221) first sets previous_rate to 100 then tests decrease. test_roc_with_zero_elapsed_time (line 249) establishes a rate then tests with 0ms elapsed. TestInternalState (line 368) verifies previous_rate tracking across calls."
+    },
+    {
+      "text": "Configuration variants tested: at least one test with non-default config values",
+      "passed": true,
+      "evidence": "TestCustomConfiguration class (lines 387-413) has four tests with non-default configs: custom startup_min_rate=20.0, startup_max_rate=30.0, cruise_max_rate=150.0, and max_rate_change=50.0."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 1,
+    "total": 8,
+    "pass_rate": 0.88
+  }
+}

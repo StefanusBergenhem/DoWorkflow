@@ -1,0 +1,15 @@
+{
+  "eval_id": 1,
+  "eval_name": "fuel-rate-limiter-pytest",
+  "prompt": "Derive test cases for the FuelRateLimiter unit. The detailed design is in evals/files/fuel-rate-limiter-design.yaml. Use Python with pytest.",
+  "assertions": [
+    "Output includes a coverage matrix mapping design elements to test cases",
+    "Every behavior rule (startup clamping, cruise rate-of-change, emergency shutdown, was_clamped flag) has at least one test",
+    "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+    "Boundary values tested for requested_rate (0.0, negative, at STARTUP_MIN, at STARTUP_MAX, at CRUISE_MAX)",
+    "No test uses 'assert does not raise' or 'assert no exception' as its only assertion",
+    "Test names describe the scenario being tested, not just the method name",
+    "Stateful behavior tested: rate-of-change limiting requires multiple sequential calls",
+    "Configuration variants tested: at least one test with non-default config values"
+  ]
+}

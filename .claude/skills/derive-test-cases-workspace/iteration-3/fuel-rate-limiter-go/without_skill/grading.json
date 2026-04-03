@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": false,
+      "evidence": "No coverage matrix file was produced. The test file contains only Go test code with no accompanying coverage matrix document."
+    },
+    {
+      "text": "Uses Go table-driven test pattern ([]struct with test cases iterated via range)",
+      "passed": true,
+      "evidence": "TestWasClampedInvariant (line 334) uses '[]struct{ name string; mode OperationalMode; requested float64; elapsedMs int; expectedClamped bool }' with 'for _, tc := range tests' and t.Run(tc.name, ...). TestActualRateWithinOutputConstraints (line 455) uses '[]struct{ name string; mode OperationalMode; requested float64 }' with range and t.Run."
+    },
+    {
+      "text": "Rate-of-change limiting has multiple test scenarios: within limit, exceeding limit, with varying elapsed_time_ms",
+      "passed": true,
+      "evidence": "Exceeding limit: TestCruiseModeRateOfChangeLimit (line 104, delta=50, allowed=10). Within limit: TestCruiseModeRateOfChangeWithinLimit (line 156, delta=5, allowed=10). Varying elapsed_time_ms: TestCruiseModeRateOfChangeZeroTime (line 208, 0ms), TestCruiseModeRateOfChangeWithLongerElapsedTime (line 182, 1000ms), TestRateOfChangeCalcSmallValues (line 481, 1ms)."
+    },
+    {
+      "text": "Stateful behavior tested: multiple sequential calls to verify previous_rate tracking",
+      "passed": true,
+      "evidence": "TestMultipleCallsPreservePreviousRate (line 368): four sequential calls verifying state chain (100 -> 105 -> 115 -> 125). TestModeSwitch (line 399): two calls across modes. TestCruiseZeroToMax (line 436): two sequential calls from 0 to 200."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "Negative rate: TestNegativeRequestedRate (line 273). Negative elapsed_time: TestNegativeElapsedTime (line 290). Unrecognized mode: TestUnrecognizedMode (line 316) using OperationalMode(999)."
+    },
+    {
+      "text": "No test checks only that a function 'does not panic' without asserting output values",
+      "passed": true,
+      "evidence": "All tests assert specific output values for actualRate, wasClamped, and reason using t.Errorf/t.Fatalf. No test uses recover() or checks only for panics."
+    },
+    {
+      "text": "Test names describe the scenario being tested using Go subtest naming conventions (t.Run)",
+      "passed": true,
+      "evidence": "TestWasClampedInvariant uses t.Run with descriptive names: 'startup no clamp', 'startup min clamp', 'startup max clamp', 'cruise no clamp', 'cruise max clamp', 'emergency'. TestActualRateWithinOutputConstraints uses t.Run with: 'startup max is < 500', 'cruise max is < 500', 'emergency is 0'. Top-level test function names are also descriptive."
+    },
+    {
+      "text": "Boundary values tested for rate-of-change: elapsed_time_ms = 0, very large elapsed_time_ms",
+      "passed": false,
+      "evidence": "elapsed_time_ms = 0: TestCruiseModeRateOfChangeZeroTime (line 208) tests with 0ms. However, there is no test with a very large elapsed_time_ms value. TestCruiseModeRateOfChangeWithLongerElapsedTime uses 1000ms which is moderate, not 'very large'. TestRateOfChangeCalcSmallValues uses 1ms (small, not large). No test uses values like 10000ms or higher to represent a very large elapsed time boundary."
+    }
+  ],
+  "summary": {"passed": 5, "failed": 3, "total": 8, "pass_rate": 0.625}
+}

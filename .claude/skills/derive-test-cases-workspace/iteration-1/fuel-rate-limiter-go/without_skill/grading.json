@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": false,
+      "evidence": "The file contains only Go test functions. There is no coverage matrix, traceability table, or any mapping of design elements to test cases anywhere in the file — only section comment headers like '// Startup mode tests' and '// Cruise mode tests'."
+    },
+    {
+      "text": "Uses Go table-driven test pattern ([]struct with test cases iterated via range)",
+      "passed": false,
+      "evidence": "No table-driven tests exist in the file. All tests are individual functions (e.g., TestStartup_RequestWithinBounds, TestCruise_RateOfChangeUpwardClamped). There are no []struct definitions or range loops over test case slices."
+    },
+    {
+      "text": "Rate-of-change limiting has multiple test scenarios: within limit, exceeding limit, with varying elapsed_time_ms",
+      "passed": true,
+      "evidence": "Multiple rate-of-change scenarios exist: TestCruise_RateOfChangeUpwardClamped (exceeding, 500ms), TestCruise_RateOfChangeDownwardClamped (exceeding downward, 500ms), TestCruise_RateOfChangeExactlyAtLimit (within/at limit, 1000ms), TestCruise_RateOfChangeWithSmallElapsedTime (exceeding, 10ms), TestCruise_MultipleCallsGradualRampUp (500ms intervals). Multiple elapsed_time_ms values used: 10, 500, 1000, 10000."
+    },
+    {
+      "text": "Stateful behavior tested: multiple sequential calls to verify previous_rate tracking",
+      "passed": true,
+      "evidence": "Dedicated stateful tests exist: TestState_PreviousRateInitiallyZero, TestState_PreviousRateUpdatesAfterClamping (verifies clamped output becomes next previous_rate), TestState_PreviousRateUpdatesAcrossModeSwitch (startup->cruise carry), TestState_EmergencySetsRateToZero (emergency resets then cruise resumes). Also TestCruise_MultipleCallsGradualRampUp makes 4 sequential calls verifying ramp from 0->50->100->150->200."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "TestErrorHandling_NegativeRequestedRate (line 329), TestErrorHandling_NegativeElapsedTime (line 344), TestErrorHandling_UnrecognizedMode (line 357). Additionally TestErrorHandling_EmptyMode covers empty string as mode. All three required error categories have dedicated tests."
+    },
+    {
+      "text": "No test checks only that a function 'does not panic' without asserting output values",
+      "passed": true,
+      "evidence": "Every test function in the file asserts specific output values (ActualRate, WasClamped, ClampingReason) using almostEqual comparisons or direct boolean/string checks. No test uses recover() or merely checks for panic absence without value assertions."
+    },
+    {
+      "text": "Test names describe the scenario being tested using Go subtest naming conventions (t.Run)",
+      "passed": false,
+      "evidence": "Test names are descriptive (e.g., TestStartup_RequestBelowMinimum, TestCruise_RateOfChangeUpwardClamped), but they use top-level test functions, NOT t.Run subtests. There are zero calls to t.Run anywhere in the file."
+    },
+    {
+      "text": "Boundary values tested for rate-of-change: elapsed_time_ms = 0, very large elapsed_time_ms",
+      "passed": true,
+      "evidence": "TestEdge_ZeroElapsedTimeInCruise (line 451) tests elapsed_time_ms = 0, verifying actual_rate is clamped to 0 with rate_of_change reason. TestEdge_VeryLargeElapsedTime (line 468) tests elapsed_time_ms = 1000000, verifying rate-of-change limit is effectively removed."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 3,
+    "total": 8,
+    "pass_rate": 0.63
+  }
+}

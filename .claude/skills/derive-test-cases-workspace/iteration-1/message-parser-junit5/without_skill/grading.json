@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": false,
+      "evidence": "No coverage matrix, traceability table, or structured mapping of design elements to test cases exists anywhere in the file. The file contains only test code organized in @Nested classes with no matrix or mapping artifact."
+    },
+    {
+      "text": "Every sequential behavior step's on_failure path has a dedicated test (invalid_sync, unsupported_version, length_mismatch, checksum_failed, unknown_type)",
+      "passed": true,
+      "evidence": "invalid_sync: tested at lines 109, 119, 176, 189, 202. unsupported_version: tested at lines 239, 251, 264. length_mismatch: tested at lines 138, 298, 314. checksum_failed: tested at lines 351, 367. unknown_type: tested at line 401. All five on_failure paths have dedicated tests asserting the specific ErrorCode."
+    },
+    {
+      "text": "Every error_handling entry (null/empty raw_data, too-short raw_data) has a dedicated test",
+      "passed": true,
+      "evidence": "null input: line 109 (nullInput_returnsInvalidSync). empty input: line 119 (emptyInput_returnsInvalidSync). too-short input: line 138 (tooShort_returnsLengthMismatch, uses 11-byte array below the 12-byte minimum). All three error_handling entries are covered."
+    },
+    {
+      "text": "Boundary values tested for raw_data length (4 bytes minimum, 1024 bytes maximum, 3 bytes too short, 1025 bytes too long)",
+      "passed": false,
+      "evidence": "4 bytes: tested at line 577 (fourBytes_belowMinimumFrame_returnsError). 1024 bytes: tested at line 589 (maxInputSize_withValidFraming_isAccepted). However, there is no test for exactly 3 bytes (too short boundary) and no test for 1025 bytes (too long boundary). The too-short tests use 11 bytes (line 138) and 1 byte (line 570), missing the specific 3-byte boundary. The over-max boundary of 1025 bytes is entirely absent."
+    },
+    {
+      "text": "Union return type handled: tests assert on specific Success or Error variant fields, not just non-null",
+      "passed": true,
+      "evidence": "Tests consistently call result.isError()/result.isSuccess() to discriminate the union, then access variant-specific fields: result.getError().getErrorCode(), result.getError().getByteOffset() for Error; result.getSuccess().getMessageType(), result.getSuccess().getSequenceNumber(), result.getSuccess().getPayload() for Success. Assertions check specific field values (e.g., assertEquals(ErrorCode.INVALID_SYNC, ...), assertEquals(messageType & 0xFF, ...))."
+    },
+    {
+      "text": "No test uses only 'assertDoesNotThrow' or 'assertNotNull' as its sole assertion",
+      "passed": true,
+      "evidence": "assertDoesNotThrow is never used in the file. assertNotNull appears only once at line 453 (validMessage_returnsPayloadMap), but that test also contains assertTrue(result.isSuccess()) at line 452, so assertNotNull is not the sole assertion. Every other test uses assertEquals, assertTrue, or assertNotEquals with substantive checks."
+    },
+    {
+      "text": "Test names describe the scenario being tested, not just the method name",
+      "passed": true,
+      "evidence": "All test method names follow a scenario_expectedOutcome pattern: nullInput_returnsInvalidSync, wrongFirstSyncByte_returnsInvalidSync, versionZero_returnsUnsupportedVersion, corruptedChecksum_returnsChecksumFailed, validMessage_returnsCorrectMessageType, errorThenSuccess_noStateLeakage, etc. Additionally, @DisplayName annotations provide human-readable descriptions. No test is named after just the method under test."
+    },
+    {
+      "text": "Happy path test: valid message parsed correctly with verified payload fields",
+      "passed": true,
+      "evidence": "validMessage_returnsCorrectMessageType (line 423): builds message with type 0x01 and seq 42, asserts result.isSuccess() and assertEquals(messageType & 0xFF, result.getSuccess().getMessageType()). validMessage_returnsCorrectSequenceNumber (line 435): asserts assertEquals(12345, result.getSuccess().getSequenceNumber()). zeroLengthPayload_producesEmptyMap (line 483): asserts payload.isEmpty(). Parsed fields (messageType, sequenceNumber) are verified against known input values. However, non-empty payload map contents are only checked for non-null (line 453), not for specific field values within the map."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 2,
+    "total": 8,
+    "pass_rate": 0.75
+  }
+}

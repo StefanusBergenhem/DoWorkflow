@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "Output includes a coverage matrix mapping design elements to test cases",
+      "passed": true,
+      "evidence": "coverage_matrix.md contains 7 tables mapping design elements to test case names with verified status: Requirement-Based (11 entries), Equivalence Class (7), Boundary Value (9), Error Handling (4), Stateful Behavior (5), Configuration Variants (3), Interaction Tests (2). Each row links a design element to one or more specific test function names."
+    },
+    {
+      "text": "Uses Go table-driven test pattern ([]struct with test cases iterated via range)",
+      "passed": false,
+      "evidence": "The test file contains no []struct test case slices, no range iteration over test cases, and no table-driven pattern. All 37 tests are individual top-level test functions (e.g., TestStartupMode_RequestWithinBounds_NoClamp, TestCruiseMode_ExceedsMaxRate_ClampsToMax). No usage of []struct or range found in the file."
+    },
+    {
+      "text": "Rate-of-change limiting has multiple test scenarios: within limit, exceeding limit, with varying elapsed_time_ms",
+      "passed": true,
+      "evidence": "Multiple rate-of-change scenarios present: (1) within limit: TestCruiseMode_RequestWithinBoundsAndRateOfChange_NoClamp (elapsed=1000ms, change=50<100), TestCruiseMode_RateOfChangeExactlyAtLimit_NoClamp (elapsed=1000ms, change=100==100); (2) exceeding limit: TestCruiseMode_RateOfChangeExceeded_ClampsRate (elapsed=500ms, change=150>50), TestCruiseMode_RateOfChangeDecrease_ClampsDownwardRate (elapsed=500ms); (3) varying elapsed_time_ms: TestElapsedTime_ZeroInCruise_NoRateOfChangeAllowed (0ms), TestElapsedTime_LargeValue_AllowsFullChange (10000ms), tests use 500ms, 1000ms, 5000ms, 10000ms across scenarios."
+    },
+    {
+      "text": "Stateful behavior tested: multiple sequential calls to verify previous_rate tracking",
+      "passed": true,
+      "evidence": "Five dedicated stateful tests make multiple sequential limiter.Limit() calls: TestState_PreviousRateUpdatedAfterEachCall (2 calls, verifies change calculation uses previous actual rate), TestState_PreviousRateUpdatedEvenWhenClamped (2 calls, verifies previous_rate set to clamped value not requested), TestState_ModeTransitionStartupToCruise (2 calls across modes), TestState_EmergencyResetsRateThenCruiseUsesZero (3 calls: cruise->emergency->cruise), TestCruiseMode_RateOfChangeDecrease_ClampsDownwardRate (2 calls)."
+    },
+    {
+      "text": "Every error_handling entry (negative rate, negative elapsed_time, unrecognized mode) has a dedicated test",
+      "passed": true,
+      "evidence": "All three error conditions have dedicated tests: (1) negative rate: TestError_NegativeRequestedRate_TreatedAsZero (startup mode) and TestError_NegativeRequestedRate_InCruise (cruise mode); (2) negative elapsed_time: TestError_NegativeElapsedTime_SkipsRateOfChange (verifies roc skipped, rate passes through); (3) unrecognized mode: TestError_UnrecognizedMode_TreatedAsEmergencyShutdown (passes OperationalMode(\"invalid_mode\"), asserts emergency behavior). All assert specific output values, not just absence of errors."
+    },
+    {
+      "text": "No test checks only that a function 'does not panic' without asserting output values",
+      "passed": true,
+      "evidence": "No usage of panic, recover, or NotPanics found in the test file. Every test asserts specific output values (ActualRate, WasClamped, ClampingReason) using floatEqual comparisons and boolean checks. No test relies solely on 'did not panic' as its assertion."
+    },
+    {
+      "text": "Test names describe the scenario being tested using Go subtest naming conventions (t.Run)",
+      "passed": false,
+      "evidence": "The test file uses zero t.Run() calls. All tests are top-level functions with descriptive names (e.g., TestStartupMode_BelowMinimum_ClampsToMin, TestError_NegativeElapsedTime_SkipsRateOfChange) but they do not use Go subtest naming via t.Run(\"scenario_name\", func(t *testing.T){...}). The assertion specifically requires t.Run, which is absent."
+    },
+    {
+      "text": "Boundary values tested for rate-of-change: elapsed_time_ms = 0, very large elapsed_time_ms",
+      "passed": true,
+      "evidence": "TestElapsedTime_ZeroInCruise_NoRateOfChangeAllowed tests elapsed_time_ms=0 (asserts no change allowed, rate stays at previous 0.0, clamped due to rate_of_change). TestElapsedTime_LargeValue_AllowsFullChange tests elapsed_time_ms=10000 (asserts allowed change=1000 which permits full 200.0 request). Both test rate-of-change behavior at these elapsed_time_ms boundary values."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 2,
+    "total": 8,
+    "pass_rate": 0.75
+  }
+}
