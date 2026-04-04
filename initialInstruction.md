@@ -87,3 +87,23 @@ To start with the lowest level of the V. Let me tell you what I invision:
 * Then in the layer above there should be individual skills for ceating detailed design. these skills we talk about now should assume that detailed design already exists.
 * Then for agentic orchistration and keeping context window seperate i also want to have anoter skill between detailed design and coding level to basically scope the work (tell which files to touch or not)
 * Finally, we need to concider how many skills are loded at a single time. Too many skills loaded will mean to many instructions and that will mean that instructions get lost. 
+
+
+Well, we actually need to go back and re-work the derive-test-cases. But I think that we actually need to create 3 skills in parallel. We are creating the skill for the "code developer" agent (and in parallel best practices also for human). This contains the skills
+* derive-test-cases: for covering the unit testing part of the V
+* develop-code: this should cover the code implementation best practices part of the V model. Here I want a combination of what is required by the standards, what is general best practice for development. e.g "clean code", and thirdly what is best practice for AI agents when developing code
+
+These two skills should be completely independent of our pillar 1 and 2 workflow. So here we need to rework deriving-test-cases because there are some inbuilt dependencies on pillar 1 there.
+
+The final skill is
+* develop-in-DoWorkflow: Here we make the agent aware of Pillar 1 and 2, where to take inputs from and also what to produce (both code and artifacts like review preparation)
+
+I need you to do some research:
+- Find out what the V model standards say about software implementation.
+- Find out best practices for "clean code" and how to develop good and scalable software. I like the clean code book which this is based on: https://github.com/sickn33/antigravity-awesome-skills/blob/main/skills/clean-code/SKILL.md but dont limit yourself to that webpage, just showing ths as inspiration for what kind of patterns im looking for
+
+As always, store the research in research folder.
+
+After that, create a best practice documentation for humans, stored in guidelines. This can be verbose, with lots of examples and explanation.
+
+After that, get back to me, we will start looking into actually creating the 3 skills
