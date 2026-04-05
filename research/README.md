@@ -13,3 +13,4 @@ Research artifacts for the DoWorkflow project - an agentic V-model workflow syst
 | 05 | Legacy Java Retrofit Strategies | `05-legacy-java-retrofit-strategies.md` |
 | 06 | Synthesis and Gap Analysis | `06-synthesis-and-gaps.md` |
 | 07 | Traceability Tools Comparison | `07-traceability-tools-comparison.md` |
+| 08 | Requirement Syntax Beyond EARS | `08-requirement-syntax-beyond-ears.md` |
