@@ -2,129 +2,93 @@
 
 ## Vision
 
-A framework for V-model compliant software development, built as three independent pillars that can be used standalone or combined. Supports human-only, agent-only, or mixed development teams.
+A framework for V-model compliant software development that combines documentation, templates, traceability, and AI skills into a coherent system. Each component is independently usable but designed to work together. The end goal: V-model compliant software, developed by AI agents, fully understood and verified by human engineers.
 
-## Three Pillars
+## Components
+
+Four independent components plus two primary use cases:
 
 ```
-PILLAR 1                        PILLAR 2                       PILLAR 3
-V-Model Compliance              Traceability                   Agentic Skills
+TEMPLATES & SCHEMAS          TRACEABILITY              DOCUMENTATION             AI SKILLS
+(artifact definitions)       (link model + validation)  (single source of truth)  (AI-optimized knowledge)
 
-┌────────────────────┐         ┌────────────────────┐         ┌────────────────────┐
-│                    │         │                    │         │                    │
-│ Artifact schemas   │         │ Link data model    │         │ Craft skills       │
-│ Templates          │         │ Link type defs     │         │ (standalone,       │
-│ Checklists         │         │ Validation rules   │         │  composable)       │
-│ Assurance config   │         │                    │         │                    │
-│ Translation docs   │         │ Phase A (now):     │         │ Orchestration      │
-│                    │         │   Data model +     │         │ (framework         │
-│ Scaffold tool:     │         │   agent skill as   │         │  interaction)      │
-│ Create blank       │         │   temp engine      │         │                    │
-│ artifacts from     │         │                    │         │                    │
-│ templates          │         │ Phase B (later):   │         │                    │
-│                    │         │   Deterministic    │         │                    │
-│                    │         │   CLI tool (fast,  │         │                    │
-│                    │         │   portable, CI)    │         │                    │
-│                    │         │                    │         │                    │
-│                    │         │ Phase C (future):  │         │                    │
-│                    │         │   Web GUI for      │         │                    │
-│                    │         │   non-developers   │         │                    │
-│                    │         │                    │         │                    │
-│ Usable by:         │         │ Usable by:         │         │ Usable by:         │
-│ humans, agents,    │         │ humans, CI/CD,     │         │ AI agents          │
-│ or both            │         │ agents, anyone     │         │                    │
-└────────────────────┘         └────────────────────┘         └────────────────────┘
-      independent                   independent                   independent
+┌──────────────────┐        ┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
+│                  │        │                  │      │                  │      │                  │
+│ Artifact envelope│        │ Link data model  │      │ V-model education│      │ Craft skills     │
+│ Type schemas     │        │ Link type catalog│      │  (what, where,   │      │ (standalone best │
+│ Checklists       │        │ Validation rules │      │   why, how)      │      │  practices, not  │
+│ Assurance config │        │ Coverage analysis│      │                  │      │  framework-aware)│
+│ Translation layer│        │ Impact analysis  │      │ Best practices   │      │                  │
+│                  │        │                  │      │  per artifact    │      │ Framework skills │
+│                  │        │ Coupled to our   │      │  (exhaustive)    │      │ (use templates,  │
+│                  │        │ templates        │      │                  │      │  traceability,   │
+│                  │        │                  │      │ Anti-patterns    │      │  orchestration)  │
+│ Usable by:       │        │ Usable by:       │      │ Examples         │      │                  │
+│ humans, agents,  │        │ humans, CI/CD,   │      │                  │      │ Usable by:       │
+│ or both          │        │ agents, anyone   │      │ Framework manual │      │ AI agents        │
+└──────────────────┘        └──────────────────┘      └──────────────────┘      └──────────────────┘
+
+         │                          │                         │                         │
+         └──────────────────────────┴─────────────────────────┴─────────────────────────┘
+                                              │
+                                    USE CASES (combine components)
+                              ┌───────────────┴───────────────┐
+                              │                               │
+                     Greenfield V-model              Legacy Retrofit
+                     development (top-down)           (bottom-up RE)
 ```
 
-**No pillar depends on the others to function.**
+**No component depends on the others to function.**
 
-- Pillar 1 alone: human team gets V-model templates and checklists
-- Pillar 1 + 2: human team gets templates + automated completeness checking
-- Pillar 1 + 2 + 3: full agentic V-model development
-- Pillar 3 craft skills alone: someone just wants a good requirement-writing or review prompt
+- Templates alone: human team gets V-model artifact definitions and checklists
+- Traceability alone: automated completeness checking for any project using our templates
+- Documentation alone: comprehensive V-model education and best practices reference
+- Craft skills alone: someone just wants quality requirement-writing or code development skills
+- All together: full agentic V-model development with traceability and compliance
 
-## Pillar 1: V-Model Compliance
+## Component Details
 
-### Purpose
+### Templates & Schemas
 
 Define what artifacts are needed for V-model compliance, their structure, and their relationships. This is the **definitional** layer — it says what things look like, not how to create them or how to check them.
 
-### Components
-
-**Artifact Schemas** — YAML definitions for each V-level artifact type:
-
-Left side (development):
-- System Requirements, SW Requirements, Architecture, Detailed Design
-- ~~Source Code metadata~~ — replaced by pragmatic approach: source code is real files, linked via Pillar 2 trace files
-
-Right side (verification):
-- System Test Cases (YAML artifact — system tests are often manual procedures, demonstrations, or analyses, not executable code)
-- ~~Test Specifications, Test Results, Coverage Reports~~ — replaced by pragmatic approach: lower-level tests are real test files (unit, integration, qualification), results are tool output (JUnit XML, gtest XML), coverage is tool output (jacoco, gcov) — all linked via Pillar 2 trace files
-- Review Records (separate artifact type, linked via traceability)
-
-Plans:
-- Development, Verification, CM, QA
-
-Each schema defines: required fields, optional fields, field types. Schemas do NOT enforce specific content patterns (e.g., EARS is not required by the schema).
-
-**Assurance Level Configuration** — How rigor scales:
-- Optional property on artifacts (not universal)
-- Defines coverage targets, verification methods, documentation formality per level
-- Default behavior is high-rigor (benefits agent output quality)
-- Maps to DAL (aviation), ASIL (automotive), or quality levels (ASPICE)
-
-**Translation Layer** — Domain-specific vocabulary:
-- Generic V-model terms -> DO-178C terms
-- Generic V-model terms -> ASPICE terms
-- Applied to reports and exports, not to internal data
-
-**Scaffold Tool** (concept, CLI for later):
-- Creates blank artifacts from templates
-- Humans can populate artifacts without any agent involvement
-- Could be same tool as Pillar 2 engine, or separate lightweight CLI
-
-### Artifact Envelope
-
-Every artifact shares a common envelope. Type-specific content goes in the body:
-
+**Artifact Envelope** — Common fields shared by all artifacts:
 ```yaml
 artifact_id: "SWREQ-042"           # human-readable, type-prefixed
 artifact_type: "sw-requirement"     # references an artifact schema
 version: "1.0.0"
 status: "draft"                     # draft | in_review | approved | baselined | superseded
-assurance_level: 3                  # OPTIONAL — not all artifact types need this
-
+assurance_level: 3                  # OPTIONAL
 body:                               # type-specific content
-  title: "Fuel rate limiting"
-  statement: "..."                  # free text, any format
-  rationale: "..."
-  verification_method: "test"
+  ...
 ```
 
-Fields explicitly NOT in the envelope:
-- `created_by` — irrelevant to compliance assessment
-- `reviewed_by` — insufficient; review records are separate artifacts
-- `trace_up` / `trace_down` — traceability is Pillar 2's concern
+**Artifact Type Schemas** — YAML definitions for each V-level:
 
-### Artifact ID Strategy
+Left side (development):
+- System Requirements, SW Requirements, Architecture, Detailed Design
+- Source code is real files, linked via traceability trace files
 
-Two-tier identification:
-- **Human-facing:** `TYPE-nnn` (e.g., `SWREQ-042`) — readable, stable
-- **Machine-facing:** content hash appended for change detection (e.g., `SWREQ-042@a3f7c2`)
+Right side (verification):
+- System Test Cases (YAML artifact — often manual procedures)
+- Lower-level tests are real test files (unit, integration, qualification), linked via trace files
+- Test results and coverage are tool output (JUnit XML, jacoco), linked via trace files
+- Review Records (separate artifact type)
 
-The hash changes when content changes, enabling automatic staleness detection.
+Plans:
+- Development, Verification, CM, QA
 
-## Pillar 2: Traceability
+**Assurance Level Configuration** — How rigor scales with safety level (DAL, ASIL, etc.)
 
-### Purpose
+**Translation Layer** — Generic V-model terms mapped to domain-specific vocabularies (DO-178C, ASPICE, ISO 26262)
+
+### Traceability
 
 Link artifacts together, validate completeness, detect gaps. This is the **relational** layer — it manages the graph between artifacts.
 
-### Data Model (Phase A — now)
+**Coupled to our templates** — the traceability framework validates against our artifact schemas and link type rules.
 
-**Link Schema** — defines how artifacts connect:
-
+**Link Schema:**
 ```yaml
 source: "SWREQ-042"
 target: "TS-042-01"
@@ -132,163 +96,170 @@ link_type: "verified-by"
 status: "draft"
 ```
 
-Links are:
-- **Many-to-many** — a requirement can trace to multiple tests, designs, review records
-- **Typed** — each link has a defined type (verified-by, allocated-to, reviewed-in, etc.)
-- **Attributed** — links carry their own metadata (status, etc.)
-- **Stored separately** — not embedded in artifacts
+Links are many-to-many, typed, attributed, and stored separately from artifacts.
 
-**Link Type Definitions** — what link types exist and their rules:
-- Which artifact types can be source/target for each link type
-- Which links are required for completeness at each assurance level
-- Bidirectional validation rules
-
-**Validation Rules** — completeness and consistency checks:
+**Validation capabilities:**
 - Orphan detection (artifact with no required links)
-- Coverage analysis (% of requirements with tests)
+- Coverage analysis (% of requirements with tests, scaled to safety level)
 - Staleness detection (content hash changed, links not re-validated)
-- Bidirectional consistency
+- Change impact analysis (requirement changed → which designs, code, tests affected?)
+- Bidirectional consistency checks
 
-### Temporary Agent Skill (Phase A — now)
+**Phased delivery:**
+- **Phase A (current):** Data model + agent skill as temporary engine
+- **Phase B (next):** Deterministic CLI tool (Rust/Go) — fast, CI/CD-embeddable
+- **Phase C (future):** Web GUI — visual traceability graphs for non-developer stakeholders
 
-An agent craft skill that reads YAML artifact and trace files and performs validation. Serves as stand-in until the deterministic engine is built. Good enough to get started and validate the data model.
+### Documentation
 
-### Deterministic Engine (Phase B — later)
+The single source of truth for all domain knowledge. Everything else (templates, skills) is derived from or validated against the documentation.
 
-A CLI tool:
-- Written in a fast, portable language
-- Reads YAML artifacts and trace files
-- Validates completeness, detects gaps, produces reports
-- Runs in CI/CD pipelines
-- No AI dependency — purely deterministic
+**Per artifact type / V-model activity, documentation covers:**
+1. **V-model context** — Where does this artifact sit? What level? What are the inputs/outputs? Why does it exist?
+2. **Best practices** — How to produce a high-quality artifact. Detailed, exhaustive guidance. Enough for a junior engineer to produce industry-standard output.
+3. **Anti-patterns** — What to avoid, with examples of common mistakes.
+4. **Examples** — Concrete illustrations of good and bad artifacts.
+5. **Framework integration** — Which template to use, how it links in the traceability model, which AI skills are coupled to this artifact type.
 
-### Web GUI (Phase C — future)
+**Scope:** Not a summary — equivalent in depth to the union of major V-model standards (DO-178C, ISO 26262, ASPICE, IEC 62304, EN 50128), expressed in generic V-model terms. This is a major content effort but is non-negotiable: the documentation proves the framework is sound, and AI skills are derived from it.
 
-For non-developer stakeholders:
-- View and edit documentation artifacts
-- Input flows into the repo via defined process
+**Long-term goal:** Could serve as a standalone "generic V-model standard" reference.
 
-## Pillar 3: Agentic Skills
-
-### Purpose
-
-Skills, agents, and commands that guide AI to produce quality V-model artifacts. Built as standard Claude Code skills following the [agentskills.io](https://agentskills.io) open spec, using the `/skill-creator` plugin for development and evaluation.
-
-> Research: `research/pillar3/` — covers agents vs skills vs commands, HumanLayer workflow patterns, HITL integration, skill composition, LLM-tier compatibility, and existing libraries.
-
-### Three Layers (bottom-up, no orchestration until proven)
-
+**Documentation-to-skill pipeline:**
 ```
-Layer 1: Craft Skills          Layer 2: Pillar 1+2 Integration     Layer 3: Repo Investigation
-(pure domain knowledge)        (framework-aware)                   (existing codebase)
-
-┌──────────────────────┐      ┌──────────────────────┐           ┌──────────────────────┐
-│ write-requirement    │      │ Output templates     │           │ Analyze existing     │
-│ review-requirement   │      │ (Pillar 1 schemas)   │           │ module structure      │
-│ write-architecture   │      │                      │           │                      │
-│ review-architecture  │      │ Framework info       │           │ Bootstrap artifacts  │
-│ write-test-case      │      │ (how to use schemas, │           │ from code            │
-│ review-test-case     │      │  trace model)        │           │                      │
-│ write-detailed-design│      │                      │           │ Gap analysis         │
-│ ...                  │      │ Pillar 2 scripts     │           │                      │
-│                      │      │ (validation helpers) │           │ HumanLayer-style     │
-│ No Pillar 1/2 knowledge     │                      │           │ codebase research    │
-│ No framework awareness│      │ Knows our schemas    │           │ agents               │
-│ Independently usable │      │ and trace model      │           │                      │
-└──────────────────────┘      └──────────────────────┘           └──────────────────────┘
-  ~/.claude/skills/ (global)    .claude/skills/ (project)          .claude/skills/ (project)
+Documentation (human-readable)          AI Skill (AI-optimized)
+┌─────────────────────────────┐        ┌──────────────────────────┐
+│ V-model context             │        │ Same knowledge, distilled│
+│ Best practices              │───────>│ Step-by-step procedure   │
+│ Anti-patterns               │        │ Quality checklist        │
+│ Examples                    │        │ Anti-pattern guards      │
+│ Framework integration       │        │ Output template          │
+└─────────────────────────────┘        └──────────────────────────┘
 ```
 
-### Layer 1: Craft Skills (current focus)
+### AI Skills
 
-Each craft skill follows the agentskills.io / mgechev best practices format:
+Two distinct categories of skills, plus agentic engineering practices baked into all skills:
+
+**Craft Skills (standalone, framework-independent):**
+- AI-optimized versions of the documentation best practices
+- Each skill teaches how to do one thing well (write requirements, derive tests, review code)
+- No knowledge of our templates, schemas, or traceability
+- Independently usable on any project, in any framework
+- Follows agentskills.io open standard (SKILL.md format)
+- Must work on smaller/cheaper models (Haiku, Sonnet) — tested with baseline comparison
+
+**Framework Skills (DoWorkflow-specific):**
+- How to use our templates, produce trace artifacts, follow our schemas
+- Per-layer orchestration: research/plan → implement → review loops
+- Human transition between V-model layers, agent orchestration within layers
+- Thin bridge: if templates/schemas change, only framework skills update
+
+**Agentic Engineering Practices (cross-cutting, baked into skill design):**
+- Context management (small, focused context windows)
+- Task splitting (break large work into scoped pieces)
+- Handoff discipline (structured contracts between phases)
+- These are design principles of the skills, not a separate skill category
+
+## Human-Agent Interaction Model
+
+Human drives at the strategic level, AI executes at the tactical level, human verifies at the quality gate.
+
+**Per V-model layer (top to bottom):**
 
 ```
-skills/craft/write-requirement/
-├── SKILL.md              # < 500 lines, frontmatter + procedures
-├── scripts/              # Deterministic validation helpers
-├── references/           # Flat: EARS templates, quality checklists
-└── assets/               # Output templates, examples
+HUMAN-DRIVEN                      AGENT-ORCHESTRATED                HUMAN-DRIVEN
+┌───────────────────┐            ┌───────────────────────┐         ┌──────────────┐
+│ Research & Plan   │            │ Implementation Loop   │         │ Final Review │
+│                   │            │                       │         │              │
+│ Human provides    │──agreed──>│ Agent writes artifact  │──done──>│ Human reviews│
+│ input & context   │  plan     │ Agent self-checks      │         │ and approves │
+│ AI gathers context│            │ Agent sends to review  │         │ or rejects   │
+│ Impact analysis   │            │ Review feedback loop   │         │              │
+│ Back-and-forth    │            │ Traceability updated   │         │              │
+│ discussion        │            │                       │         │              │
+└───────────────────┘            └───────────────────────┘         └──────────────┘
+                                                                          │
+                                                                    human transitions
+                                                                    to next V-model
+                                                                    layer ↓
 ```
 
-Properties:
-- **One responsibility** (write a requirement, review a design, characterize code)
-- **No framework knowledge** (doesn't know about our YAML schemas or trace model)
-- **Independently usable** — someone can use just this skill outside DoWorkflow
-- **Third-person imperative** instructions, step-by-step numbered procedures
-- **Progressive disclosure** — SKILL.md is navigation, references loaded JiT
-- **Deterministic scripts** for fragile/repetitive operations
-- **Evaluated** using skill-creator's eval framework (test prompts, assertions, benchmarks)
+**Key principle:** This is NOT an autonomous pipeline with human checkpoints. It is a human-orchestrated workflow where AI handles implementation within each layer. The human transitions between layers, participates in research/planning, and does final review.
 
-Skill categories:
+**Research/Plan phase produces a handoff artifact** — a structured "implementation contract" that scopes what the agent-orchestrated loop does. This captures design decisions and rationale from the discussion.
 
-| Category | Examples |
-|---|---|
-| Requirements | Requirement writing (EARS), requirement review, decomposition |
-| Design | Architecture design, detailed design, design review |
-| Verification | Test case writing, test review, coverage interpretation |
-| Implementation | Implement from tests, refactor, code review |
-| Analysis | Code structure analysis, behavior characterization, change impact |
+## Use Cases
 
-EARS is a preference of our craft skills, not a framework requirement.
+### Greenfield V-Model Development (top-down)
 
-### Layer 2: Pillar 1+2 Integration (future)
+Start from system requirements, work down through the V-model layers. Each layer follows the research/plan → implement → review cycle. Traceability is built as artifacts are created.
 
-Thin skills that bridge craft output to our framework:
-- **Output templates** from Pillar 1 artifact schemas (YAML templates an agent fills in)
-- **Framework context** (how to use schemas, what trace links to create)
-- **Pillar 2 scripts** (validation helpers that check schema compliance, link completeness)
+### Legacy Retrofit (bottom-up, primary market entry)
 
-These skills call or compose with Layer 1 craft skills but add framework awareness.
+Start from existing code, reverse-engineer V-model artifacts upward. Specialized analysis skills examine code and infer implicit requirements, designs, and test coverage gaps. Produces improvement suggestions based on best practices.
 
-### Layer 3: Repo Investigation (future)
+This is the **primary selling point** — the volume of legacy codebases needing V-model compliance far exceeds greenfield development. The unique value is the analysis/inference skills combined with the standard framework components.
 
-Skills and agents for creating artifacts in existing codebases (the pilot):
-- **Codebase analysis agents** — inspired by HumanLayer's read-only specialized agents (codebase-locator, codebase-analyzer pattern)
-- **Artifact bootstrapping** — extract implicit requirements from code
-- **Gap analysis** — what's missing, what needs formalization
-- **Handoff documents** — cross-session continuity for large analysis work
+**Legacy RE is a use case, not a separate component.** It combines:
+- Analysis/inference craft skills (understand existing code)
+- Templates (produce artifacts in V-model format)
+- Traceability (link discovered artifacts)
+- Best practices documentation (suggest improvements)
 
-### Orchestration (deferred)
+## Per-Layer Skill Set
 
-Orchestration pipelines (DRTDD, scan, report) are deferred until individual craft skills are proven in practice. Will revisit when Layer 1 skills are stable and evaluated.
+For each V-model layer, we develop:
+
+| Skill | Type | Purpose |
+|-------|------|---------|
+| **Research/Plan** | Framework, interactive | Context gathering, impact analysis, back-and-forth with human, produces implementation contract |
+| **Implement** | Framework, orchestrated | Agent writes artifact following template + craft skill, self-checks against checklist |
+| **Review** | Framework, orchestrated | Review agent validates against best practices + template + traceability |
+| **Craft: Write** | Standalone | Best practices for producing this artifact type (derived from documentation) |
+| **Craft: Review** | Standalone | Best practices for reviewing this artifact type (derived from documentation) |
 
 ## Key Design Decisions
 
-### 1. Three Independent Pillars
+### 1. Documentation is the Foundation
+All knowledge lives in documentation first. Templates are derived from it. Skills are distilled from it. This is non-negotiable — if we can't explain what we're doing in documentation, we can't prove the framework works.
 
-No cross-pillar dependencies where not strictly needed. A craft skill references Pillar 1 schemas via `schema_ref` for its contracts, but the schemas don't know about skills. The traceability engine reads artifacts defined by Pillar 1 schemas, but the schemas don't know about the engine.
+### 2. Components are Independent (SOLID)
+No forced dependencies. Adopt incrementally. But designed to work together for maximum value.
 
-### 2. YAML for All Machine-Readable Data
+### 3. Traceability is Coupled to Templates
+Decision: the traceability framework validates against our artifact schemas. Not a generic graph-linking tool.
 
+### 4. Individual Orchestration Per Layer
+Each V-model layer gets its own implementation loop. Optimized for the specific concerns of that layer. Refactor to shared patterns only after building 3-4 layers and seeing what's common.
+
+### 5. YAML for All Machine-Readable Data
 Human-readable, git-diffable, easy for both humans and agents to produce.
 
-### 3. Artifacts Live Alongside Code
-
+### 6. Artifacts Live Alongside Code
 In the target repository, version-controlled, diffable, PR-reviewable.
 
-### 4. Deterministic Where Possible
+### 7. Deterministic Where Possible
+Traceability validation is a tool concern, not an agent concern. Agents create, tools verify.
 
-Traceability validation is a tool concern, not an agent concern. Coverage checking is deterministic. Schema validation is deterministic. Agents create, tools verify.
+### 8. Generic V-Model + Translation
+Internal terms are generic. Domain-specific vocabulary applied via translation layer.
 
-### 5. Incremental by Design
+### 9. Bottom-Up Build Order
+Start from code + unit tests (lowest V-level), work upward through detailed design, architecture, requirements. Prove each layer end-to-end before moving to the next.
 
-Everything works on subsets: module-by-module, requirement-by-requirement.
-
-### 6. Generic V-Model + Translation
-
-Internal terms are generic. Domain-specific vocabulary applied via translation layer for reports and exports.
+### 10. Target User: Mid-Senior Engineers with AI
+Not autonomous AI. Not manual-only humans. Engineers who orchestrate AI agents and verify output. Human at strategic level, AI at tactical level, human at quality gate.
 
 ## Quality Attributes
 
 | Attribute | Approach |
 |---|---|
-| **Independence** | Each pillar usable standalone; no forced AI dependency |
+| **Independence** | Each component usable standalone; no forced AI dependency |
 | **Portability** | Language-agnostic schemas; language-specific adapters |
 | **Extensibility** | New skills, translations, artifact types without changing existing |
 | **Reliability** | Deterministic tools for validation; agents for creative work |
 | **Usability** | Works for human-only, agent-only, or mixed teams |
-| **Maintainability** | YAML schemas are self-documenting; skills are self-contained |
-| **Testability** | Skills evaluated via skill-creator (test prompts, assertions, benchmarks); engine has deterministic expected outputs |
-| **Composability** | Small craft skills, independently usable; orchestration deferred until proven |
-| **Portability** | agentskills.io open standard; skills usable in other tools (Cursor, Codex CLI) |
+| **Maintainability** | Documentation is source of truth; skills derived from it |
+| **Testability** | Skills evaluated via skill-creator; engine has deterministic expected outputs |
+| **Composability** | Small craft skills, independently usable; orchestration per layer |

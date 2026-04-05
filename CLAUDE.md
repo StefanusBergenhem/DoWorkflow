@@ -2,13 +2,20 @@
 
 ## What This Project Is
 
-Three independent pillars that can be used standalone or combined:
+Four independent components designed to work together for V-model compliant software development:
 
-1. **V-Model Compliance** — Schemas, templates, checklists defining what artifacts are needed for V-model compliance. Usable by humans, agents, or both.
-2. **Traceability** — Data model and engine for linking artifacts, validating completeness, detecting gaps. Usable by humans, CI/CD, agents, or anyone.
-3. **Agentic Skills** — Prompt packages that guide AI agents to produce quality V-model artifacts. Craft skills (standalone, composable) + orchestration (framework interaction).
+1. **Documentation** — Single source of truth for all domain knowledge. Per artifact type: V-model context, best practices, anti-patterns, examples, framework integration. AI skills are derived from this. Non-negotiable foundation.
+2. **Templates & Schemas** — Artifact definitions, envelopes, checklists. If followed, produce V-model compliant artifacts that pass assessment. Usable by humans, agents, or both.
+3. **Traceability** — Data model and validation engine for linking artifacts, validating completeness, detecting gaps. Coupled to our templates. Usable by humans, CI/CD, agents, or anyone.
+4. **AI Skills** — Two categories: craft skills (standalone best practices, framework-independent, derived from documentation) and framework skills (DoWorkflow-specific orchestration, template integration, traceability).
 
-**No pillar depends on the others.** A human team can use Pillar 1 alone. Pillar 2 can validate any YAML artifacts regardless of how they were created. Craft skills in Pillar 3 can be used individually outside this framework.
+**End goal:** V-model compliant software, developed by AI agents, fully understood and verified by human engineers.
+
+**Primary use cases:**
+- **Greenfield development** (top-down through V-model layers)
+- **Legacy retrofit** (bottom-up reverse-engineering from existing code — primary market entry point)
+
+**Each component is independently usable.** A human team can use templates alone. Someone can use just a craft skill. But the real value is the combination.
 
 ## Working Process
 
@@ -16,16 +23,36 @@ Three independent pillars that can be used standalone or combined:
 - **Structured back-and-forth.** Present ideas, ask for input or approval, then implement. This applies to schemas, skills, prompts, and any new files.
 - **Small increments.** One concept at a time. Get alignment, then move on.
 
+## Human-Agent Interaction Model
+
+Human drives at the strategic level, AI executes at the tactical level, human verifies at the quality gate. This is NOT an autonomous pipeline with human checkpoints.
+
+Per V-model layer:
+1. **Research/Plan (human-driven):** Human provides context, AI gathers and analyzes, back-and-forth discussion until agreed plan
+2. **Implementation (agent-orchestrated):** AI writes artifacts, self-checks, sends to review agent, feedback loop, traceability updated
+3. **Final Review (human-driven):** Human reviews output, approves or rejects
+4. **Human transitions to next V-model layer**
+
+## Build Order
+
+Bottom-up, one V-model layer at a time. For each layer: **documentation first**, then template, then craft skill, then framework skill.
+
+Current: Phase 1 — Code + Unit Tests (lowest V-level)
+Next: Phase 2 — Detailed Design
+
+See `docs/plan/BACKLOG.md` for full backlog and `docs/plan/TARGET_ARCHITECTURE.md` for architecture.
+
 ## Design Principles
 
-- **Three independent pillars**: V-Model Compliance, Traceability, Agentic Skills. No cross-pillar dependencies where not strictly needed.
-- **Craft vs Orchestration separation**: Craft skills teach *how* to do one thing well. Orchestration handles *when* and *what* to hand off. SOLID applied to the skill framework.
-- **Contract-driven**: Skills communicate through typed YAML schemas. Orchestration routes using contracts, not internal knowledge.
-- **Language-agnostic**: Must be portable across Java, C++, and other languages.
-- **Model-tier aware**: Skills must work with smaller/older LLMs — crisp, unambiguous instructions.
+- **Documentation is the foundation**: Write docs first, derive everything else from them. If we can't explain it, we can't claim AI skills will produce compliant output.
+- **Components are independent (SOLID)**: No forced coupling. Adopt incrementally.
+- **Individual orchestration per layer**: Each V-model layer gets its own implementation loop. Refactor to shared patterns only after building 3-4 layers.
+- **Craft vs Framework skill separation**: Craft skills are standalone best practices (no framework knowledge). Framework skills handle templates, traceability, orchestration.
+- **Contract-driven**: Skills communicate through typed YAML schemas.
+- **Language-agnostic**: Portable across Java, C++, and other languages.
+- **Model-tier aware**: Skills must work with smaller/older LLMs — test on Haiku with baseline comparison.
 - **Incremental**: Works on legacy codebases module-by-module, not all-at-once.
 - **Human-gated**: Every artifact starts as draft, requires human approval.
-- **Composable**: Many small skills, recombined into different workflows via orchestration.
 - **Deterministic where possible**: Traceability validation is a tool concern, not an agent concern. Agents create, tools verify.
 
 ## Domain
@@ -39,6 +66,7 @@ Three independent pillars that can be used standalone or combined:
 - Java 17, Gradle, JUnit 5
 - Legacy codebase: 100k+ lines, ~10% test coverage, no documentation
 - Requirements in mixed formats (Word, spreadsheets, DOORS) — possibly incomplete or stale
+- Target user: mid-senior engineers orchestrating AI agents
 
 ## Key Concept: DRTDD
 
@@ -52,35 +80,42 @@ Each phase produces traceable artifacts. Human gates between phases.
 
 ```
 research/              — Research documents on standards, patterns, strategies
-docs/plan/             — Architecture and backlog documents
+docs/plan/             — Architecture (TARGET_ARCHITECTURE.md) and backlog (BACKLOG.md)
 docs/guide/            — Interactive HTML documentation (V-model guide + framework docs)
   css/                 — Styling
   js/                  — domain.js (translation plugin), app.js (nav), v-diagram.js (SVG)
   domains/             — Domain translation plugins (generic.json, do178c.json, aspice.json)
 schemas/
   core/                — Meta-schemas (skill contracts, pipeline contracts)
-  artifacts/           — V-model artifact type definitions (Pillar 1)
-  traceability/        — Link model and validation rules (Pillar 2 data model)
+  artifacts/           — V-model artifact type definitions
+  traceability/        — Link model and validation rules
   translations/        — Domain-specific term mappings
   safety-levels/       — Assurance level configurations
 skills/
-  craft/               — Atomic domain skills (Pillar 3)
-  orchestration/       — Workflow pipelines (Pillar 3)
+  craft/               — Standalone domain skills (framework-independent)
+  orchestration/       — Framework-specific workflow skills
 ```
 
-## Documentation (docs/guide/)
+## Documentation
 
-**Keep documentation in sync with every change.** Whenever any of the three pillars is updated (schemas, trace model, skills, orchestration), the corresponding section in `docs/guide/index.html` must also be updated. This includes:
+### docs/guide/ (Interactive HTML)
 
-- New or changed artifact schemas → update the artifact section + examples
-- New or changed link types / trace rules → update the traceability section
-- New or changed craft skills / orchestration → update the framework section
-- New domain translations → add or update the JSON plugin in `docs/guide/domains/`
-- Calculator E2E walkthrough should be extended when new artifact types are added
+**Keep documentation in sync with every change.** Whenever components are updated (schemas, trace model, skills), the corresponding section in `docs/guide/index.html` must also be updated.
 
 The documentation uses a domain translation plugin system (SOLID: content uses generic terms via `data-term` attributes, domain-specific vocabulary is applied at runtime from JSON plugins). Never hard-couple domain-specific terms into the HTML content.
 
-**Proactively raise this**: when working on pillar changes, always remind that docs/guide/ needs a corresponding update before the work is considered complete.
+**Proactively raise this**: when working on component changes, always remind that docs/guide/ needs a corresponding update before the work is considered complete.
+
+### Per-Artifact Documentation
+
+Each artifact type gets comprehensive documentation covering:
+1. V-model context (what, where, why)
+2. Best practices (how to produce quality output)
+3. Anti-patterns (common mistakes)
+4. Examples (good and bad)
+5. Framework integration (template, traceability links, AI skills)
+
+This documentation is the source of truth. AI craft skills are distilled from it. Write documentation first, then derive skills.
 
 ## Conventions
 
