@@ -36,6 +36,8 @@
       <a class="nav-link" data-section="artifact-sw-requirement" href="#artifact-sw-requirement">SW Requirement</a>
       <a class="nav-link" data-section="artifact-sw-architecture" href="#artifact-sw-architecture">SW Architecture</a>
       <a class="nav-link" data-section="artifact-detailed-design" href="#artifact-detailed-design">Detailed Design</a>
+      <a class="nav-link" href="artifacts/source-code.html">Source Code</a>
+      <a class="nav-link" href="artifacts/unit-test.html">Unit Test</a>
       <a class="nav-link" data-section="artifact-system-requirement" href="#artifact-system-requirement">System Requirement</a>
       <a class="nav-link" data-section="artifact-system-test-case" href="#artifact-system-test-case">System Test Case</a>
       <a class="nav-link" data-section="artifact-plans" href="#artifact-plans">Plans <span class="status-badge stub">stub</span></a>
@@ -1932,6 +1934,9 @@ links:
   // Sidebar link clicks
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href') || '';
+      // Let external links (non-hash) navigate normally
+      if (href && !href.startsWith('#')) return;
       e.preventDefault();
       const section = this.getAttribute('data-section');
       if (section) window.showSection(section);

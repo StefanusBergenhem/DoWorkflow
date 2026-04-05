@@ -111,3 +111,22 @@ After that, get back to me, we will start looking into actually creating the 3 s
 
 
 
+Almost. But to clarify the documentation structure i envision. For each "artifact"/"activity" in the V model we should have explanation of
+- What it is in general (V-model independent). This aims to give an introduction to what we are doing
+- How it fits into the V model (V-model dependent). This aims to give info on how it fits to the V model and why
+- Comprehensive documentation on how to produce the artifact (V model INDEPENDENT). This aims to instruct how to develop a quality, industry standard workproduct. This is what the craft skills will be based on, and what human developers will base their work on.
+  - Best practices
+  - patterns and anti patterns
+  - quality metrics
+  - examples
+- Then we can have a V model best practices and anti-patterns for the artifact. IF there are any V model specific things to think about
+- We need to have a section where we fit the artifact in with our VModelWorkflow artifact templates/schemas and with the traceability framework.
+- Finally, later on we will also add a section on how the agent skills fits in.
+
+Overall this should be a comprehensive documentation. the section about developing a quality workproduct is something that i forsee being 10 pages alone. 
+First priority is always to develop a quality workproduct, second priority is to fit it into V model.
+
+Is this clear?
+
+So for the current work we are doing the above, but for source code and unit tests. We should have done enough research to do the documentation already. 
+I want us to also have a look at the repo structure for the documentation. I want the produced output to be in a clear strcture. I also want it all to be included in the HTML document, that is the main way i will interact with it and review it.

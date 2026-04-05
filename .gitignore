@@ -1,3 +1,5 @@
 .workflow/
 __pycache__/
 *.pyc
+
+.venv/
