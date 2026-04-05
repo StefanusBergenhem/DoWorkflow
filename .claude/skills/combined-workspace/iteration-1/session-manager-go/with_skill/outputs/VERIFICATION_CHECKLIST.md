@@ -192,7 +192,7 @@
 - [x] VERIFICATION_CHECKLIST.md (this checklist)
 
 All files saved to:
-`/home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs/`
+`/home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs/`
 
 ## Skill Methodology
 

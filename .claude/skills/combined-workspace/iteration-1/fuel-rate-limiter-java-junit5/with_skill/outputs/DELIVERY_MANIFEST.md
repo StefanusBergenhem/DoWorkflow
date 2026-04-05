@@ -200,7 +200,7 @@ docs/
 
 **All files included in:**
 ```
-/home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/
+/home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/
   iteration-1/fuel-rate-limiter-java-junit5/with_skill/outputs/
 ```
 

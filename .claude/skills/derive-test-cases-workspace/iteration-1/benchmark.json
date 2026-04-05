@@ -1,7 +1,7 @@
 {
   "metadata": {
     "skill_name": "derive-test-cases",
-    "skill_path": "/home/stefanus/repos/DoWorkflow/.claude/skills/derive-test-cases",
+    "skill_path": "/home/stefanus/repos/VModelWorkflow/.claude/skills/derive-test-cases",
     "executor_model": "claude-opus-4-6",
     "analyzer_model": "claude-opus-4-6",
     "timestamp": "2026-03-31T21:00:00Z",

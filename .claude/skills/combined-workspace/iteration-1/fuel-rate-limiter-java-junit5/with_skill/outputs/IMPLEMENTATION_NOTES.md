@@ -1,6 +1,6 @@
 # FuelRateLimiter Implementation Notes
 
-Design reference: `/home/stefanus/repos/DoWorkflow/.claude/skills/develop-code/evals/files/fuel-rate-limiter-design.md`
+Design reference: `/home/stefanus/repos/VModelWorkflow/.claude/skills/develop-code/evals/files/fuel-rate-limiter-design.md`
 
 ## Architecture & Design Decisions
 

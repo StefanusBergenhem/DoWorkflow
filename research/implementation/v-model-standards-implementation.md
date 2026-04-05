@@ -601,7 +601,7 @@ implementation activity should ensure:
 
 ---
 
-## 7. Implications for DoWorkflow
+## 7. Implications for VModelWorkflow
 
 ### 7.1 Schema Needs
 

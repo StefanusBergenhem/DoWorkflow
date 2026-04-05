@@ -8,7 +8,7 @@ Sources: Web search results (fetched 2026-03-31), GitHub repos, Claude Code docs
 
 ### A1. The Problem
 
-DoWorkflow skills must work on smaller/older LLMs. This means:
+VModelWorkflow skills must work on smaller/older LLMs. This means:
 - No long-context assumptions
 - Crisp, unambiguous instructions
 - Structured output must be reliable
@@ -126,7 +126,7 @@ Significant repositories found (search 2026-03-31):
 https://github.com/hesreallyhim/awesome-claude-code
 Curated list of skills, hooks, slash-commands, agent orchestrators, applications, plugins.
 
-Relevant to DoWorkflow:
+Relevant to VModelWorkflow:
 - **AB Method** — Spec-driven workflow: transforms large problems into focused, incremental missions using specialized sub-agents. Most directly aligned with V-model approach.
 - **RIPER Workflow** — Research, Innovate, Plan, Execute, Review separation phases. Similar to our DRTDD.
 - **Trail of Bits Security Skills** — Professional collection for code auditing, variant analysis, vulnerability detection, differential code review. Reusable pattern for our review layer.
@@ -147,11 +147,11 @@ https://github.com/sickn33/antigravity-awesome-skills
 https://github.com/rohitg00/awesome-claude-code-toolkit
 135 agents, 35 curated skills (+400,000 via SkillKit), 42 commands, 150+ plugins, 19 hooks, 15 rules, 7 templates, 8 MCP configs.
 
-### B2. Skills Directly Relevant to DoWorkflow
+### B2. Skills Directly Relevant to VModelWorkflow
 
 From awesome-claude-code analysis:
 
-| Skill/Resource | Relevance to DoWorkflow |
+| Skill/Resource | Relevance to VModelWorkflow |
 |----------------|------------------------|
 | AB Method | Spec-driven development pattern, very close to DRTDD |
 | RIPER Workflow | Research-Plan-Execute-Review phases, maps to V-model |
@@ -196,7 +196,7 @@ No existing skill library specifically addresses:
 
 **These are our Layer 1 craft skills to build.**
 
-### B5. Skills Worth Installing for DoWorkflow Development
+### B5. Skills Worth Installing for VModelWorkflow Development
 
 Based on research, recommend evaluating:
 

@@ -32,7 +32,7 @@ The file system IS the state. Artifacts written to disk persist across sessions.
 - Agent-specific memory directory
 - Best for: accumulated domain knowledge, codebase patterns (e.g., code reviewer accumulating findings over time)
 
-**4. .workflow/ state files (DoWorkflow pattern)**
+**4. .workflow/ state files (VModelWorkflow pattern)**
 - `pipeline_state.yaml` — current phase, metadata
 - `current_task.yaml` — active task contract
 - `review_ready.yaml` — build completion claim
@@ -44,13 +44,13 @@ thoughts/shared/handoffs/ENG-XXXX/YYYY-MM-DD_HH-MM-SS_description.md
 ```
 Compact structured summaries for cross-session continuity.
 
-### A3. The Artifact-as-State Pattern (Recommended for DoWorkflow)
+### A3. The Artifact-as-State Pattern (Recommended for VModelWorkflow)
 
 **Core insight from research:**
 > "An artifact is any tangible output created by an AI agent that persists beyond the conversation or session. Each save creates a new version and all versions are retained."
 Source: https://fast.io/resources/ai-agent-artifacts/
 
-**For DoWorkflow:**
+**For VModelWorkflow:**
 The V-model artifact file IS the state. Add status fields to artifact schemas:
 
 ```yaml
@@ -132,9 +132,9 @@ Implementation:
 
 ### B2. The Reviewer Pattern
 
-From HumanLayer and DoWorkflow research, the quality gate is a dedicated `review` skill/agent:
+From HumanLayer and VModelWorkflow research, the quality gate is a dedicated `review` skill/agent:
 
-**DoWorkflow already has this**: `wf-skill-review`
+**VModelWorkflow already has this**: `wf-skill-review`
 - Adversarial QA gatekeeper
 - Validates developer work against task contract
 - Produces: APPROVED, REJECTED, or DESIGN_ISSUE verdict
@@ -192,7 +192,7 @@ version: "2.0"
 - Pro: clean namespace
 - Con: no automatic compatibility checking
 
-**Option C: Schema-version pinning (recommended for DoWorkflow)**
+**Option C: Schema-version pinning (recommended for VModelWorkflow)**
 ```yaml
 name: write-requirement
 produces: sw-requirement@1.2   # artifact schema version it targets

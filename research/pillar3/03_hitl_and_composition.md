@@ -42,7 +42,7 @@ Let me know when manual testing is complete so I can proceed to Phase [N+1].
 - HumanLayer's `create_handoff` / `resume_handoff` implements this
 - Requires explicit state serialization
 
-**Recommendation for DoWorkflow:**
+**Recommendation for VModelWorkflow:**
 Both patterns are needed:
 - Synchronous: within a single DRTDD phase (quick human approval of generated artifact)
 - Asynchronous: between phases (human reviews, approves, then triggers next phase when ready)
@@ -61,7 +61,7 @@ From HumanLayer `implement_plan`:
 - Do NOT check off manual verification items until human confirms
 - Multiple revision rounds are expected and structured
 
-From the existing DoWorkflow `wf-skill-receiving-feedback`:
+From the existing VModelWorkflow `wf-skill-receiving-feedback`:
 - Activates when `feedback.yaml` is present or review returns REJECT
 - Enforces surgical fixes (not wholesale rewrites)
 - Escalates after 3 failed attempts
@@ -81,9 +81,9 @@ From the existing DoWorkflow `wf-skill-receiving-feedback`:
 1. **File-based state** (HumanLayer pattern): Plan file with checkboxes, updated as work proceeds
 2. **Handoff documents**: Compact structured summaries for cross-session continuity
 3. **Claude Code memory**: Persistent MEMORY.md for cross-session context
-4. **Pipeline state files** (DoWorkflow pattern): `pipeline_state.yaml`, `current_task.yaml`, `review_ready.yaml`, `feedback.yaml`
+4. **Pipeline state files** (VModelWorkflow pattern): `pipeline_state.yaml`, `current_task.yaml`, `review_ready.yaml`, `feedback.yaml`
 
-**Recommendation**: For DoWorkflow artifacts, the artifact file itself IS the state. Use status/phase fields within the artifact schema. Supplemented by a lightweight pipeline state file.
+**Recommendation**: For VModelWorkflow artifacts, the artifact file itself IS the state. Use status/phase fields within the artifact schema. Supplemented by a lightweight pipeline state file.
 
 ### A5. Enterprise HITL Design Principles (2026)
 
@@ -108,7 +108,7 @@ From Microsoft Azure Architecture Center and AWS Prescriptive Guidance (fetched 
 **Manager-Worker Pattern:**
 Central "manager" agent acts as team lead, delegates to specialized "worker" agents. Workers can employ their own patterns.
 - HumanLayer: `create_plan` (manager) delegates to `codebase-locator`, `codebase-analyzer` (workers)
-- DoWorkflow: orchestrator delegates to build, review, retrospective agents
+- VModelWorkflow: orchestrator delegates to build, review, retrospective agents
 
 **ReAct (Reasoning and Acting):**
 Observe → Think → Act → Observe loop. Transparency: we can see step-by-step decision making.
@@ -116,7 +116,7 @@ Works well for single agents. Less applicable to multi-agent orchestration.
 
 **Pipeline:**
 Linear sequence: A → B → C. Each step takes the output of the previous.
-DoWorkflow already implements this: plan → build → review → retrospective.
+VModelWorkflow already implements this: plan → build → review → retrospective.
 Good for: sequential V-model phases (REQUIRE → DESIGN → TEST → IMPLEMENT → REFACTOR → VERIFY)
 
 **DAG (Directed Acyclic Graph):**
@@ -129,7 +129,7 @@ Good for: hooks-based automation (PostToolUse triggers next step).
 
 ### B2. Separation of Concerns: Craft vs Orchestration
 
-**Craft skills** (from DoWorkflow CLAUDE.md):
+**Craft skills** (from VModelWorkflow CLAUDE.md):
 > "Teach HOW to do one thing well"
 > "Standalone, composable"
 > "Completely independent of Pillar 1 and 2"
@@ -140,7 +140,7 @@ Examples from HumanLayer:
 
 **Principle**: Single Responsibility. A skill that does two things is a skill that does two things poorly.
 
-**Orchestration skills** (from DoWorkflow CLAUDE.md):
+**Orchestration skills** (from VModelWorkflow CLAUDE.md):
 > "Handle WHEN and WHAT to hand off"
 > "Route using contracts, not internal knowledge"
 
@@ -152,7 +152,7 @@ Examples from HumanLayer:
 
 ### B3. Contract-Driven Artifact Passing
 
-From DoWorkflow CLAUDE.md:
+From VModelWorkflow CLAUDE.md:
 > "Skills communicate through typed YAML schemas. Orchestration routes using contracts, not internal knowledge."
 
 **Pattern:**
@@ -180,7 +180,7 @@ HumanLayer explicitly states: "Wait for ALL sub-tasks to complete before proceed
 Synthesizing partial results creates inconsistent plans.
 
 **4. Blind retry**
-DoWorkflow CLAUDE.md: "Each retry must use a different approach. On 2nd consecutive failure, apply root-cause tracing."
+VModelWorkflow CLAUDE.md: "Each retry must use a different approach. On 2nd consecutive failure, apply root-cause tracing."
 
 **5. Stale evidence**
 "Never claim 'all tests pass' without running them in the current session."
@@ -189,7 +189,7 @@ DoWorkflow CLAUDE.md: "Each retry must use a different approach. On 2nd consecut
 Claude Code docs: "Subagents cannot spawn other subagents." This is a hard limit.
 Design implication: orchestration must happen at the main-conversation or skill level, not inside a subagent.
 
-### B5. The Separation of Concerns for DoWorkflow Pillar 3
+### B5. The Separation of Concerns for VModelWorkflow Pillar 3
 
 Based on research, three distinct layers emerge:
 

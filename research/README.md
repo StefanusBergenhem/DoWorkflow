@@ -1,6 +1,6 @@
 # Research Documents
 
-Research artifacts for the DoWorkflow project - an agentic V-model workflow system for safety-critical software development.
+Research artifacts for the VModelWorkflow project - an agentic V-model workflow system for safety-critical software development.
 
 ## Documents
 

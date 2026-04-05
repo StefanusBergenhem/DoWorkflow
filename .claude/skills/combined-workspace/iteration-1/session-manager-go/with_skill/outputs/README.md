@@ -248,7 +248,7 @@ No third-party libraries required. Code is portable across Go 1.16+ (uses standa
 To verify the implementation:
 
 ```bash
-cd /home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs
+cd /home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs
 
 # Compile the code
 go build -v session_manager.go

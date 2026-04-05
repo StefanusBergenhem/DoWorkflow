@@ -90,7 +90,7 @@ Massive overlap — they're saying the same things from different motivations:
 
 **What to leave out** (model already knows): SOLID basics, naming basics, "write clean code." Keep the skill focused on the things that actually change behavior.
 
-### Skill 3: `develop-in-DoWorkflow` (new)
+### Skill 3: `develop-in-VModelWorkflow` (new)
 
 **Scope:** Thin bridge layer that makes the agent aware of Pillar 1 and 2. This is where the framework-specific stuff lives.
 
@@ -99,6 +99,6 @@ Massive overlap — they're saying the same things from different motivations:
 - What trace artifacts to produce (Pillar 2 trace file format)
 - What review preparation looks like (review record schema)
 - Where outputs go in the repo structure
-- How to use `develop-code` and `derive-test-cases` within the DoWorkflow context
+- How to use `develop-code` and `derive-test-cases` within the VModelWorkflow context
 
 This keeps the framework knowledge in one place. If Pillar 1/2 schemas change, only this skill updates.

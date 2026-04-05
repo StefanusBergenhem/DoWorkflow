@@ -96,7 +96,7 @@ Well, we actually need to go back and re-work the derive-test-cases. But I think
 These two skills should be completely independent of our pillar 1 and 2 workflow. So here we need to rework deriving-test-cases because there are some inbuilt dependencies on pillar 1 there.
 
 The final skill is
-* develop-in-DoWorkflow: Here we make the agent aware of Pillar 1 and 2, where to take inputs from and also what to produce (both code and artifacts like review preparation)
+* develop-in-VModelWorkflow: Here we make the agent aware of Pillar 1 and 2, where to take inputs from and also what to produce (both code and artifacts like review preparation)
 
 I need you to do some research:
 - Find out what the V model standards say about software implementation.
@@ -107,3 +107,7 @@ As always, store the research in research folder.
 After that, create a best practice documentation for humans, stored in guidelines. This can be verbose, with lots of examples and explanation.
 
 After that, get back to me, we will start looking into actually creating the 3 skills
+
+
+
+

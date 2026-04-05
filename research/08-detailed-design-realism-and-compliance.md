@@ -181,7 +181,7 @@ Design does NOT add value when it:
 
 ---
 
-## 3. Gap Analysis: DoWorkflow's Current Schema vs. Standards
+## 3. Gap Analysis: VModelWorkflow's Current Schema vs. Standards
 
 ### 3.1 What the Schema Gets Right
 

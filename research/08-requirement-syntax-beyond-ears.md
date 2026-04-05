@@ -79,7 +79,7 @@ Wish:         10 ms
 
 **Weakness:** Verbose for simple functional requirements; best suited for non-functional/quality requirements.
 
-**Relevance to DoWorkflow:** Excellent for performance, reliability, and safety integrity requirements where measurable targets are needed. Could complement EARS for non-functional requirements.
+**Relevance to VModelWorkflow:** Excellent for performance, reliability, and safety integrity requirements where measurable targets are needed. Could complement EARS for non-functional requirements.
 
 ### 1.3 Boilerplate Requirements (CESAR Project)
 
@@ -124,7 +124,7 @@ SysML (Systems Modeling Language) provides a graphical notation for requirements
 - `<<refine>>` — Model element refines requirement
 - `<<trace>>` — General traceability link
 
-**Relevance to DoWorkflow:** SysML is the notation, not the syntax. Requirements inside SysML blocks still need structured text (EARS, Rupp, etc.). However, SysML's relationship types map directly to our traceability model.
+**Relevance to VModelWorkflow:** SysML is the notation, not the syntax. Requirements inside SysML blocks still need structured text (EARS, Rupp, etc.). However, SysML's relationship types map directly to our traceability model.
 
 ### 1.5 INCOSE Guide for Writing Requirements
 
@@ -291,7 +291,7 @@ Based on published audit experience from DERs and ASPICE assessors:
 
 ### 4.2 Automatable Quality Rules
 
-These rules can be implemented as automated checks (relevant for DoWorkflow's tooling):
+These rules can be implemented as automated checks (relevant for VModelWorkflow's tooling):
 
 ```yaml
 requirement_quality_rules:
@@ -339,7 +339,7 @@ requirement_quality_rules:
 | **INCOSE Guide** | Any — quality checklist, not a syntax | Universal | Low | N/A (guidance) |
 | **SysML** | System-level, model-based development | Aerospace, auto | High | MBSE tools |
 
-### 5.1 Recommended Approach for DoWorkflow
+### 5.1 Recommended Approach for VModelWorkflow
 
 A pragmatic combination:
 

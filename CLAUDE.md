@@ -1,4 +1,4 @@
-# DoWorkflow — V-Model Development Framework
+# VModelWorkflow — V-Model Development Framework
 
 ## What This Project Is
 
@@ -7,7 +7,7 @@ Four independent components designed to work together for V-model compliant soft
 1. **Documentation** — Single source of truth for all domain knowledge. Per artifact type: V-model context, best practices, anti-patterns, examples, framework integration. AI skills are derived from this. Non-negotiable foundation.
 2. **Templates & Schemas** — Artifact definitions, envelopes, checklists. If followed, produce V-model compliant artifacts that pass assessment. Usable by humans, agents, or both.
 3. **Traceability** — Data model and validation engine for linking artifacts, validating completeness, detecting gaps. Coupled to our templates. Usable by humans, CI/CD, agents, or anyone.
-4. **AI Skills** — Two categories: craft skills (standalone best practices, framework-independent, derived from documentation) and framework skills (DoWorkflow-specific orchestration, template integration, traceability).
+4. **AI Skills** — Two categories: craft skills (standalone best practices, framework-independent, derived from documentation) and framework skills (VModelWorkflow-specific orchestration, template integration, traceability).
 
 **End goal:** V-model compliant software, developed by AI agents, fully understood and verified by human engineers.
 

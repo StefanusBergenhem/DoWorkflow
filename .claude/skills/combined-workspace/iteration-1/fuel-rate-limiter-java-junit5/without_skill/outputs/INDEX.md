@@ -352,6 +352,6 @@ open build/reports/jacoco/test/html/index.html
 
 ---
 
-**All files ready in: `/home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/fuel-rate-limiter-java-junit5/without_skill/outputs/`**
+**All files ready in: `/home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/fuel-rate-limiter-java-junit5/without_skill/outputs/`**
 
 Start with **QUICK_REFERENCE.md** or **README.md** depending on your familiarity with the project.

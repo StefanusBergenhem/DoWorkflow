@@ -1,6 +1,6 @@
 # Clean Code, Scalable Software, and AI-Agent Coding Best Practices
 
-Research compilation for the DoWorkflow implementation skill.
+Research compilation for the VModelWorkflow implementation skill.
 Covers principles, patterns, and anti-patterns from multiple authoritative sources.
 
 ---

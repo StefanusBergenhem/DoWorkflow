@@ -149,7 +149,7 @@ Two distinct categories of skills, plus agentic engineering practices baked into
 - Follows agentskills.io open standard (SKILL.md format)
 - Must work on smaller/cheaper models (Haiku, Sonnet) — tested with baseline comparison
 
-**Framework Skills (DoWorkflow-specific):**
+**Framework Skills (VModelWorkflow-specific):**
 - How to use our templates, produce trace artifacts, follow our schemas
 - Per-layer orchestration: research/plan → implement → review loops
 - Human transition between V-model layers, agent orchestration within layers

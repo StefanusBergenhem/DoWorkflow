@@ -1,4 +1,4 @@
-- [DoWorkflow Project Goals](project_goals.md) — three-pillar V-model framework (compliance, traceability, agentic skills), each independently usable
+- [VModelWorkflow Project Goals](project_goals.md) — three-pillar V-model framework (compliance, traceability, agentic skills), each independently usable
 - [User Background](user_background.md) — ASPICE/ISO26262 automotive experience, now in aviation DO-330 domain
 - [Working Style](feedback_working_style.md) — always discuss and get approval before writing files; show ASCII diagrams, motivate choices
 - [Process Discussion After Batch D](project_process_discussion.md) — pause after governance schemas to discuss process/skill coupling before Pillar 3

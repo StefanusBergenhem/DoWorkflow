@@ -805,7 +805,7 @@ No known open-source project as of early 2026 provides:
 - AI agent qualification evidence under DO-330 or ISO 26262 Part 8.
 - A benchmark for evaluating AI agents on safety-critical development tasks.
 
-These gaps represent significant opportunities for the DoWorkflow project.
+These gaps represent significant opportunities for the VModelWorkflow project.
 
 ---
 
@@ -1073,7 +1073,7 @@ The risks are substantial and must be mitigated before deployment:
 3. **Regulatory uncertainty** could result in rejected certification applications.
 4. **Liability gaps** could leave organizations exposed.
 
-### 9.3 Recommended Approach for DoWorkflow
+### 9.3 Recommended Approach for VModelWorkflow
 
 **Phase 1: Foundation (current)**
 - Establish the agentic workflow framework with TDD, review gates, and scope guards.

@@ -3,7 +3,7 @@
 ## Compile the code
 
 ```bash
-cd /home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs
+cd /home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs
 go build -v session_manager.go
 ```
 

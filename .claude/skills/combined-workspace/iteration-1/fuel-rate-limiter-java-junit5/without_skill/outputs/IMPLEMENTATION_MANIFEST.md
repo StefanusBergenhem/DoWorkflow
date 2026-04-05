@@ -361,7 +361,7 @@ To adapt for different engines, modify these constants in FuelRateLimiter.java:
 ### Related Documents
 
 - **Design Specification**: `/fuel-rate-limiter-design.md` (Artifact CD-001)
-- **V-Model Compliance**: See DoWorkflow framework documentation
+- **V-Model Compliance**: See VModelWorkflow framework documentation
 - **Build Guide**: `COVERAGE_AND_BUILD_GUIDE.md` (this delivery)
 - **API Documentation**: `README.md` (this delivery)
 

@@ -191,13 +191,13 @@ Each artifact type gets a complete documentation page covering:
 - [ ] V-model overview (what the V-model is, philosophy, layers, how they connect)
 - [ ] DRTDD explanation (Design-Requirement-Test Driven Development)
 - [ ] Safety analysis basics (FMEA, FTA — how they feed into requirements)
-- [ ] Framework user manual (how to use DoWorkflow)
+- [ ] Framework user manual (how to use VModelWorkflow)
 
 ---
 
 ## Component 4: AI Skills
 
-Two categories: craft skills (standalone, derived from documentation) and framework skills (DoWorkflow-specific).
+Two categories: craft skills (standalone, derived from documentation) and framework skills (VModelWorkflow-specific).
 
 ### Skill Foundation
 
@@ -211,7 +211,7 @@ Two categories: craft skills (standalone, derived from documentation) and framew
 - [x] derive-test-cases — V-model test derivation (4 strategies, coverage matrix)
 - [x] develop-code — implementation with quantified quality rules
 
-**Framework skills (DoWorkflow-specific):**
+**Framework skills (VModelWorkflow-specific):**
 - [ ] code-implementation orchestration — agent-orchestrated implement → self-check → review loop for code + tests
 - [ ] code-review framework skill — review agent validates code against detailed design, template, traceability
 

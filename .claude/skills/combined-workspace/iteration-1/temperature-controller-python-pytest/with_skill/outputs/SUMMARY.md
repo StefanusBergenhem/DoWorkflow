@@ -239,7 +239,7 @@ Also includes:
 
 **Run the tests:**
 ```bash
-cd /home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/temperature-controller-python-pytest/with_skill/outputs/
+cd /home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/temperature-controller-python-pytest/with_skill/outputs/
 
 # Install pytest if needed
 pip install pytest

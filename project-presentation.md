@@ -1,4 +1,4 @@
-# DoWorkflow — V-Model Development Framework
+# VModelWorkflow — V-Model Development Framework
 
 ## The Problem
 
@@ -54,11 +54,11 @@ The V-model's hierarchical decomposition maps almost perfectly onto how AI agent
 | Structured error handling | No null returns | AI omits error paths without guidance |
 | Testability | If hard to test, design is wrong | Test-first gives AI success criteria |
 
-**V-model compliance, clean code, and AI-driven development all demand the same discipline — from different motivations.** This convergence is the foundation of DoWorkflow.
+**V-model compliance, clean code, and AI-driven development all demand the same discipline — from different motivations.** This convergence is the foundation of VModelWorkflow.
 
 ---
 
-## What DoWorkflow Provides
+## What VModelWorkflow Provides
 
 Four independent components designed to work together:
 
@@ -97,10 +97,10 @@ Two categories of AI capabilities:
 **Craft Skills (standalone, framework-independent):**
 - AI-optimized versions of the documentation best practices
 - Each skill teaches one thing well: write requirements, derive tests, review designs
-- Usable on any project, in any framework — not tied to DoWorkflow
+- Usable on any project, in any framework — not tied to VModelWorkflow
 - Proven to work on smaller, cheaper AI models (not just the largest)
 
-**Framework Skills (DoWorkflow-specific):**
+**Framework Skills (VModelWorkflow-specific):**
 - Per V-model layer: research/plan with human → agent-orchestrated implementation → human final review
 - Template integration, traceability maintenance, review automation
 - Human transitions between layers, AI handles implementation within each layer
@@ -165,7 +165,7 @@ Standard TDD addresses functional correctness but misses requirements traceabili
 
 The biggest value proposition is not greenfield development — it is taking **existing legacy codebases** and making them V-model compliant.
 
-The volume of legacy code needing compliance far exceeds new development. DoWorkflow provides specialized AI skills that:
+The volume of legacy code needing compliance far exceeds new development. VModelWorkflow provides specialized AI skills that:
 
 - **Analyze existing code** — understand structure, dependencies, implicit design decisions
 - **Reverse-engineer V-model artifacts** — infer requirements, designs, and test coverage from code
@@ -180,7 +180,7 @@ This is not a separate product — it's the same components (documentation, temp
 
 ### Standards Coverage
 
-DoWorkflow targets the universal V-model pattern shared across all major safety-critical domains:
+VModelWorkflow targets the universal V-model pattern shared across all major safety-critical domains:
 
 | Domain | Standard | Safety Levels | Key Coverage Requirement |
 |--------|----------|--------------|--------------------------|
@@ -202,7 +202,7 @@ The industry is at an inflection point:
 - **Documentation generation** is the most widely accepted AI use case in regulated development
 - Three emerging approaches: *qualification by verification*, *AI as suggestion engine*, and *deterministic wrappers*
 
-**The gap DoWorkflow fills:** No existing framework addresses agentic AI (autonomous multi-step workflows) in safety-critical development contexts. DoWorkflow treats AI as a "suggestion engine" — AI generates candidates, deterministic tools verify, humans approve.
+**The gap VModelWorkflow fills:** No existing framework addresses agentic AI (autonomous multi-step workflows) in safety-critical development contexts. VModelWorkflow treats AI as a "suggestion engine" — AI generates candidates, deterministic tools verify, humans approve.
 
 ### Competitive Landscape
 
@@ -220,7 +220,7 @@ The industry is at an inflection point:
 
 ## Estimated Impact
 
-| Area | Current Cost | With DoWorkflow |
+| Area | Current Cost | With VModelWorkflow |
 |------|-------------|-----------------|
 | Traceability maintenance | 30-50% of documentation time | Automated — near zero manual effort |
 | Independent review overhead | +20-40% development time at highest safety levels | AI pre-review reduces human review burden |
@@ -236,7 +236,7 @@ The industry is at an inflection point:
 - **Build system:** Gradle, JUnit 5
 - **Requirements:** Mixed formats (Word, spreadsheets, DOORS) — possibly incomplete or stale
 - **Approach:** Incremental retrofit, module-by-module — not a big-bang rewrite
-- **Goal:** Demonstrate that DoWorkflow can take a real legacy codebase from "undocumented and untested" to "V-model compliant with full traceability" — incrementally, with AI assistance at every step
+- **Goal:** Demonstrate that VModelWorkflow can take a real legacy codebase from "undocumented and untested" to "V-model compliant with full traceability" — incrementally, with AI assistance at every step
 
 ---
 
@@ -257,7 +257,7 @@ Building bottom-up, one V-model layer at a time. For each layer: documentation f
 
 ## Summary
 
-DoWorkflow bridges the gap between what safety standards require and what development teams can practically deliver. It recognizes that V-model discipline, clean code principles, and AI-driven development are the same discipline viewed from different angles.
+VModelWorkflow bridges the gap between what safety standards require and what development teams can practically deliver. It recognizes that V-model discipline, clean code principles, and AI-driven development are the same discipline viewed from different angles.
 
 The framework is:
 - **Modular** — adopt what you need, each component works independently

@@ -860,7 +860,7 @@ feasible:
 
 ---
 
-## 8. Summary and Applicability to DoWorkflow
+## 8. Summary and Applicability to VModelWorkflow
 
 EARS provides a lightweight, proven methodology for writing requirements that
 are simultaneously human-readable and machine-processable. Key takeaways:
@@ -882,7 +882,7 @@ are simultaneously human-readable and machine-processable. Key takeaways:
 5. **Low adoption cost:** Engineers can learn EARS in under an hour and
    immediately produce better requirements.
 
-For a workflow automation system like DoWorkflow, EARS could serve as the
+For a workflow automation system like VModelWorkflow, EARS could serve as the
 requirement syntax for task contracts, ensuring that each task specification is
 unambiguous, testable, and machine-parseable. The structured format aligns well
 with YAML-based pipeline configuration and automated test generation.

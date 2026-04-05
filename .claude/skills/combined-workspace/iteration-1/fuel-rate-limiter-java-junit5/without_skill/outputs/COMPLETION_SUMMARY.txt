@@ -301,7 +301,7 @@ FILES LOCATION
 ================================================================================
 
 All deliverables saved to:
-  /home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/
+  /home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/
   fuel-rate-limiter-java-junit5/without_skill/outputs/
 
 File Listing:

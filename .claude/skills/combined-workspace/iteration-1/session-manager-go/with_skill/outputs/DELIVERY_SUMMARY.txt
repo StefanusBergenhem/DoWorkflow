@@ -39,7 +39,7 @@ DELIVERABLES
      - Test summary by category
 
 OUTPUT DIRECTORY
-  /home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs/
+  /home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs/
 
 CODE QUALITY VERIFICATION
   ✓ Complexity limits: All functions under 50 lines, cyclomatic complexity ≤ 10
@@ -79,7 +79,7 @@ DEPENDENCIES
 
 VERIFICATION
   To run tests:
-    cd /home/stefanus/repos/DoWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs
+    cd /home/stefanus/repos/VModelWorkflow/.claude/skills/combined-workspace/iteration-1/session-manager-go/with_skill/outputs
     go test -v
 
   Expected: All 31 tests pass, no race conditions
