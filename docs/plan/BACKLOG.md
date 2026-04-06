@@ -161,13 +161,28 @@ Priority: quality workproduct first, V-model fit second.
 
 > Done: `docs/guide/artifacts/unit-test.html`
 
-### 3.3 Detailed Design Documentation (next — one layer up)
+### 3.3 Detailed Design Documentation (DONE — one layer up)
 
-- [ ] V-model context (what detailed design is, level of detail expected, relationship to architecture above and code below)
-- [ ] Best practices (algorithms, data structures, interfaces, error handling, timing — per standards requirements)
-- [ ] Anti-patterns (design-after-code, paraphrasing code, missing "why", insufficient detail for direct implementation)
-- [ ] Examples
-- [ ] Framework integration
+- [x] Complete artifact page: `docs/guide/artifacts/detailed-design.html` (1096 lines)
+- [x] Section 1: What is detailed design (general intro, test derivation litmus test)
+- [x] Section 2: V-model context (position, design-before-code, standards table: DO-178C, ASPICE, ISO 26262, IEC 62304)
+- [x] Section 3: Producing quality detailed designs — 8 knowledge-domain subsections:
+  - [x] 3.1 Design documentation fundamentals (Parnas, Reeves, IEEE 1016, what-to-document table)
+  - [x] 3.2 Interface specification (DbC, Hoare triples, complete contract checklist, good/bad examples, LSP)
+  - [x] 3.3 Behavioral specification (algorithm spec, decision tables, state machines, specification patterns, formalism spectrum)
+  - [x] 3.4 Design rationale and decisions (Kruchten, ADRs, constraint taxonomy)
+  - [x] 3.5 Error handling and fault containment (Bloch exception design, Nygard stability patterns, error handling matrix, safety-critical)
+  - [x] 3.6 Dynamic behavior and concurrency (Goetz thread safety, timing constraints, ARINC 653/FFI)
+  - [x] 3.7 Scaling: what needs a design and how much detail (economics, standards tiering, 3-tier model, metrics, legacy retrofit)
+  - [x] 3.8 AI-assisted detailed design (forward generation, legacy retrofit, post-hoc paraphrase trap, regulatory status)
+- [x] Section 4: V-model specific considerations (traceability, derived requirements, review independence, code-as-LLR, ASPICE failures)
+- [x] Section 5: Framework integration — full schema walkthrough (Layer 1/2/3 model, heading structure, table formats, ID conventions, principle-to-schema mapping)
+- [x] Section 6: AI skills integration (stub)
+- [x] Two complete worked examples: Fuel Control component (Layer 3 with embedded unit) and Configuration Loader (Layer 1 only)
+- [x] Backed by 7 research documents in `research/detailed-design/` + existing Category A doc
+- [x] Updated detailed-design.schema.yaml to v2.0 markdown format with Layer 1/2/3 model
+
+> Done: `docs/guide/artifacts/detailed-design.html`
 
 ### 3.4 SW Architecture Documentation (later)
 
@@ -326,23 +341,26 @@ Specialized analysis/inference skills for reverse-engineering V-model artifacts 
 
 Bottom-up, one V-model layer at a time. For each layer: documentation first, then template, then craft skills, then framework skills.
 
-### Phase 1: Lowest V-Level (Code + Unit Tests) — CURRENT
+### Phase 1: Lowest V-Level (Code + Unit Tests) — DONE (documentation)
 
 ```
 1. [DONE] Documentation for code implementation (3.1)
    └── docs/guide/artifacts/source-code.html — comprehensive, 6 sections
 2. [DONE] Documentation for unit testing (3.2)
    └── docs/guide/artifacts/unit-test.html — comprehensive, 6 sections
-3. [NEXT] Framework skills for code + unit test layer (4.1, 4.2)
-   └── Orchestration loop, review skills, traceability integration
+3. [NEXT] Skills for the lower V (code + unit tests + detailed design)
+   └── Craft skills, framework skills, orchestration
 4. Traceability: link type rules for code ↔ detailed design (2A partial)
 ```
 
-### Phase 2: Detailed Design Layer
+### Phase 2: Detailed Design Layer — DONE (documentation)
 
 ```
-1. Documentation for detailed design (3.3)
-2. Craft skills: write-detailed-design, review-detailed-design (4.3 craft)
+1. [DONE] Documentation for detailed design (3.3)
+   └── docs/guide/artifacts/detailed-design.html — 1096 lines, 8 knowledge domains
+   └── 7 research docs in research/detailed-design/ + Category A doc
+   └── Schema v2.0 with Layer 1/2/3 model, two worked examples
+2. [NEXT] Craft skills: write-detailed-design, review-detailed-design (4.3 craft)
 3. Framework skills: research/plan, orchestration, review (4.3 framework)
 4. Traceability: link type rules for detailed design ↔ code, detailed design ↔ SW architecture (2A partial)
 5. Wire full V-pair: detailed design → code + unit tests (end-to-end)
@@ -498,8 +516,8 @@ For each artifact documentation page:
 
 | Artifact (Section) | Cat A: Standards | Cat B: Craft (estimated docs) | Cat C: AI |
 |---|---|---|---|
-| Unit Test (3.2 rework) | Done | 5 docs (in progress) | 1 doc (in progress) |
-| Detailed Design (3.3) | Needed | ~3-4 (design documentation, interface specification, algorithm description, state modeling) | Needed |
+| Unit Test (3.2 rework) | Done | 5 docs (done) | 1 doc (done) |
+| Detailed Design (3.3) | Done (08-detailed-design-realism-and-compliance.md) | 6 docs (done): design-documentation-craft, interface-specification-design-by-contract, behavioral-specification-techniques, dynamic-behavior-concurrency, design-scaling-tiering, error-handling-specification | 1 doc (done): ai-assisted-detailed-design |
 | SW Architecture (3.4) | Needed | ~3-4 (component decomposition, architecture styles, interface design, modularity/coupling metrics) | Needed |
 | SW Requirements (3.5) | Partially done (EARS research exists) | ~3-4 (requirements engineering, EARS deep dive, testability/verifiability, requirements management) | Needed |
 | System Requirements (3.6) | Needed | ~2-3 (system-level requirements, allocation, derived requirements) | Needed |

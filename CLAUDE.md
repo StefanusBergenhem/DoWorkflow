@@ -37,8 +37,8 @@ Per V-model layer:
 
 Bottom-up, one V-model layer at a time. For each layer: **documentation first**, then template, then craft skill, then framework skill.
 
-Current: Phase 1 — Code + Unit Tests (lowest V-level)
-Next: Phase 2 — Detailed Design
+Current: Phases 1+2 documentation complete (Code, Unit Tests, Detailed Design)
+Next: Skills for the lower V (code + unit tests + detailed design)
 
 See `docs/plan/BACKLOG.md` for full backlog and `docs/plan/TARGET_ARCHITECTURE.md` for architecture.
 

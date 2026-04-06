@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detailed Design — VModelWorkflow Guide</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>VModelWorkflow</h1>
+    <div class="subtitle">V-Model Development Guide</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-group-label">Navigation</span>
+      <a class="nav-link" href="../index.html">Back to Main Guide</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Detailed Design</span>
+      <a class="nav-link" href="#dd-intro">What is Detailed Design?</a>
+      <a class="nav-link" href="#dd-vmodel">V-Model Context</a>
+      <a class="nav-link" href="#dd-quality">Producing Quality Designs</a>
+      <a class="nav-link" href="#dd-fundamentals">Design Fundamentals</a>
+      <a class="nav-link" href="#dd-interfaces">Interface Specification</a>
+      <a class="nav-link" href="#dd-behavior">Behavioral Specification</a>
+      <a class="nav-link" href="#dd-rationale">Rationale &amp; Decisions</a>
+      <a class="nav-link" href="#dd-error-handling">Error Handling</a>
+      <a class="nav-link" href="#dd-dynamic">Dynamic Behavior</a>
+      <a class="nav-link" href="#dd-scaling">Scaling &amp; Tiering</a>
+      <a class="nav-link" href="#dd-ai-development">AI-Assisted Design</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">V-Model &amp; Framework</span>
+      <a class="nav-link" href="#dd-vmodel-considerations">V-Model Considerations</a>
+      <a class="nav-link" href="#dd-framework">Framework Integration</a>
+      <a class="nav-link" href="#dd-schema-layers">Schema: Layer Model</a>
+      <a class="nav-link" href="#dd-schema-layer1">Schema: Layer 1</a>
+      <a class="nav-link" href="#dd-schema-layer2">Schema: Layer 2</a>
+      <a class="nav-link" href="#dd-schema-layer3">Schema: Layer 3</a>
+      <a class="nav-link" href="#dd-schema-traceability">Schema: Traceability IDs</a>
+      <a class="nav-link" href="#dd-example-full">Example: Fuel Control (L3)</a>
+      <a class="nav-link" href="#dd-example-layer1">Example: Config Loader (L1)</a>
+      <a class="nav-link" href="#dd-skills">AI Skills <span class="status-badge stub">stub</span></a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Related Artifacts</span>
+      <a class="nav-link" href="#dd-references">References</a>
+      <a class="nav-link" href="source-code.html">Source Code</a>
+      <a class="nav-link" href="unit-test.html">Unit Test</a>
+    </div>
+  </nav>
+
+  <div class="domain-switcher">
+    <label for="domain-select">Domain Vocabulary</label>
+    <select id="domain-select">
+      <option value="generic">Generic V-Model</option>
+      <option value="do178c">DO-178C (Aviation)</option>
+      <option value="aspice">ASPICE / ISO 26262 (Automotive)</option>
+    </select>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content" style="margin-left: var(--sidebar-width); padding: var(--space-3xl) var(--space-2xl); max-width: calc(var(--content-max) + var(--space-2xl) * 2 + var(--sidebar-width));">
+
+  <!-- ===================== SECTION 1: INTRO ===================== -->
+  <section id="dd-intro">
+    <div class="level-indicator left">Level 3 &mdash; Design</div>
+    <h2>What is Detailed Design?</h2>
+    <p class="lead">Detailed design is the specification of individual software units &mdash; their interfaces, behavior, error handling, and internal structure &mdash; at sufficient detail that an engineer can implement them without further information and a tester can derive test cases without reading the code.</p>
+
+    <p>A detailed design document answers these questions for each unit:</p>
+    <ul>
+      <li><strong>What does this unit do?</strong> &mdash; its behavioral contract, inputs, outputs, and state changes</li>
+      <li><strong>What does this unit promise to callers?</strong> &mdash; its interface specification with preconditions and postconditions</li>
+      <li><strong>What design decisions shaped it?</strong> &mdash; the rationale, constraints, and rejected alternatives</li>
+      <li><strong>What can go wrong?</strong> &mdash; error conditions, fault containment, and recovery strategy</li>
+    </ul>
+
+    <div class="card">
+      <h3>The Fundamental Principle</h3>
+      <p>A detailed design is <strong>not a description of what the code does</strong>. The code already says what it does. A detailed design captures what the code <em>cannot</em> say: intent, decisions, constraints, and contracts that enable independent verification. If your design document reads like prose-formatted source code, it has failed its purpose.</p>
+      <p><cite>&ldquo;The implementation documentation should never describe what happens, that does already the code for you. It should describe why it is implemented in the way it is.&rdquo; &mdash; <a href="https://github.com/eclipse-iceoryx/iceoryx/blob/main/doc/aspice_swe3_4/swe_docu_guidelines.md">Eclipse iceoryx SWE.3 documentation guidelines</a></cite></p>
+    </div>
+
+    <div class="card">
+      <h3>The Test Derivation Litmus Test</h3>
+      <p>A detailed design is complete when an engineer who has not seen the source code can derive a meaningful set of test cases from it. If the test engineer must look at the implementation to understand what to test, the design is incomplete.</p>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 2: V-MODEL CONTEXT ===================== -->
+  <section id="dd-vmodel">
+    <h2><span data-term="detailed-design">Detailed Design</span> in the V-Model</h2>
+    <p class="lead"><span data-term="detailed-design">Detailed design</span> sits on the left side of the V at Level 3, below the <span data-term="sw-architecture">Software Architecture</span> and directly opposite the <span data-term="unit-test">Unit Tests</span> on the right side. It is the lowest level of specification before code.</p>
+
+    <h3>Position in the V</h3>
+    <div class="trace-flow">
+      <span class="artifact-ref" data-term="sw-requirements">SW Requirements</span>
+      <span class="arrow">&rarr;</span>
+      <span class="artifact-ref" data-term="sw-architecture">Architecture</span>
+      <span class="arrow">&rarr;</span>
+      <span class="artifact-ref" data-term="detailed-design">Detailed Design</span>
+      <span class="arrow">&rarr;</span>
+      <span class="artifact-ref" data-term="source-code">Source Code</span>
+    </div>
+    <p>The detailed design takes the <span data-term="sw-architecture">software architecture</span> as input and decomposes each architectural component into individually implementable and testable units. Each unit&rsquo;s design becomes the specification against which <span data-term="unit-test">unit tests</span> are derived and the implementation is verified.</p>
+
+    <h3>The Critical Principle: Design Before Code</h3>
+    <div class="card">
+      <p>The V-model requires that design precedes implementation. This is not bureaucracy &mdash; it is the mechanism that makes independent verification possible. If tests are derived from the design (not from the code), they can catch implementation errors. If the design is written after the code, tests derived from it will mirror the code&rsquo;s behavior &mdash; including its bugs.</p>
+      <p><cite>&ldquo;If you write the detailed design after documenting your code, the point of the unit test is lost.&rdquo; &mdash; <a href="https://www.ul.com/sis/insights/software-detailed-design-and-unit-construction-swe3-automotive-spice">UL Solutions, ASPICE SWE.3 Insights</a></cite></p>
+    </div>
+
+    <h3>Standards Perspective</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>Standard</th><th>Section</th><th>Key Requirement</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>DO-178C</td><td>&sect;11.9, &sect;6.3&ndash;6.4</td><td><span data-term="detailed-design">Low-level requirements</span> must be detailed enough that &ldquo;source code can be directly implemented without further information.&rdquo; Bidirectional traceability required. 31 review/analysis objectives; DAL A/B requires independent review of LLR verification.</td></tr>
+        <tr><td>ASPICE</td><td>SWE.3</td><td>8 base practices: develop detailed design (BP.1), document interfaces with names, types, units, ranges, defaults (BP.2), evaluate dynamic behavior (BP.3), evaluate for testability (BP.4), establish bidirectional traceability (BP.5), ensure consistency (BP.6).</td></tr>
+        <tr><td>ISO 26262</td><td>Part 6, Clause 8</td><td>Software unit design. Notation scales with ASIL: natural language (ASIL A/B), semi-formal (ASIL C/D recommended), formal (ASIL D highly recommended). Design must address simplicity, modularity, verifiability, encapsulation.</td></tr>
+        <tr><td>IEC 62304</td><td>&sect;5.4</td><td>Detailed design required <strong>only for Class C</strong> (risk of death or serious injury). Class A and B are exempt. When required: sufficient detail for correct implementation and documented interfaces.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== SECTION 3: QUALITY ===================== -->
+  <section id="dd-quality">
+    <h2>Producing Quality Detailed Designs</h2>
+    <p class="lead">This section covers the craft of writing effective detailed designs. It is organized by knowledge domain: design fundamentals, interface specification, behavioral specification, rationale, error handling, dynamic behavior, scaling strategies, and AI-assisted design. Each principle includes concrete examples.</p>
+  </section>
+
+  <!-- ===================== 3.1: DESIGN FUNDAMENTALS ===================== -->
+  <section id="dd-fundamentals">
+    <h3>3.1 Design Documentation Fundamentals</h3>
+    <p>Before writing any design, you need to understand what makes a design document valuable. The answer is deceptively simple: <strong>a design document must contain information that the code cannot provide</strong>.</p>
+
+    <h4>What Design Documentation Is For</h4>
+    <p>Parnas and Clements established the definitive framework in their 1986 paper &ldquo;A Rational Design Process: How and Why to Fake It.&rdquo; Their key insight: documentation is not a record of what happened during development &mdash; it is a structured presentation of what is known about the system. Even when development is iterative and exploratory, the documentation should be written as if a rational process was followed. <cite>&mdash; Parnas &amp; Clements, <a href="https://ieeexplore.ieee.org/document/6312940">IEEE Trans. SE, 12(2), 1986</a></cite></p>
+
+    <p>Their model requires that there be <strong>one, and only one, place for every fact</strong> in the design. Redundancy creates inconsistency under change. Every design fact belongs to exactly one document section.</p>
+
+    <h4>What Design Adds That Code Cannot</h4>
+    <p>Jack Reeves argued in 1992 that &ldquo;source code is the real software design&rdquo; &mdash; but explicitly warned against reading this as &ldquo;no documentation needed.&rdquo; His framework clarifies what documentation must add: <strong>everything that a skilled reader cannot derive from reading the code</strong>. <cite>&mdash; Reeves, <a href="https://www.developerdotstar.com/mag/articles/reeves_design.html">&ldquo;What Is Software Design?&rdquo;, C++ Journal, 1992</a></cite></p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Document This (code cannot provide)</th><th>Do NOT Document This (code already shows)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Why this algorithm was chosen over alternatives</td><td>The step-by-step implementation logic</td></tr>
+        <tr><td>What external constraint forced this data structure</td><td>Variable names and their types</td></tr>
+        <tr><td>Valid state space of parameters (ranges, invariants)</td><td>Control flow that is clear from structure</td></tr>
+        <tr><td>What happens when preconditions are violated</td><td>Language-specific syntax</td></tr>
+        <tr><td>Expected performance envelope and why</td><td>Information the type system already captures</td></tr>
+        <tr><td>What the module hides and why that boundary was drawn</td><td>What the code does line-by-line</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Information Hiding: What a Module Must Document</h4>
+    <p>Parnas&rsquo;s 1972 paper &ldquo;On the Criteria To Be Used in Decomposing Systems into Modules&rdquo; established that every module is characterized by a design decision it hides from all others. The design document for a module must describe: (1) what the module hides, (2) what the module reveals through its interface, and (3) why that particular boundary was drawn. <cite>&mdash; Parnas, <a href="https://dl.acm.org/doi/10.1145/361598.361623">CACM, 15(12), 1972</a></cite></p>
+
+    <h4>IEEE 1016: The Standard for Software Design Descriptions</h4>
+    <p>IEEE Std 1016-2009 defines what a Software Design Description (SDD) must contain. It is applicable to both high-level and detailed design, and explicitly covers reverse engineering scenarios. The standard does not prescribe specific methodologies but establishes that an SDD must communicate design information to key stakeholders. <cite>&mdash; <a href="https://ieeexplore.ieee.org/document/5167255">IEEE Std 1016-2009</a></cite></p>
+  </section>
+
+  <!-- ===================== 3.2: INTERFACE SPECIFICATION ===================== -->
+  <section id="dd-interfaces">
+    <h3>3.2 Interface Specification</h3>
+    <p>Interface specification is the core of detailed design. ASPICE SWE.3 BP.2 states it directly: &ldquo;without this information, proper testing of the interfaces in the unit test is impossible.&rdquo; Every V-model standard requires that unit interfaces be defined with enough precision to derive tests from them.</p>
+
+    <h4>Design by Contract</h4>
+    <p>Bertrand Meyer formalized Design by Contract (DbC) in the Eiffel language. Every function interface is a contract between caller (client) and implementation (supplier), structured as a Hoare triple: <strong>{P} S {Q}</strong> &mdash; if precondition P holds before operation S, then postcondition Q holds after. <cite>&mdash; Hoare, <a href="https://dl.acm.org/doi/10.1145/363235.363259">CACM, 12(10), 1969</a>; Meyer, <a href="https://www.kth.se/social/files/59526bfb56be5b4f17000807/meyer-92-contracts.pdf">IEEE Computer, 25(10), 1992</a></cite></p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Contract Element</th><th>Meaning</th><th>Unit Test Role</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Precondition</td><td>What the caller must guarantee before the call</td><td>Test setup &mdash; arrange phase establishes state satisfying pre</td></tr>
+        <tr><td>Postcondition</td><td>What the supplier guarantees on return</td><td>Test assertion &mdash; assert phase verifies post holds</td></tr>
+        <tr><td>Invariant</td><td>What must hold before and after every public call</td><td>Assertion after every mutating call</td></tr>
+      </tbody>
+    </table>
+
+    <h4>What a Complete Interface Contract Contains</h4>
+    <p>Not every element applies to every function, but completeness means having consciously decided each:</p>
+    <ol>
+      <li><strong>Signature</strong> &mdash; name, parameter types, return type (the syntactic minimum)</li>
+      <li><strong>Preconditions</strong> &mdash; value ranges, state conditions, relationship constraints, units of measurement</li>
+      <li><strong>Postconditions</strong> &mdash; return value range, state changes, idempotency, old-value relationships</li>
+      <li><strong>Invariants</strong> &mdash; properties that hold across all public calls</li>
+      <li><strong>Error semantics</strong> &mdash; what happens on invalid input: exception, error code, assertion, or undefined?</li>
+      <li><strong>Nullability</strong> &mdash; explicit <code>@NonNull</code> / <code>@Nullable</code> for every parameter and return type</li>
+      <li><strong>Thread-safety guarantee</strong> &mdash; immutable, thread-safe, conditionally thread-safe, or not thread-safe</li>
+    </ol>
+
+    <div class="example-block bad">
+      <div class="example-label">Bad &mdash; Signature only, no contract</div>
+      <div class="code-block"><span class="lang-label">Java</span><code>/**
+ * Calculates the discount for an order.
+ */
+double calculateDiscount(Order order);</code></div>
+    </div>
+
+    <div class="example-block good">
+      <div class="example-label">Good &mdash; Full interface contract</div>
+      <div class="code-block"><span class="lang-label">Java</span><code>/**
+ * Calculates the percentage discount for an order based on customer tier.
+ *
+ * @param order the order to evaluate; must not be null; must have
+ *        at least one line item; total must be &gt; 0
+ * @return discount as a decimal in [0.0, 0.5]; 0.0 means no discount
+ * @throws IllegalArgumentException if order is null or has no line items
+ * @throws IllegalStateException if customer tier is not set on the order
+ *
+ * Thread-safety: this method is stateless and thread-safe.
+ * Derived from: SWREQ-PRICING-012
+ */
+@NonNull
+double calculateDiscount(@NonNull Order order);</code></div>
+    </div>
+
+    <h4>Defensive Programming vs. Design by Contract</h4>
+    <p>These are philosophically opposed. DbC assigns each consistency condition to exactly one party: either it is the caller&rsquo;s precondition (caller&rsquo;s bug if violated) or the supplier&rsquo;s obligation (supplier&rsquo;s bug if violated). Defensive programming validates everything everywhere, blurring responsibility. <cite>&mdash; Meyer, IEEE Computer, 1992; <a href="https://www.sciencedirect.com/topics/computer-science/design-by-contract">ScienceDirect DbC overview</a></cite></p>
+
+    <p><strong>Practical synthesis for safety-critical systems:</strong> Use DbC semantics in the interface specification. Apply defensive checks at trust boundaries (hardware interfaces, external inputs, IPC). Use assertions for internal module interfaces. <cite>&mdash; <a href="https://www.state-machine.com/dbc">Quantum Leaps, Embedded DbC</a></cite></p>
+
+    <h4>The Liskov Substitution Principle as a Contract Rule</h4>
+    <p>When a subtype overrides a method, its contract must be compatible: preconditions may only weaken (accept more), postconditions may only strengthen (promise more), invariants must be maintained. This is a reviewable property of interface specifications. <cite>&mdash; Liskov &amp; Wing, <a href="https://dl.acm.org/doi/10.1145/197320.197383">ACM TOPLAS, 16(6), 1994</a></cite></p>
+  </section>
+
+  <!-- ===================== 3.3: BEHAVIORAL SPECIFICATION ===================== -->
+  <section id="dd-behavior">
+    <h3>3.3 Behavioral Specification</h3>
+    <p>How to specify <em>what</em> a unit does without paraphrasing <em>how</em> the code works. This is the art of describing expected behavior at a level that enables independent test derivation.</p>
+
+    <h4>The Level-of-Detail Problem</h4>
+    <p>Algorithm specification has two failure modes: <strong>too abstract</strong> (&ldquo;process the data&rdquo; &mdash; untestable) and <strong>too concrete</strong> (copying pseudocode from the implementation &mdash; circular, useless for independent testing). The right level constrains behavior enough to derive tests while leaving the implementer freedom to choose data structures and optimize.</p>
+
+    <p>DO-178C defines the target precisely: Low-Level Requirements must be detailed enough that &ldquo;source code can be directly implemented without further information.&rdquo; <cite>&mdash; <a href="https://www.parasoft.com/learning-center/do-178c/what-is/">Parasoft, DO-178C overview</a></cite></p>
+
+    <h4>Algorithm Specification</h4>
+    <p>A spectrum from natural language through pseudocode to mathematical notation. The key distinction is between <strong>behavioral requirement</strong> (what property the output must satisfy) and <strong>algorithm selection</strong> (which specific algorithm to use).</p>
+
+    <div class="example-block bad">
+      <div class="example-label">Bad &mdash; Algorithm selection without behavioral requirement</div>
+      <div class="code-block"><span class="lang-label">Design</span><code>The function shall use quicksort with median-of-three pivot selection.</code></div>
+    </div>
+
+    <div class="example-block good">
+      <div class="example-label">Good &mdash; Behavioral requirement with justified algorithm constraint</div>
+      <div class="code-block"><span class="lang-label">Design</span><code>The function shall produce a list containing exactly the elements of
+the input, in non-descending order according to the provided comparator.
+
+Stability is required (equal elements preserve their relative order)
+because downstream processing depends on insertion order as a tiebreaker.
+
+Performance: O(n log n) worst-case is required for real-time scheduling
+compliance (SYS-TIMING-003). Quicksort is excluded due to O(n&sup2;) worst case.</code></div>
+    </div>
+
+    <h4>Decision Tables</h4>
+    <p>Decision tables excel at specifying rule-based behavior. Each rule is a complete combination of conditions mapped to actions. A complete decision table gives a test suite with decision coverage by construction, and maps directly to MC/DC test case derivation. <cite>&mdash; Myers, <a href="https://books.google.com/books/about/The_Art_of_Software_Testing.html?id=86rz6UExDEEC"><em>The Art of Software Testing</em>, 1979, Ch. 4</a>; <a href="https://magdalenaolak.gitbook.io/istqb-foundation-level/4-test-techniques/4.2-black-box-test-techniques/4.2.3-decision-table-testing">ISTQB Foundation Level, &sect;4.2.3</a></cite></p>
+
+    <h4>State Machine Specification</h4>
+    <p>Use a state machine when a unit has distinct operational modes &mdash; when it behaves differently based on prior history, not just current inputs. Harel statecharts (1987) solved the state explosion problem with hierarchy, concurrency, and communication. <cite>&mdash; Harel, <a href="https://www.sciencedirect.com/science/article/pii/0167642387900359"><em>Science of Computer Programming</em>, 8(3), 1987</a></cite></p>
+
+    <p>A state machine section in a design document must include: state inventory with invariants, transition table (source, event, guard, action, target), initial and terminal states, and undefined event handling (ignore, log, fault, or exception).</p>
+
+    <h4>Specification Patterns: Choosing the Right Form</h4>
+    <table class="field-table">
+      <thead>
+        <tr><th>Behavior Type</th><th>Recommended Pattern</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Pure function, mathematical transformation</td><td>Pre/postcondition + property-based</td></tr>
+        <tr><td>Rule-based logic (many conditions &rarr; action)</td><td>Decision table</td></tr>
+        <tr><td>Mode-dependent, event-driven behavior</td><td>State machine (Harel statechart)</td></tr>
+        <tr><td>Protocol, multi-step ordered sequence</td><td>Scenario-based or UML sequence diagram</td></tr>
+        <tr><td>Complex boolean guard logic</td><td>Truth table</td></tr>
+        <tr><td>Complex input domain partitioning</td><td>Parnas table / tabular specification</td></tr>
+        <tr><td>High ASIL/DAL formal verification</td><td>JML or equivalent BISL</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Natural Language vs. Semi-Formal vs. Formal</h4>
+    <p>ISO 26262 explicitly maps notation formality to ASIL: natural language suffices for ASIL A/B; semi-formal notation (UML, state machines) is highly recommended for ASIL C/D; formal methods are highly recommended for ASIL D. DO-333 (the Formal Methods Supplement to DO-178C) provides a framework for using formal methods as an alternative verification path. <cite>&mdash; <a href="https://afuzion.com/do-333-introduction-formal-methods/">AFuzion, DO-333 overview</a></cite></p>
+  </section>
+
+  <!-- ===================== 3.4: DESIGN RATIONALE ===================== -->
+  <section id="dd-rationale">
+    <h3>3.4 Design Rationale and Decisions</h3>
+    <p>Rationale is what separates a design document from a code description. Without it, maintainers encounter decisions that appear arbitrary and either reverse them (breaking hidden constraints) or preserve them unnecessarily (losing improvement opportunities).</p>
+
+    <h4>Why Rationale Matters</h4>
+    <p>Kruchten argued that design decisions should be first-class entities with attributes and relationships, not implementation footnotes. Decisions have context, alternatives, justification, and connections to other decisions. <cite>&mdash; Kruchten, <a href="https://philippe.kruchten.com/wp-content/uploads/2009/07/kruchten-2004-design-decisions.pdf">&ldquo;An Ontology of Architectural Design Decisions&rdquo;, 2004</a></cite></p>
+
+    <p>Burge and Brown identified the costs of rationale absence: design verification becomes impossible (an auditor cannot assess appropriateness without knowing rejected alternatives), conflict mitigation fails (engineers cannot trace conflicting constraints), and knowledge transfer breaks. <cite>&mdash; Burge &amp; Brown, <a href="http://web.cs.wpi.edu/~dcb/Papers/AID00-janet.pdf">&ldquo;Reasoning with Design Rationale&rdquo;</a></cite></p>
+
+    <h4>Architecture Decision Records for Unit-Level Design</h4>
+    <p>The ADR format (Tyree &amp; Akerman 2005; lightweight form by Nygard 2011) is directly applicable to non-trivial unit-level design decisions. Nygard&rsquo;s format: Title, Status, Context, Decision, Consequences. The Context section describes the forces at play; the Consequences section records what becomes easier or harder. <cite>&mdash; Tyree &amp; Akerman, <a href="https://ieeexplore.ieee.org/document/1407822">IEEE Software, 22(2), 2005</a>; Nygard, <a href="https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions">Cognitect blog, 2011</a></cite></p>
+
+    <p>A unit-level decision record is appropriate when the decision is non-obvious, was constrained by factors not visible in the code, was made in preference to a plausible alternative, or has implications that a future maintainer must understand before modifying the code.</p>
+
+    <h4>Constraint Documentation</h4>
+    <p>A decision cannot be fully understood without documenting the constraints that limited the solution space. Four categories:</p>
+    <ul>
+      <li><strong>External</strong> &mdash; standards mandates, platform limitations, certification requirements. <em>&ldquo;MISRA-C compliance; no dynamic allocation after init.&rdquo;</em></li>
+      <li><strong>Architectural</strong> &mdash; decisions from a higher layer. <em>&ldquo;Single-threaded event loop; blocking prohibited in this module.&rdquo;</em></li>
+      <li><strong>Resource</strong> &mdash; timing budgets, memory limits, stack depth. <em>&ldquo;Called from interrupt context; stack bounded to 256 bytes.&rdquo;</em></li>
+      <li><strong>Temporal</strong> &mdash; correct at the time but may be lifted later. <em>&ldquo;Matches legacy interface; legacy decommissioned in Phase 4.&rdquo;</em></li>
+    </ul>
+    <p>Without explicit constraint documentation, the next engineer has no way to distinguish &ldquo;this design is bad and should be changed&rdquo; from &ldquo;this design is forced by an external constraint and cannot be changed.&rdquo;</p>
+  </section>
+
+  <!-- ===================== 3.5: ERROR HANDLING ===================== -->
+  <section id="dd-error-handling">
+    <h3>3.5 Error Handling and Fault Containment</h3>
+    <p>Error handling is a design decision, not an implementation detail. A design that leaves error strategy to individual implementers will produce inconsistent, untestable, and potentially unsafe error behavior.</p>
+
+    <h4>What the Design Must Specify About Errors</h4>
+    <p>For each unit, the design document must answer six questions:</p>
+    <ol>
+      <li>What errors can this unit encounter or produce?</li>
+      <li>How is each error detected?</li>
+      <li>How does each error propagate (or get contained)?</li>
+      <li>What is the recovery strategy for each error class?</li>
+      <li>What state is the unit left in after an error?</li>
+      <li>What does the caller receive (exception, error code, degraded result)?</li>
+    </ol>
+
+    <h4>Error Propagation Strategy</h4>
+    <p>Joshua Bloch&rsquo;s <em>Effective Java</em> Items 69&ndash;77 establish the canonical guidance for Java exception design. Key design decisions: <cite>&mdash; Bloch, <em>Effective Java</em>, 3rd ed., Addison-Wesley, 2018</cite></p>
+    <ul>
+      <li><strong>Checked vs. unchecked exceptions</strong> &mdash; a checked exception is a specification of caller obligation (the caller <em>must</em> handle it). An unchecked exception indicates a programming error (the caller has a bug). This is a design-level decision about who is responsible.</li>
+      <li><strong>Exception translation at boundaries</strong> &mdash; lower-layer exceptions should be caught and translated to domain-specific exceptions at component boundaries. A database <code>SQLException</code> should not leak through to business logic.</li>
+      <li><strong>Exception hierarchy</strong> &mdash; keep hierarchies shallow. Separate domain exceptions (business rule violations) from technical exceptions (infrastructure failures).</li>
+    </ul>
+
+    <h4>Fault Containment and Isolation</h4>
+    <p>Michael Nygard&rsquo;s <em>Release It!</em> formalized stability patterns that are design-level decisions: <cite>&mdash; Nygard, <em>Release It!</em>, 2nd ed., Pragmatic Bookshelf, 2018</cite></p>
+    <ul>
+      <li><strong>Bulkhead pattern</strong> &mdash; isolate resource pools so that failure in one subsystem does not drain resources from others. The design must specify the isolation boundaries.</li>
+      <li><strong>Circuit breaker</strong> &mdash; a three-state machine (closed, open, half-open) that prevents cascading failures. The design must specify: failure threshold, timeout period, health check mechanism, and fallback behavior.</li>
+    </ul>
+    <p>Robert Hanmer&rsquo;s <em>Patterns for Fault Tolerant Software</em> extends this with error containment barriers and quarantine patterns specifically for safety-critical systems. <cite>&mdash; Hanmer, <em>Patterns for Fault Tolerant Software</em>, Wiley, 2007</cite></p>
+
+    <h4>Fail-Fast vs. Recovery vs. Degraded Operation</h4>
+    <p>Jim Shore defined &ldquo;fail fast&rdquo; as: &ldquo;When a problem occurs, it fails immediately and visibly. If something unusually or unexpectedly occurs, let the software fail immediately.&rdquo; In safety-critical contexts, fail-fast means detect-and-surface, not crash &mdash; the design must specify what &ldquo;surface&rdquo; means (safe state, alert, shutdown sequence). <cite>&mdash; Shore, <a href="https://www.martinfowler.com/ieeeSoftware/failFast.pdf">&ldquo;Fail Fast&rdquo;, IEEE Software, Sep/Oct 2004</a></cite></p>
+
+    <p>The design must specify, for each error class, which strategy applies: retry (with backoff?), fallback (to what?), compensating action, safe state, or propagation to caller.</p>
+
+    <h4>Error Handling Matrix</h4>
+    <p>A structured way to specify error handling in a design document:</p>
+    <table class="field-table">
+      <thead>
+        <tr><th>Error</th><th>Detection</th><th>Containment</th><th>Recovery</th><th>Caller Receives</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Invalid input range</td><td>Precondition check</td><td>Reject at boundary</td><td>None (caller&rsquo;s bug)</td><td><code>IllegalArgumentException</code></td></tr>
+        <tr><td>Database timeout</td><td>Connection pool timeout</td><td>Circuit breaker</td><td>Retry 2x, then fallback to cache</td><td>Stale data with staleness flag</td></tr>
+        <tr><td>Sensor value out of range</td><td>Range check per SYS-SAFE-007</td><td>Isolate sensor channel</td><td>Use last known good value for 1 cycle, then safe state</td><td>Degraded mode indicator</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Safety-Critical Error Handling</h4>
+    <p>DO-178C requires robustness testing &mdash; tests that verify behavior under abnormal and erroneous inputs. These tests can only exist if the design specifies what &ldquo;abnormal behavior&rdquo; means for each unit. Undocumented error handling creates an untestability gap: the test engineer cannot write a robustness test without knowing what the correct error response is.</p>
+    <p>ASPICE SWE.3 requires that error handling be traceable to requirements, not ad-hoc defensive code. ISO 26262 defines specific fault tolerance mechanisms and requires that degradation concepts be designed, not improvised.</p>
+
+    <div class="card">
+      <h3>Anti-Patterns</h3>
+      <ul>
+        <li><strong>No error strategy</strong> &mdash; each implementer handles errors differently, producing inconsistent behavior across the component</li>
+        <li><strong>Catch and ignore</strong> &mdash; silently swallowing exceptions masks defects and violates every safety standard</li>
+        <li><strong>Catch <code>Exception</code></strong> &mdash; over-broad catching masks programming errors (NPE, ClassCast) alongside expected conditions</li>
+        <li><strong>Exception tunneling</strong> &mdash; low-level exceptions propagate through layers that don&rsquo;t understand them, leaking implementation details</li>
+        <li><strong>Missing error specification in interfaces</strong> &mdash; the function signature says nothing about what can go wrong; callers must guess</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== 3.6: DYNAMIC BEHAVIOR ===================== -->
+  <section id="dd-dynamic">
+    <h3>3.6 Dynamic Behavior and Concurrency</h3>
+    <p>ASPICE SWE.3 BP.3 requires: &ldquo;Evaluate and document the dynamic behavior of and the interaction between relevant software units.&rdquo; The key qualifier is &ldquo;relevant&rdquo; &mdash; not every unit has dynamic behavior worth modeling. Specify dynamic behavior when the unit has multiple states, history-dependent behavior, concurrency, or timing constraints.</p>
+
+    <h4>State Machine Testing Coverage</h4>
+    <p>State-based testing has an established coverage hierarchy: state coverage (every state visited) &rarr; transition coverage (every transition exercised) &rarr; round-trip path coverage (every cycle covered) &rarr; sneak-path testing (verify illegal transitions cannot be triggered). Sneak-path testing is critical for safety: it exercises the system with events undefined for the current state to verify correct rejection. <cite>&mdash; <a href="https://www.researchgate.net/publication/330047546_Coverage_Criteria_for_State-Based_Testing_A_Systematic_Review">Coverage Criteria for State-Based Testing, systematic review</a></cite></p>
+
+    <h4>Thread Safety as a Design Contract</h4>
+    <p>Thread safety is an interface property, not an implementation detail. Brian Goetz established the standard taxonomy for Java: <cite>&mdash; Goetz et al., <a href="https://www.oreilly.com/library/view/java-concurrency-in/0321349601/"><em>Java Concurrency in Practice</em>, 2006</a></cite></p>
+    <table class="field-table">
+      <thead>
+        <tr><th>Level</th><th>Meaning</th><th>Caller Obligation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Immutable</td><td>State cannot change after construction</td><td>None &mdash; inherently safe</td></tr>
+        <tr><td>Thread-safe</td><td>Internal synchronization sufficient</td><td>None &mdash; safe for concurrent access</td></tr>
+        <tr><td>Conditionally thread-safe</td><td>Some method sequences need external sync</td><td>Must synchronize documented sequences</td></tr>
+        <tr><td>Thread-compatible</td><td>Not internally synchronized</td><td>Must provide all synchronization externally</td></tr>
+        <tr><td>Thread-hostile</td><td>Cannot be made safe</td><td>Avoid in multi-threaded contexts</td></tr>
+      </tbody>
+    </table>
+
+    <p>Every shared mutable field must be documented at design level: which field, which lock guards it, what happens-before relationship is established, and what invariants must hold across all threads. An undocumented shared field is a design defect. <cite>&mdash; SEI CERT, <a href="https://wiki.sei.cmu.edu/confluence/display/java/CON52-J.+Document+thread-safety+and+use+annotations+where+applicable">CON52-J</a></cite></p>
+
+    <h4>Timing and Performance Constraints</h4>
+    <p>A timing constraint must specify: constraint type (deadline, period, response time), numeric bound with unit, conditions (worst-case, nominal), source requirement, and verification method (static analysis, instrumented measurement, formal proof). Vague timing specifications (&ldquo;shall execute quickly&rdquo;) are untestable.</p>
+
+    <div class="example-block good">
+      <div class="example-label">Good &mdash; Well-formed timing constraint</div>
+      <div class="code-block"><span class="lang-label">Design</span><code>processFrame() shall complete within 5 ms on target hardware
+(ARM Cortex-M4 @ 168 MHz) under worst-case input conditions.
+Derived from: SYS-TIMING-003.
+Verification: WCET analysis via static tool + instrumented measurement.</code></div>
+    </div>
+
+    <h4>Concurrency Anti-Patterns in Design</h4>
+    <ul>
+      <li><strong>Check-then-act without atomicity</strong> &mdash; two operations described as sequential that must be atomic but are not specified to be atomic</li>
+      <li><strong>Missing cancellation policy</strong> &mdash; a long-running task without specification of how, when, and what happens on cancellation <cite>&mdash; Goetz, JCIP, Ch. 7</cite></li>
+      <li><strong>Over-synchronization</strong> &mdash; synchronizing code that does not need protection; lock nesting without consistent ordering</li>
+      <li><strong>Implicit concurrency assumptions</strong> &mdash; returning mutable objects that may be shared, without specifying ownership semantics</li>
+    </ul>
+
+    <h4>Safety-Critical Concurrency</h4>
+    <p>DO-178C addresses concurrency through ARINC 653 partitioning: spatial isolation (hardware-enforced memory regions) and temporal isolation (fixed time windows in a major frame). ISO 26262 defines freedom from interference (FFI) across three categories: timing/execution, memory, and information exchange. Design documents for safety-critical software must include an FFI analysis for every interface between components of different assurance levels. <cite>&mdash; <a href="https://en.wikipedia.org/wiki/ARINC_653">ARINC 653</a>; <a href="https://piembsystech.com/freedom-from-interference-iso-26262/">ISO 26262 FFI</a></cite></p>
+  </section>
+
+  <!-- ===================== 3.7: SCALING ===================== -->
+  <section id="dd-scaling">
+    <h3>3.7 Scaling: What Needs a Design and How Much Detail</h3>
+    <p>A 300,000-line codebase cannot have 300,000 lines of design documentation that paraphrase the code. The question is: which units warrant full detailed design, which need only interface documentation, and which are adequately covered by their code and tests alone?</p>
+
+    <h4>The Economics</h4>
+    <p>Capers Jones found that on defense/aerospace projects, document production costs can be twice the cost of writing the code. Yet a systematic mapping of 69 empirical papers (Zhi et al. 2015) found only 6 addressed documentation cost at all &mdash; there is no reliable model to calculate documentation ROI per unit. <cite>&mdash; Zhi et al., <a href="https://www.sciencedirect.com/science/article/abs/pii/S0164121214002131">JSS, Vol. 99, 2015</a></cite></p>
+
+    <p>Stale documentation is worse than none &mdash; it creates false confidence. An engineer reading a design document that has drifted from the code believes they understand the system when they do not. <cite>&mdash; Rios et al., <a href="https://dl.acm.org/doi/10.1145/3350768.3350773">&ldquo;Documentation Technical Debt&rdquo;, ACM, 2019</a></cite></p>
+
+    <h4>Standards-Supported Tiering</h4>
+    <table class="field-table">
+      <thead>
+        <tr><th>Standard</th><th>Tiering Support</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>IEC 62304</td><td><strong>Explicit.</strong> Detailed design required only for Class C. Classes A and B exempt.</td></tr>
+        <tr><td>ISO 26262</td><td><strong>Notation-based.</strong> Natural language (ASIL A/B), semi-formal (ASIL C/D recommended), formal (ASIL D highly recommended).</td></tr>
+        <tr><td>DO-178C</td><td><strong>No internal tiering</strong> within a DAL. All software at a given DAL treated uniformly. But LLR content naturally scales with complexity.</td></tr>
+        <tr><td>ASPICE</td><td><strong>No formal tiering.</strong> All components in scope. Can be combined with ISO 26262 ASIL levels to justify differentiated rigor.</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Practical Tiering: Three Levels</h4>
+    <p><strong>Tier 1 &mdash; Full detailed design</strong> when any of the following apply: safety-critical functionality, complex algorithm, state machine, concurrency/synchronization, high defect history, high change frequency, complex interface contracts.</p>
+
+    <p><strong>Tier 2 &mdash; Interface documentation</strong> when the unit performs well-understood operations, implements standard patterns without deviation, and has behavior fully specified by its interface and comprehensive tests. The iceoryx header-file model is proven viable for ASPICE SWE.3. <cite>&mdash; <a href="https://github.com/eclipse-iceoryx/iceoryx/blob/main/doc/aspice_swe3_4/swe_docu_guidelines.md">iceoryx SWE.3 guidelines</a></cite></p>
+
+    <p><strong>Tier 3 &mdash; Component-level summary</strong> for DTOs, value objects, simple utilities, and data classes with no significant logic. Named in the component inventory with one-line description only.</p>
+
+    <h4>Metrics for Prioritization</h4>
+    <ul>
+      <li><strong>Cyclomatic complexity &gt; 10</strong> &mdash; strong candidate for full design documentation. NIST SP 500-235 recommends 10 as the baseline limit. <cite>&mdash; Watson &amp; McCabe, <a href="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication500-235.pdf">NIST SP 500-235, 1996</a></cite></li>
+      <li><strong>High fan-in</strong> &mdash; shared infrastructure used by many callers. A defect propagates widely. Prioritize interface documentation regardless of internal complexity.</li>
+      <li><strong>High change frequency</strong> &mdash; hotspot analysis using VCS history. About 1&ndash;2% of a codebase accounts for up to 70% of development work. <cite>&mdash; Tornhill, <a href="https://pragprog.com/titles/atcrime2/your-code-as-a-crime-scene-second-edition/"><em>Your Code as a Crime Scene</em>, 2nd ed., 2024</a></cite></li>
+      <li><strong>Defect density</strong> &mdash; units with above-average historical defects have demonstrated unclear design intent.</li>
+    </ul>
+
+    <h4>Legacy Retrofit: The Post-Hoc Design Problem</h4>
+    <p>When retrofitting design documentation onto existing code, the design-before-code chain is broken. Acknowledge this honestly to assessors. Demonstrate disciplined analysis (not just code-comment extraction). Implement design-before-code for all new changes going forward. Use the retrofit as a gap-finding exercise &mdash; undocumented behavior and missing test coverage are legitimate findings.</p>
+  </section>
+
+  <!-- ===================== 3.8: AI-ASSISTED DESIGN ===================== -->
+  <section id="dd-ai-development">
+    <h3>3.8 AI-Assisted Detailed Design</h3>
+    <p>LLMs can produce design-shaped text quickly and fluently. Whether that text corresponds to correct, complete, and verifiable design intent is a different question &mdash; and the evidence base does not support optimism.</p>
+
+    <h4>Forward Design Generation</h4>
+    <p>LLMs can take requirements and produce interface specifications, behavioral descriptions, and state machine descriptions that <em>look</em> like detailed design. The primary risks are hallucinated constraints (plausible but untraced), missing edge cases, and over-generic designs that appear complete but omit the specifics that make them testable. <cite>&mdash; <a href="https://arxiv.org/html/2507.14330v1">&ldquo;Leveraging LLMs for Formal Software Requirements&rdquo;, 2025</a></cite></p>
+
+    <p>A 2025 study found that LLMs &ldquo;often fail to properly understand existing design patterns and coding styles of a project,&rdquo; leading to generated artifacts that require extensive revision. <cite>&mdash; <a href="https://arxiv.org/html/2501.04835v1">&ldquo;Do Code LLMs Understand Design Patterns?&rdquo;, 2025</a></cite></p>
+
+    <h4>Reverse-Engineering Design from Code (Legacy Retrofit)</h4>
+    <p>For legacy codebases, the question is whether AI can produce useful design documentation from existing code. The critical distinction:</p>
+    <ul>
+      <li><strong>Code paraphrase</strong> &mdash; the AI describes what the code does in English. This is not design documentation; it is a different encoding of the same information, with the same gaps.</li>
+      <li><strong>Recovered design intent</strong> &mdash; the AI identifies abstractions, boundaries, invariants, and contracts that the code implements, expressed above the implementation level. This is what design documentation should contain.</li>
+    </ul>
+
+    <div class="card">
+      <h3>The Post-Hoc Paraphrase Trap</h3>
+      <p>The central failure mode: AI produces a sophisticated description of what the code does, not a design document that reveals intent, decisions, and constraints independently of the code. This is the exact anti-pattern that standards warn about &mdash; amplified by AI&rsquo;s ability to produce authoritative-sounding prose.</p>
+      <p><strong>Missing rationale is a structural failure, not a fixable omission.</strong> Rationale is not in code. Any AI-generated rationale for a legacy system is invention, not recovery.</p>
+    </div>
+
+    <h4>Safety-Critical Implications</h4>
+    <p>No published study as of 2026 has evaluated whether LLM-generated design documentation can pass a V-model assessment at any assurance level. FAA (July 2024 roadmap) and EASA (NPA 2025-07) are actively building AI guidance for aviation, but neither has produced specific requirements for AI-generated lifecycle data. DO-178C independence requirements (reviewer cannot be the author) create an unresolved ambiguity for AI-authored design documents. <cite>&mdash; <a href="https://www.faa.gov/aircraft/air_cert/step/roadmap_for_AI_safety_assurance">FAA AI Safety Roadmap, 2024</a>; <a href="https://www.easa.europa.eu/en/document-library/notices-of-proposed-amendment/npa-2025-07">EASA NPA 2025-07</a></cite></p>
+
+    <h4>Mitigation Strategies</h4>
+    <ul>
+      <li><strong>Structured templates as guardrails</strong> &mdash; constrain AI output to match valid design document schemas; omissions become visible as empty fields</li>
+      <li><strong>AI as analyst, not author</strong> &mdash; use AI for code comprehension and pattern identification; human authors supply design intent and judgment <cite>&mdash; <a href="https://www.thoughtworks.com/en-us/radar/techniques/using-genai-to-understand-legacy-codebases">Thoughtworks Technology Radar</a></cite></li>
+      <li><strong>Bidirectional traceability enforcement</strong> &mdash; every design claim must trace to a requirement; gaps and hallucinated constraints are caught mechanically</li>
+      <li><strong>Human-in-the-loop at every decision point</strong> &mdash; not superficial approval of plausible-looking output, but substantive review of content correctness</li>
+    </ul>
+  </section>
+
+  <!-- ===================== SECTION 4: V-MODEL CONSIDERATIONS ===================== -->
+  <section id="dd-vmodel-considerations">
+    <h2>V-Model Specific Considerations</h2>
+
+    <h3>Traceability Requirements</h3>
+    <p>Every V-model standard requires bidirectional traceability through the detailed design layer:</p>
+    <div class="trace-flow">
+      <span class="artifact-ref" data-term="sw-requirements">SW Requirements</span>
+      <span class="arrow">&harr;</span>
+      <span class="artifact-ref" data-term="sw-architecture">Architecture</span>
+      <span class="arrow">&harr;</span>
+      <span class="artifact-ref" data-term="detailed-design">Detailed Design</span>
+      <span class="arrow">&harr;</span>
+      <span class="artifact-ref" data-term="source-code">Source Code</span>
+      <span class="arrow">&harr;</span>
+      <span class="artifact-ref" data-term="unit-test">Unit Tests</span>
+    </div>
+    <p>Each design element must trace upward to the architectural component or requirement it satisfies, and downward to the source files and test cases that implement and verify it. Orphan design elements (no parent requirement) and orphan requirements (no child design element) are both compliance findings.</p>
+
+    <h3>Derived Requirements</h3>
+    <p>Design decisions often generate new requirements that were not in the original specification. These <em>derived requirements</em> must be explicitly identified, justified, and traced. Common sources: choice of synchronization mechanism creates timing constraints; error handling strategy creates recovery requirements; interface design creates compatibility constraints. ASPICE requires traceability of derived requirements back to the design decision that created them.</p>
+
+    <h3>Design Review Independence</h3>
+    <p>DO-178C requires independent review for DAL A/B &mdash; the reviewer must not be the author. For DAL C, review can be by a peer. This has implications for AI-assisted design: if an LLM generates the design, the review must be performed by a human with domain expertise who can assess correctness, not merely structural completeness.</p>
+
+    <h3>Code-Can-Be-the-LLR Question</h3>
+    <p>Can source code serve as its own detailed design? The general advice from DO-178C practitioners is <strong>no</strong>. AdaCore&rsquo;s compliance guidance states: &ldquo;the general advice is to avoid using a programming language as the medium for expressing &mdash; even in part &mdash; the software design&rdquo; and &ldquo;requirements are properties to be verified by the code and are not the code itself.&rdquo; Exception: Ada&rsquo;s specification/body separation can serve design purposes. Model-based development (DO-331) is another path where the model IS the design. <cite>&mdash; <a href="https://learn.adacore.com/booklets/adacore-technologies-for-airborne-software/chapters/analysis.html">AdaCore DO-178C Compliance Analysis</a></cite></p>
+
+    <h3>ASPICE SWE.3: Common Assessment Failures</h3>
+    <ul>
+      <li><strong>Post-hoc design</strong> &mdash; writing design after code. Assessors can tell from document metadata and commit history.</li>
+      <li><strong>Source code markup as design</strong> &mdash; using code comments or Javadoc as the sole design artifact, when the content merely describes what the code does rather than serving as a prior contract.</li>
+      <li><strong>Missing interface detail</strong> &mdash; interfaces documented without types, units, ranges, or constraints. BP.2 requires these explicitly.</li>
+      <li><strong>Missing dynamic behavior</strong> &mdash; no state machine or interaction documentation for units that clearly have modal behavior (BP.3).</li>
+    </ul>
+  </section>
+
+  <!-- ===================== SECTION 5: FRAMEWORK INTEGRATION ===================== -->
+  <section id="dd-framework">
+    <h2>Framework Integration</h2>
+
+    <h3>Design Artifact Input</h3>
+    <p>The detailed design takes the <span data-term="sw-architecture">software architecture</span> as its primary input. Each architectural component is decomposed into units with individual design specifications. The architecture defines component boundaries, responsibilities, and inter-component interfaces; the detailed design specifies how each unit fulfills its component&rsquo;s responsibilities.</p>
+
+    <h3>Design Artifact Format</h3>
+    <p>Detailed designs are <strong>Markdown files with YAML frontmatter</strong> (<code>.md</code>). This makes them readable by humans and assessors while remaining parseable by agents and the traceability engine. The schema is at <code>schemas/artifacts/detailed-design.schema.yaml</code>.</p>
+
+    <h3>Trace Links</h3>
+    <p>Each detailed design artifact links to:</p>
+    <ul>
+      <li><strong>Upward:</strong> <code>trace_from</code> in the frontmatter lists architecture or SW requirement IDs this design derives from</li>
+      <li><strong>Downward:</strong> source files implement the design; unit test cases verify it. The traceability engine validates bidirectional coverage and detects staleness via content hashes.</li>
+    </ul>
+
+    <h3>Design-to-Test Pipeline</h3>
+    <p>The detailed design is the direct input for unit test derivation. Every behavior rule (B1, B2, &hellip;) and error handling rule (E1, E2, &hellip;) maps to at least one test case. The <code>derive-test-cases</code> craft skill reads the design specification and produces test cases using four strategies: requirement-based testing, equivalence class partitioning, boundary value analysis, and fault injection. See the <a href="unit-test.html#ut-derivation-strategies">Unit Test derivation strategies</a> documentation.</p>
+  </section>
+
+  <!-- ===================== SECTION 5b: SCHEMA LAYER MODEL ===================== -->
+  <section id="dd-schema-layers">
+    <h2>Schema: The Layer Model</h2>
+    <p class="lead">The detailed design schema uses an <strong>additive layering model</strong>. Higher layers build on lower layers &mdash; you never skip a layer. The layer a document reaches determines how much design evidence it contains.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Layer</th><th>What It Contains</th><th>When It&rsquo;s Sufficient</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Layer 1</strong><br>Component Design</td>
+          <td>Purpose, external interfaces, unit inventory, shared patterns, constraints. The <em>map</em> of what exists and how it connects.</td>
+          <td>QM / ASIL A / IEC 62304 Class A. Components with only simple, well-understood units.</td>
+        </tr>
+        <tr>
+          <td><strong>Layer 2</strong><br>Unit Interface Contracts</td>
+          <td>Per-unit: purpose, interfaces (inputs/outputs tables), behavior rules, error handling. The level from which <strong>unit tests can be derived</strong>.</td>
+          <td>ASIL A&ndash;B / IEC 62304 Class B / DO-178C DAL D&ndash;E. Standard units with testable behavior.</td>
+        </tr>
+        <tr>
+          <td><strong>Layer 3</strong><br>Deep Design Evidence</td>
+          <td>Design rationale, dynamic behavior (state machines, diagrams), concurrency model, negative requirements.</td>
+          <td>ASIL C&ndash;D / DO-178C DAL A&ndash;C / IEC 62304 Class C. Safety-critical or high-complexity units.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card">
+      <h3>How Layers Map to Section 3.7 Tiering</h3>
+      <p>The schema&rsquo;s layers implement the documentation tiering discussed in <a href="#dd-scaling">Section 3.7</a>. A Layer 1 document is the Tier 3 &ldquo;component-level summary.&rdquo; Layer 2 adds the Tier 2 &ldquo;interface documentation.&rdquo; Layer 3 adds the Tier 1 &ldquo;full detailed design&rdquo; with rationale and formal notation.</p>
+    </div>
+
+    <h3>File Organization</h3>
+    <p>Two artifact ID patterns:</p>
+    <ul>
+      <li><strong>CD-nnn</strong> &mdash; Component Design document. Always starts at Layer 1. May embed Layer 2/3 content for its units as subsections.</li>
+      <li><strong>DD-nnn</strong> &mdash; Standalone Unit Design document. Used when a unit is complex enough to warrant its own file. References the parent CD-nnn.</li>
+    </ul>
+    <p>Both live in <code>docs/artifacts/detailed-design/</code>. When units are embedded in the component document, no separate DD-nnn files are needed.</p>
+
+    <h3>YAML Frontmatter</h3>
+    <p>Every detailed design file starts with YAML frontmatter between <code>---</code> delimiters:</p>
+    <div class="code-block"><span class="lang-label">YAML frontmatter</span><code>---
+artifact_id: CD-001         # or DD-017 for standalone unit
+artifact_type: detailed-design
+version: "1.0.0"
+status: draft               # draft | in_review | approved | baselined | superseded
+component: fuel-control     # references sw-architecture component id
+layer: 3                    # highest layer present in this document
+trace_from:                 # upward traceability
+  - ARCH-004
+  - SWREQ-FUEL-001
+assurance_level: 2          # optional: 1=highest (DAL A/ASIL D), 5=lowest
+unit_id: FuelRateLimiter    # only for standalone DD-nnn documents
+---</code></div>
+  </section>
+
+  <!-- ===================== SCHEMA: LAYER 1 ===================== -->
+  <section id="dd-schema-layer1">
+    <h3>Layer 1: Component Design (Always Present)</h3>
+    <p>Every detailed design document starts with these headings. They provide the component-level map.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Heading</th><th>Content</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code># {Component Name}</code></td><td>Document title. The component&rsquo;s human-readable name.</td></tr>
+        <tr><td><code>## Purpose</code></td><td>What this component does and why it exists. 1&ndash;3 paragraphs. Not a restatement of the architecture &mdash; focus on this component&rsquo;s specific role.</td></tr>
+        <tr><td><code>## External Interfaces</code></td><td>How this component communicates with <em>other</em> components. Table: Direction | Partner Component | Mechanism | Data | Description.</td></tr>
+        <tr><td><code>## Unit Inventory</code></td><td>All units listed with their design layer. Table: Unit ID | Layer | Brief Description. Every unit must appear &mdash; even trivial ones.</td></tr>
+        <tr><td><code>## Shared Patterns</code></td><td>Design decisions that apply across multiple units: error strategy, threading model, resource management, naming conventions, common data types. Document once here rather than repeating per unit.</td></tr>
+        <tr><td><code>## Constraints</code></td><td>Component-wide non-functional requirements: performance budgets, memory limits, certification requirements, deployment constraints.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== SCHEMA: LAYER 2 ===================== -->
+  <section id="dd-schema-layer2">
+    <h3>Layer 2: Unit Interface Contracts (Per Unit)</h3>
+    <p>Added per unit, either as subsections within the component document (using <code>###</code> headings under a <code>## {Unit Name}</code>) or as separate DD-nnn files. This is the level from which tests are derived.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Heading</th><th>Content</th><th>ID Convention</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>### Purpose</code></td><td>What this specific unit does. 1&ndash;2 sentences.</td><td>&mdash;</td></tr>
+        <tr><td><code>### Interfaces</code></td><td>The unit&rsquo;s inputs and outputs with full type information.</td><td>&mdash;</td></tr>
+        <tr><td><code>#### Inputs</code></td><td>Table: ID | Name | Type | Unit | Constraints | Description</td><td>I1, I2, I3&hellip;</td></tr>
+        <tr><td><code>#### Outputs</code></td><td>Table: ID | Name | Type | Unit | Constraints | Description</td><td>O1, O2, O3&hellip;</td></tr>
+        <tr><td><code>### Behavior</code></td><td>How inputs become outputs. Each row is one testable rule. Table: ID | Condition | Result</td><td>B1, B2, B3&hellip;</td></tr>
+        <tr><td><code>### Error Handling</code></td><td>Every foreseeable error and the unit&rsquo;s response. Table: ID | Condition | Response</td><td>E1, E2, E3&hellip;</td></tr>
+        <tr><td><code>### Configuration</code></td><td><em>(optional)</em> Parameters set at init/deploy time. Table: Name | Type | Default | Description</td><td>&mdash;</td></tr>
+        <tr><td><code>### Internal State</code></td><td><em>(optional)</em> State retained between invocations. Table: Name | Type | Description</td><td>&mdash;</td></tr>
+        <tr><td><code>### Constraints</code></td><td><em>(optional)</em> Unit-specific non-functional requirements (timing, memory, thread-safety).</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+
+    <div class="card">
+      <h3>How Section 3 Principles Map to Layer 2 Tables</h3>
+      <ul>
+        <li><strong>DbC preconditions</strong> (Section 3.2) &rarr; the <strong>Constraints</strong> column in the Inputs table</li>
+        <li><strong>DbC postconditions</strong> (Section 3.2) &rarr; the <strong>Result</strong> column in the Behavior table + Output constraints</li>
+        <li><strong>Error semantics</strong> (Section 3.2, 3.5) &rarr; the <strong>Error Handling</strong> table</li>
+        <li><strong>Thread-safety guarantee</strong> (Section 3.6) &rarr; the unit-level <strong>Constraints</strong> section</li>
+        <li><strong>Behavioral specification</strong> (Section 3.3) &rarr; the <strong>Behavior</strong> table (one row per testable rule)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== SCHEMA: LAYER 3 ===================== -->
+  <section id="dd-schema-layer3">
+    <h3>Layer 3: Deep Design Evidence (Critical Units)</h3>
+    <p>Added for safety-critical or high-complexity units. These sections provide the evidence that separates design from code paraphrase.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Heading</th><th>Content</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>### Design Rationale</code></td><td>For each significant decision: what was decided, alternatives considered, justification. Table or prose. Maps to Section 3.4.</td></tr>
+        <tr><td><code>### Dynamic Behavior</code></td><td><em>(optional)</em> State machines, sequence diagrams, timing diagrams. Use Mermaid or PlantUML code blocks. Maps to Section 3.6.</td></tr>
+        <tr><td><code>### Concurrency Model</code></td><td><em>(optional)</em> Thread-safety level, shared state with guards, synchronization mechanisms. Maps to Section 3.6.</td></tr>
+        <tr><td><code>### Negative Requirements</code></td><td><em>(optional)</em> What the unit explicitly must NOT do. Prevents scope creep and clarifies responsibility.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== SCHEMA: TRACEABILITY IDS ===================== -->
+  <section id="dd-schema-traceability">
+    <h3>Traceability ID Conventions</h3>
+    <p>Every table row has an ID column. These IDs enable fine-grained traceability between design elements and test cases.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Element</th><th>ID Format</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Component design document</td><td>CD-{nnn}</td><td>CD-001</td></tr>
+        <tr><td>Standalone unit design</td><td>DD-{nnn}</td><td>DD-017</td></tr>
+        <tr><td>Input</td><td>I{n}</td><td>I1, I2</td></tr>
+        <tr><td>Output</td><td>O{n}</td><td>O1, O2</td></tr>
+        <tr><td>Behavior rule</td><td>B{n}</td><td>B1, B2, B3</td></tr>
+        <tr><td>Error handling rule</td><td>E{n}</td><td>E1, E2</td></tr>
+      </tbody>
+    </table>
+
+    <p>Use <strong>dot notation</strong> to reference specific elements across documents:</p>
+    <ul>
+      <li><code>DD-001.B3</code> &rarr; Behavior rule 3 in design DD-001</li>
+      <li><code>DD-001.E1</code> &rarr; Error handling rule 1</li>
+      <li><code>CD-001.FuelRateLimiter.B3</code> &rarr; When unit is embedded in component doc</li>
+    </ul>
+    <p>These references are used by trace links and test case mappings. A test case traces to a specific behavior or error rule, not to the entire design document.</p>
+  </section>
+
+  <!-- ===================== EXAMPLE: FULL (LAYER 3) ===================== -->
+  <section id="dd-example-full">
+    <h2>Example: Fuel Control Component (Layer 3)</h2>
+    <p class="lead">A complete component design with an embedded Layer 3 unit. This is what a detailed design looks like for a safety-critical component in an engine control system.</p>
+
+    <div class="code-block"><span class="lang-label">CD-001.md &mdash; Complete component design</span><code>---
+artifact_id: CD-001
+artifact_type: detailed-design
+version: "1.0.0"
+status: draft
+component: fuel-control
+layer: 3
+trace_from:
+  - ARCH-004
+  - SWREQ-FUEL-001
+  - SWREQ-FUEL-002
+  - SWREQ-FUEL-003
+assurance_level: 2
+---
+
+# Fuel Control
+
+## Purpose
+
+The fuel-control component computes the fuel delivery rate for
+a single engine. It receives a raw demanded rate from the engine
+control law and clamps it to mode-specific safety bounds before
+passing it to the fuel metering hardware interface.
+
+If this component were deleted, the engine would receive
+unvalidated fuel demands &mdash; potentially exceeding structural
+limits during transients or producing negative rates during
+shutdown sequencing.
+
+## External Interfaces
+
+| Direction | Partner Component | Mechanism      | Data            | Description                                    |
+|-----------|-------------------|----------------|-----------------|------------------------------------------------|
+| Consumes  | engine-control    | function call  | RawFuelDemand   | Demanded rate from control law (kg/h)          |
+| Consumes  | mode-manager      | shared state   | EngineMode      | Current engine operating mode                  |
+| Provides  | fuel-metering     | function call  | ClampedFuelRate | Validated rate after safety clamping (kg/h)    |
+| Provides  | health-monitor    | event          | FuelRateAlert   | Emitted when clamping activates (&gt;5% delta) |
+
+## Unit Inventory
+
+| Unit ID           | Layer | Brief Description                                  |
+|-------------------|-------|----------------------------------------------------|
+| FuelRateLimiter   | 3     | Clamps fuel rate to mode-specific bounds            |
+| FuelRateLogger    | 1     | Logs rate history to circular buffer for diagnostics|
+| FuelDemandAdapter | 1     | Adapts raw demand from control law interface format |
+
+## Shared Patterns
+
+**Error strategy:** Units in this component throw
+`FuelControlException` (unchecked) for programming errors
+(null inputs, invalid enum values). For operational errors
+(sensor out of range, mode transition during computation),
+units return a safe fallback value and emit a `FuelRateAlert`
+event. No silent error swallowing.
+
+**Threading model:** Single-threaded. All calls originate
+from the main control loop at 100 Hz. No unit in this
+component may block or spawn threads.
+
+**Units of measurement:** All fuel rates are in kg/h as
+`double`. All temperatures are in Kelvin as `double`.
+No imperial units anywhere in this component.
+
+## Constraints
+
+- WCET budget: entire component must complete within 2 ms
+  per cycle (allocated from SYS-TIMING-001).
+- No heap allocation after initialization (MISRA-C heritage
+  rule, retained for predictability).
+- Component is DAL B / ASIL C &mdash; independent review required.
+
+---
+
+## Fuel Rate Limiter (FuelRateLimiter)
+
+### Purpose
+
+Clamps a raw fuel demand to the safety bounds defined for
+the current engine operating mode. This is the primary safety
+function in the fuel-control component.
+
+### Interfaces
+
+#### Inputs
+
+| ID | Name           | Type    | Unit | Constraints                        | Description                              |
+|----|----------------|---------|------|------------------------------------|------------------------------------------|
+| I1 | rawDemand      | float   | kg/h | &ge; 0.0, &le; 500.0              | Raw fuel demand from engine control law  |
+| I2 | mode           | enum    | &mdash; | {STARTUP, IDLE, CRUISE, MAX, SHUTDOWN} | Current engine operating mode       |
+| I3 | ambientTemp    | float   | K    | &ge; 200.0, &le; 330.0            | Outside air temperature for density comp |
+
+#### Outputs
+
+| ID | Name           | Type    | Unit | Constraints                        | Description                              |
+|----|----------------|---------|------|------------------------------------|------------------------------------------|
+| O1 | clampedRate    | float   | kg/h | Within mode bounds (see B1&ndash;B5) | Validated fuel rate after clamping        |
+| O2 | wasClipped     | boolean | &mdash; | &mdash;                            | true if clamping changed the raw demand  |
+| O3 | clipDelta      | float   | kg/h | &ge; 0.0                          | Absolute difference between raw and clamped |
+
+### Behavior
+
+| ID | Condition                          | Result                                                                   |
+|----|------------------------------------|--------------------------------------------------------------------------|
+| B1 | mode = STARTUP                     | O1 = min(I1, 50.0). Startup clamped to 50 kg/h max.                     |
+| B2 | mode = IDLE                        | O1 = clamp(I1, 5.0, 30.0). Idle range: 5&ndash;30 kg/h.                |
+| B3 | mode = CRUISE                      | O1 = clamp(I1, 20.0, 300.0). Cruise range: 20&ndash;300 kg/h.          |
+| B4 | mode = MAX                         | O1 = clamp(I1, 100.0, 500.0). Max thrust range: 100&ndash;500 kg/h.    |
+| B5 | mode = SHUTDOWN                    | O1 = max(I1 &times; 0.5, 0.0). Halve demand, floor at zero.            |
+| B6 | I3 &lt; 233.15 (below &minus;40&deg;C) | O1 = O1 &times; 1.05. Cold-start density compensation (+5%).            |
+| B7 | always                             | O2 = (O1 &ne; I1). O3 = |I1 &minus; O1|.                               |
+
+### Error Handling
+
+| ID | Condition                          | Response                                                                 |
+|----|------------------------------------|--------------------------------------------------------------------------|
+| E1 | I1 &lt; 0.0                       | Return O1 = 0.0, emit FuelRateAlert(NEGATIVE_DEMAND).                   |
+| E2 | I1 &gt; 500.0                     | Clamp to 500.0, emit FuelRateAlert(DEMAND_EXCEEDS_MAX).                 |
+| E3 | I2 is null or not a valid mode     | Throw FuelControlException(&quot;invalid mode&quot;). Programming error. |
+| E4 | I3 outside [200.0, 330.0]         | Use I3 = 288.15 (ISA standard), emit FuelRateAlert(TEMP_OUT_OF_RANGE).  |
+
+### Internal State
+
+This unit is **stateless**. Output depends only on current inputs.
+No state is retained between invocations.
+
+### Constraints
+
+- Thread-safety: not required (single-threaded control loop).
+- WCET: must complete within 0.3 ms (allocated from component budget).
+- No floating-point exceptions: all divisions guarded, no NaN/Inf propagation.
+
+### Design Rationale
+
+| Decision                              | Alternatives Considered                    | Justification                                                           |
+|---------------------------------------|--------------------------------------------|-------------------------------------------------------------------------|
+| Clamp rather than reject out-of-range | Reject and return error; saturate silently | Clamping maintains engine operability. Silent saturation would hide issues from the health monitor. Rejection would cause engine flameout on transient spikes. SWREQ-FUEL-002 requires continued operation under sensor faults. |
+| Per-mode bounds as constants          | Configurable bounds from parameter file    | Bounds are safety-critical and change only during certification updates. Runtime configurability creates a configuration management risk that SWREQ-FUEL-003 prohibits. |
+| Cold-start compensation as +5% factor | Lookup table by temperature; ignore        | Linear factor is simple, verifiable, and sufficient per flight test data (SYS-PERF-007). Lookup table adds complexity without measurable benefit in the &minus;40&deg;C to 0&deg;C range. Ignoring would violate SYS-PERF-007. |
+
+### Dynamic Behavior
+
+This unit is stateless and does not have modal behavior.
+The mode input (I2) selects bounds but does not create
+internal states. No state machine is needed.
+
+If a future requirement adds rate-of-change limiting
+(requiring memory of previous output), this unit will
+need a state machine and this section must be updated.
+
+### Negative Requirements
+
+- Must NOT perform I/O (logging is FuelRateLogger&rsquo;s responsibility).
+- Must NOT cache results between invocations.
+- Must NOT allocate heap memory.
+- Must NOT modify the mode input or any global state.</code></div>
+  </section>
+
+  <!-- ===================== EXAMPLE: LAYER 1 ONLY ===================== -->
+  <section id="dd-example-layer1">
+    <h2>Example: Configuration Loader (Layer 1 Only)</h2>
+    <p class="lead">A Layer 1 component design for a simple, non-critical component. No per-unit behavioral specification &mdash; the unit inventory and shared patterns are sufficient because all units are straightforward.</p>
+
+    <div class="code-block"><span class="lang-label">CD-008.md &mdash; Layer 1 component design</span><code>---
+artifact_id: CD-008
+artifact_type: detailed-design
+version: "1.0.0"
+status: draft
+component: config-loader
+layer: 1
+trace_from:
+  - ARCH-012
+---
+
+# Configuration Loader
+
+## Purpose
+
+Reads application configuration from YAML files on disk and
+provides typed access to configuration values for other
+components. This component is the single entry point for all
+file-based configuration &mdash; no other component reads config
+files directly.
+
+If this component were deleted, all runtime-configurable
+parameters would need to be hard-coded or passed as
+command-line arguments.
+
+## External Interfaces
+
+| Direction | Partner Component | Mechanism     | Data             | Description                            |
+|-----------|-------------------|---------------|------------------|----------------------------------------|
+| Consumes  | filesystem        | file read     | YAML files       | Config files from deployment directory |
+| Provides  | all components    | function call | typed values     | Typed getters: getString, getInt, etc. |
+| Provides  | health-monitor    | function call | loadStatus       | Whether config loaded successfully     |
+
+## Unit Inventory
+
+| Unit ID          | Layer | Brief Description                                   |
+|------------------|-------|-----------------------------------------------------|
+| YamlFileReader   | 1     | Reads and parses a single YAML file to a map        |
+| ConfigRegistry   | 1     | Holds parsed config; provides typed getters          |
+| ConfigValidator  | 1     | Validates required keys are present after loading    |
+| DefaultsProvider | 1     | Supplies default values for optional config keys     |
+
+## Shared Patterns
+
+**Error strategy:** Config loading errors (file not found,
+parse failure, missing required key) are collected into a
+`ConfigLoadResult` object with a list of warnings and errors.
+No exceptions thrown during loading. Callers check the result
+object. Missing optional keys return the default silently.
+
+**Immutability:** Once loaded, the configuration is immutable.
+No setter methods. Thread-safe by construction. Reload
+requires creating a new ConfigRegistry instance.
+
+## Constraints
+
+- Configuration is loaded once at startup. No hot-reload.
+- Maximum config file size: 1 MB (reject larger files).
+- All keys are case-sensitive.
+- No sensitive data (passwords, keys) in config files &mdash;
+  those use environment variables via a separate component.</code></div>
+
+    <div class="card">
+      <h3>Why Layer 1 Is Sufficient Here</h3>
+      <p>Every unit in this component (YamlFileReader, ConfigRegistry, ConfigValidator, DefaultsProvider) is a simple, well-understood operation: read a file, store values in a map, check for required keys, provide defaults. The shared patterns section documents the error strategy and immutability contract. A developer can implement these units from the component description and the shared patterns alone. A tester can derive integration tests from the external interfaces table.</p>
+      <p>If a unit became more complex (e.g., ConfigValidator gained complex validation rules with conditional logic), it would be promoted to Layer 2 in the Unit Inventory table and given its own Interfaces / Behavior / Error Handling sections.</p>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 6: AI SKILLS ===================== -->
+  <section id="dd-skills">
+    <h2>AI Skills Integration</h2>
+    <div class="stub-banner">
+      <h3>Coming Soon</h3>
+      <p>This section will document how the <code>write-detailed-design</code> and <code>review-detailed-design</code> craft skills integrate with this documentation. Craft skills are distilled extractions of Sections 3.1&ndash;3.8, optimized for LLM consumption. Framework skills will handle template integration, traceability, and the research/plan &rarr; implement &rarr; review orchestration loop.</p>
+    </div>
+  </section>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <section id="dd-references">
+    <h2>References</h2>
+
+    <h3>Books</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>Author</th><th>Title</th><th>Publisher, Year</th><th>Relevant Topics</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>David L. Parnas</td><td><em>On the Criteria To Be Used in Decomposing Systems into Modules</em></td><td>CACM, 1972</td><td>Information hiding; module interface design</td></tr>
+        <tr><td>David L. Parnas &amp; Paul C. Clements</td><td><em>A Rational Design Process: How and Why to Fake It</em></td><td>IEEE Trans. SE, 1986</td><td>Design documentation purpose and structure</td></tr>
+        <tr><td>Bertrand Meyer</td><td><em>Object-Oriented Software Construction</em></td><td>Prentice Hall, 1988/1997</td><td>Design by Contract; preconditions/postconditions/invariants</td></tr>
+        <tr><td>Joshua Bloch</td><td><em>Effective Java</em></td><td>Addison-Wesley, 3rd ed. 2018</td><td>Items 69&ndash;77: exception design; interface contracts</td></tr>
+        <tr><td>Brian Goetz et al.</td><td><em>Java Concurrency in Practice</em></td><td>Addison-Wesley, 2006</td><td>Thread safety taxonomy; happens-before; cancellation</td></tr>
+        <tr><td>Michael Nygard</td><td><em>Release It!</em></td><td>Pragmatic Bookshelf, 2nd ed. 2018</td><td>Stability patterns: bulkhead, circuit breaker</td></tr>
+        <tr><td>Robert Hanmer</td><td><em>Patterns for Fault Tolerant Software</em></td><td>Wiley, 2007</td><td>Error containment barriers; quarantine patterns</td></tr>
+        <tr><td>David Harel</td><td><em>Statecharts: A Visual Formalism for Complex Systems</em></td><td>Science of Comp. Prog., 1987</td><td>Hierarchical state machines; statechart notation</td></tr>
+        <tr><td>Glenford J. Myers</td><td><em>The Art of Software Testing</em></td><td>Wiley, 1979</td><td>Cause-effect graphing; decision tables (Ch. 4)</td></tr>
+        <tr><td>Adam Tornhill</td><td><em>Your Code as a Crime Scene</em></td><td>Pragmatic Bookshelf, 2nd ed. 2024</td><td>Hotspot analysis; change frequency metrics</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Papers and Articles</h3>
+    <ul>
+      <li>Hoare, C.A.R. <a href="https://dl.acm.org/doi/10.1145/363235.363259">&ldquo;An Axiomatic Basis for Computer Programming&rdquo;</a>, CACM 12(10), 1969</li>
+      <li>Liskov, B. &amp; Wing, J. <a href="https://dl.acm.org/doi/10.1145/197320.197383">&ldquo;A Behavioral Notion of Subtyping&rdquo;</a>, ACM TOPLAS 16(6), 1994</li>
+      <li>Kruchten, P. <a href="https://philippe.kruchten.com/wp-content/uploads/2009/07/kruchten-2004-design-decisions.pdf">&ldquo;An Ontology of Architectural Design Decisions&rdquo;</a>, 2004</li>
+      <li>Tyree, J. &amp; Akerman, A. <a href="https://ieeexplore.ieee.org/document/1407822">&ldquo;Architecture Decisions: Demystifying Architecture&rdquo;</a>, IEEE Software 22(2), 2005</li>
+      <li>Nygard, M. <a href="https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions">&ldquo;Documenting Architecture Decisions&rdquo;</a>, Cognitect blog, 2011</li>
+      <li>Reeves, J.W. <a href="https://www.developerdotstar.com/mag/articles/reeves_design.html">&ldquo;What Is Software Design?&rdquo;</a>, C++ Journal, 1992</li>
+      <li>Shore, J. <a href="https://www.martinfowler.com/ieeeSoftware/failFast.pdf">&ldquo;Fail Fast&rdquo;</a>, IEEE Software, Sep/Oct 2004</li>
+      <li>Zhi et al. <a href="https://www.sciencedirect.com/science/article/abs/pii/S0164121214002131">&ldquo;Cost, benefits and quality of software development documentation&rdquo;</a>, JSS Vol. 99, 2015</li>
+      <li>Rios et al. <a href="https://dl.acm.org/doi/10.1145/3350768.3350773">&ldquo;Documentation Technical Debt&rdquo;</a>, ACM, 2019</li>
+      <li>Watson &amp; McCabe. <a href="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication500-235.pdf">&ldquo;Structured Testing: Cyclomatic Complexity Metric&rdquo;</a>, NIST SP 500-235, 1996</li>
+    </ul>
+
+    <h3>Standards</h3>
+    <ul>
+      <li>RTCA DO-178C, &ldquo;Software Considerations in Airborne Systems and Equipment Certification&rdquo;, 2011. Sections 6.3, 6.4, 11.9.</li>
+      <li>RTCA DO-333, &ldquo;Formal Methods Supplement to DO-178C and DO-278A&rdquo;, 2011.</li>
+      <li>ISO 26262-6:2018, &ldquo;Road vehicles &mdash; Functional safety &mdash; Part 6: Product development at the software level.&rdquo; Clause 8.</li>
+      <li>Automotive SPICE (ASPICE) v3.1, Process SWE.3: Software Detailed Design and Unit Construction.</li>
+      <li>IEC 62304:2006+AMD1:2015, &ldquo;Medical device software &mdash; Software life cycle processes.&rdquo; Section 5.4.</li>
+      <li>IEEE Std 1016-2009, &ldquo;Standard for Information Technology &mdash; Software Design Descriptions.&rdquo;</li>
+    </ul>
+
+    <h3>Industry Sources</h3>
+    <ul>
+      <li>Eclipse iceoryx. <a href="https://github.com/eclipse-iceoryx/iceoryx/blob/main/doc/aspice_swe3_4/swe_docu_guidelines.md">SWE.3/SWE.4 Documentation Guidelines</a></li>
+      <li>UL Solutions. <a href="https://www.ul.com/sis/insights/software-detailed-design-and-unit-construction-swe3-automotive-spice">ASPICE SWE.3 Insights</a></li>
+      <li>AdaCore. <a href="https://learn.adacore.com/booklets/adacore-technologies-for-airborne-software/chapters/analysis.html">DO-178C Compliance Analysis</a></li>
+      <li>FAA. <a href="https://www.faa.gov/aircraft/air_cert/step/roadmap_for_AI_safety_assurance">Roadmap for AI Safety Assurance</a>, July 2024</li>
+      <li>EASA. <a href="https://www.easa.europa.eu/en/document-library/notices-of-proposed-amendment/npa-2025-07">NPA 2025-07 &mdash; AI Trustworthiness</a>, 2025</li>
+      <li>Thoughtworks. <a href="https://www.thoughtworks.com/en-us/radar/techniques/using-genai-to-understand-legacy-codebases">Technology Radar: GenAI for Legacy Codebases</a></li>
+    </ul>
+  </section>
+
+</main>
+
+<script src="../js/domain.js"></script>
+<script>
+  // Initialize domain translation
+  const dm = createDomainManager(document);
+
+  // Load domain plugins
+  ['do178c', 'aspice'].forEach(id => {
+    fetch('../domains/' + id + '.json')
+      .then(r => r.json())
+      .then(plugin => {
+        dm.registerDomain(plugin);
+      })
+      .catch(() => {});
+  });
+
+  // Domain switcher
+  const select = document.getElementById('domain-select');
+  if (select) {
+    select.addEventListener('change', function() {
+      dm.switchDomain(this.value);
+      dm.applyToDOM();
+    });
+  }
+
+  // Smooth scroll for sidebar links
+  document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      }
+    });
+  });
+
+  // Highlight active section on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.sidebar-nav a[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active',
+            link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
