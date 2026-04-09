@@ -1,0 +1,47 @@
+{
+  "eval_id": 2,
+  "eval_name": "temperature-controller-python",
+  "prompt": "Implement the temperature controller from the design in evals/files/temperature-controller-design.md. Use Python.",
+  "assertions": [
+  {
+    "id": "A1",
+    "text": "No scope creep: no public methods, classes, or features beyond what the design specifies",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A2",
+    "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A3",
+    "text": "Error handling: no null/None returns, invalid inputs handled per design (clamp or default), error messages include context",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A4",
+    "text": "Immutable result objects: output uses frozen dataclass, namedtuple, or equivalent — no mutable state in returned values",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A5",
+    "text": "SOLID signals: single responsibility per class, dependencies injected not hardcoded",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A6",
+    "text": "Pure logic separated from I/O: state transition logic is pure (no I/O, no logging in core logic path)",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A7",
+    "text": "No dead code: no commented-out code, no unused imports, no unreachable branches",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A8",
+    "text": "Naming quality: names reveal intent, consistent vocabulary, domain terms used (deadband, hysteresis, not generic names)",
+    "type": "llm_judge"
+  }
+]
+}

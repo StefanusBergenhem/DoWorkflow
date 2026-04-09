@@ -5,25 +5,193 @@
       "id": 1,
       "prompt": "Implement the FuelRateLimiter from the design in evals/files/fuel-rate-limiter-design.md. Use Java 17.",
       "expected_output": "Java class implementing all behavior rules, error handling, and configuration. Should respect complexity limits, use clean error handling (no null returns), and include implementation notes.",
-      "files": ["evals/files/fuel-rate-limiter-design.md"]
+      "files": ["evals/files/fuel-rate-limiter-design.md"],
+      "assertions": [
+        {
+          "id": "A1",
+          "text": "No scope creep: no public methods, classes, or features beyond what the design specifies",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A2",
+          "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A3",
+          "text": "Error handling: no null returns, no empty catch blocks, error messages include context (operation + input + expected state)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A4",
+          "text": "Architecture boundaries: domain logic has zero imports of infrastructure packages (database, HTTP, filesystem, framework)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A5",
+          "text": "Immutable result objects: output value objects use final/record fields, no setters",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A6",
+          "text": "SOLID signals: each class describable in one sentence without 'and'; dependencies injected via constructor, not created internally",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A7",
+          "text": "Pure logic separated from I/O: core calculation/decision functions take data in and return data out with no side effects",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A8",
+          "text": "Naming quality: names reveal intent (no abbreviations unless universal), classes are nouns, methods are verbs, consistent vocabulary",
+          "type": "llm_judge"
+        }
+      ]
     },
     {
       "id": 2,
       "prompt": "Implement the temperature controller from the design in evals/files/temperature-controller-design.md. Use Python.",
       "expected_output": "Python class implementing the deadband/hysteresis controller with all behavior, error clamping, and state tracking. Clean code, no dead code, proper error handling.",
-      "files": ["evals/files/temperature-controller-design.md"]
+      "files": ["evals/files/temperature-controller-design.md"],
+      "assertions": [
+        {
+          "id": "A1",
+          "text": "No scope creep: no public methods, classes, or features beyond what the design specifies",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A2",
+          "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A3",
+          "text": "Error handling: no null/None returns, invalid inputs handled per design (clamp or default), error messages include context",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A4",
+          "text": "Immutable result objects: output uses frozen dataclass, namedtuple, or equivalent — no mutable state in returned values",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A5",
+          "text": "SOLID signals: single responsibility per class, dependencies injected not hardcoded",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A6",
+          "text": "Pure logic separated from I/O: state transition logic is pure (no I/O, no logging in core logic path)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A7",
+          "text": "No dead code: no commented-out code, no unused imports, no unreachable branches",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A8",
+          "text": "Naming quality: names reveal intent, consistent vocabulary, domain terms used (deadband, hysteresis, not generic names)",
+          "type": "llm_judge"
+        }
+      ]
     },
     {
       "id": 3,
       "prompt": "Implement the MessageParser from the design in evals/files/message-parser-design.md. Use Go.",
       "expected_output": "Go implementation with struct types, sequential validation, CRC-16, and the union return type (result or error). Functions should be small and focused.",
-      "files": ["evals/files/message-parser-design.md"]
+      "files": ["evals/files/message-parser-design.md"],
+      "assertions": [
+        {
+          "id": "A1",
+          "text": "No scope creep: no exported functions, types, or features beyond what the design specifies",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A2",
+          "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A3",
+          "text": "Error handling: uses Go error return pattern (result, error), distinct error codes per design, no ignored errors",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A4",
+          "text": "Architecture boundaries: parser logic has no I/O dependencies (no net, os, or io packages in core parsing functions)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A5",
+          "text": "SOLID signals: parsing steps decomposed into focused functions, not one monolithic Parse function",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A6",
+          "text": "Pure logic separated from I/O: parse functions take []byte and return structs/errors, no side effects",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A7",
+          "text": "No dead code: no unused functions, no commented-out code, no unreachable branches",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A8",
+          "text": "Naming quality: Go naming conventions followed (exported vs unexported), names reveal intent, domain terms used",
+          "type": "llm_judge"
+        }
+      ]
     },
     {
       "id": 4,
       "prompt": "Implement the session management component from evals/files/session-manager-design-L1.md. This is a Layer 1 design — there are no detailed unit contracts, just the component overview. Use Java 17. Implement what you can from the available information.",
       "expected_output": "Java implementation of SessionStore, SessionValidator, and SessionCleaner based on component-level information. Should note assumptions made due to missing Layer 2 detail. Thread-safe, respects constraints (10k sessions, timing).",
-      "files": ["evals/files/session-manager-design-L1.md"]
+      "files": ["evals/files/session-manager-design-L1.md"],
+      "assertions": [
+        {
+          "id": "A1",
+          "text": "No scope creep: implementation stays within the three units specified (SessionStore, SessionValidator, SessionCleaner), no extra utilities or helpers beyond design scope",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A2",
+          "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A3",
+          "text": "Error handling: returns result objects per design (never throws exceptions), uses SessionError enum for error cases",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A4",
+          "text": "SOLID signals: each of the three classes has single responsibility, dependencies between them are via interfaces not concrete classes",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A5",
+          "text": "Architecture boundaries: domain logic (validation, expiry) separated from infrastructure concerns (storage, scheduling)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A6",
+          "text": "Assumptions documented: implementation notes or comments explicitly state assumptions made due to missing Layer 2 detail",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A7",
+          "text": "Immutable value objects: SessionToken and SessionInfo are immutable (final fields, no setters, record or equivalent)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "A8",
+          "text": "Naming quality: names reveal intent, domain vocabulary used (token, session, expiry — not generic names), consistent naming across the three classes",
+          "type": "llm_judge"
+        }
+      ]
     }
   ]
 }

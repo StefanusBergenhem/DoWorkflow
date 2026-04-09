@@ -566,11 +566,11 @@
       <h4>vmodel-skill-develop-code</h4>
       <p>Implement production code from a design document with quantified quality constraints.</p>
       <dl class="ref-grid">
-        <dt>Status</dt><dd>Exists (iteration 1, +67% vs baseline)</dd>
+        <dt>Status</dt><dd>Exists (iteration 2)</dd>
         <dt>Derived from</dt><dd><a href="artifacts/source-code.html">Source Code documentation</a></dd>
         <dt>Input</dt><dd>Design document (any format)</dd>
         <dt>Output</dt><dd>Production source code files</dd>
-        <dt>Key delta</dt><dd>Quantified complexity limits (function length, cyclomatic complexity, nesting), strict error handling rules (no null returns, no swallowed exceptions), architecture boundary enforcement (domain imports nothing from infrastructure)</dd>
+        <dt>Key delta</dt><dd>Quantified complexity limits (function length, cyclomatic complexity, nesting), strict error handling rules (no null returns, no swallowed exceptions), architecture boundary enforcement (domain imports nothing from infrastructure), SOLID principles (SRP, OCP, LSP, ISP, DIP with litmus tests), functional core/imperative shell separation</dd>
         <dt>References</dt><dd><code>code-quality-checks.md</code></dd>
         <dt>HALT conditions</dt><dd>Vague design, complexity limits require redesign, out-of-scope files needed</dd>
       </dl>
@@ -1248,7 +1248,7 @@ escalated: []</code>
         <tr><th>Component</th><th>Status</th><th>Notes</th></tr>
       </thead>
       <tbody>
-        <tr><td class="field-name">vmodel-skill-develop-code</td><td>Exists</td><td>Iteration 1, +67% vs Haiku baseline (combined eval)</td></tr>
+        <tr><td class="field-name">vmodel-skill-develop-code</td><td>Exists</td><td>Iteration 2 — added SOLID principles, functional core/imperative shell. Code-specific eval assertions (8 per scenario).</td></tr>
         <tr><td class="field-name">vmodel-skill-derive-test-cases</td><td>Exists</td><td>Iteration 3, eval infrastructure built</td></tr>
         <tr><td class="field-name">Artifact documentation</td><td>Complete</td><td>source-code.html, unit-test.html, detailed-design.html</td></tr>
         <tr><td class="field-name">Schemas</td><td>Partial</td><td>artifact-envelope, detailed-design v2.0, trace schema</td></tr>

@@ -37,8 +37,8 @@ Per V-model layer:
 
 Bottom-up, one V-model layer at a time. For each layer: **documentation first**, then template, then craft skill, then framework skill.
 
-Current: Phase A foundation (reference files, config schema) complete. Phase A3 (eval scenarios) is next.
-Next: A3 eval scenarios, then Phase B (revise existing skills), then Phase C (new craft skills)
+Current: Phase A foundation (reference files, config schema) complete. Phase B (revise existing skills) is next.
+Next: Phase B (revise existing skills with DRTDD per skill), then Phase C (new craft skills)
 
 See `docs/plan/BACKLOG.md` for full backlog and `docs/plan/TARGET_ARCHITECTURE.md` for architecture.
 

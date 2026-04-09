@@ -252,9 +252,9 @@ Three-layer architecture: Layer 1 (craft + framework skills) → Layer 2 (agents
 
 Structured as six phases. Each phase lists tasks, context to load, and inputs needed.
 
-#### Phase A: Foundation (reference files, config schema, eval scenarios)
+#### Phase A: Foundation (reference files, config schema)
 
-Everything downstream depends on this phase. The reference `.md` files are the distilled knowledge that skills point to. Eval scenarios are needed to test every skill.
+Everything downstream depends on this phase. The reference `.md` files are the distilled knowledge that skills point to.
 
 **A1. Extract/update shared reference files from documentation** (DONE — 2026-04-06 to 2026-04-08)
 
@@ -280,20 +280,7 @@ Documentation synced:
 
 Schema at `schemas/core/vmodel-config.schema.yaml`. Check categories are per V-model layer (currently `code` and `detailed-design`), extended as higher layers are built. Component overrides fully replace defaults (no merging). Architecture doc updated to match.
 
-**A3. Create/update eval scenarios**
-
-Existing evals: fuel-rate-limiter, message-parser, temperature-controller, session-manager-L1. These test code generation and test derivation from design docs.
-
-New eval scenarios needed:
-- [ ] **Design-level scenarios** (for develop-dd, retrofit-dd, review-dd): component with requirements/architecture as input (forward), existing code as input (retrofit)
-- [ ] **Adversarial review scenarios** (for review-code, review-dd): deliberately flawed code/designs with known defects planted — test whether the reviewer catches them
-- [ ] **Review existing code+test evals**: verify they still test the delta that matters after reference file updates
-- [ ] **Cross-language coverage**: existing evals cover Java, Python, Go. Check if this is sufficient.
-
-Context to load:
-- `.claude/skills/derive-test-cases/evals/` (existing evals and design files)
-- `.claude/skills/develop-code/evals/` (existing evals and design files)
-- `docs/guide/skills-architecture.html` §Craft Skills (what each skill is supposed to do)
+~~**A3. Create/update eval scenarios**~~ — ELIMINATED. Eval scenarios are designed alongside each skill as the first step of its development cycle (DRTDD: plan → eval → build → verify). Folded into Phases B and C.
 
 ---
 
@@ -301,13 +288,26 @@ Context to load:
 
 The existing skills were created before the comprehensive documentation existed. Need to audit, rename, update references, and re-evaluate.
 
+Each skill follows DRTDD: plan (audit against docs) → test (create/update evals) → build (revise SKILL.md) → verify (run evals, compare to baseline).
+
 **B1. vmodel-skill-develop-code** (rename from `develop-code`)
 
+*Plan:*
+- [ ] Audit SKILL.md body against `docs/guide/artifacts/source-code.html` — identify gaps
 - [ ] Rename skill directory: `develop-code` → `vmodel-skill-develop-code`
 - [ ] Update SKILL.md frontmatter (name, description with vmodel-skill prefix)
+
+*Test (eval design):*
+- [ ] Review existing evals — do they still test the right deltas after A1 reference updates?
+- [ ] Add/update eval scenarios if gaps found
+- [ ] Run evals against current skill as baseline (red — before changes)
+
+*Build:*
 - [ ] Replace `references/code-quality-checks.md` with updated version from Phase A1
-- [ ] Audit SKILL.md body against `docs/guide/artifacts/source-code.html` — check if any key delta was missed
-- [ ] Re-run evals with updated skill, compare to previous iteration results
+- [ ] Revise SKILL.md body based on audit findings
+
+*Verify:*
+- [ ] Re-run evals with updated skill, compare to baseline
 - [ ] Iterate if regression detected
 
 Context to load:
@@ -320,12 +320,23 @@ Context to load:
 
 **B2. vmodel-skill-derive-test-cases** (rename from `derive-test-cases`)
 
+*Plan:*
+- [ ] Audit SKILL.md body against `docs/guide/artifacts/unit-test.html` — identify gaps
 - [ ] Rename skill directory: `derive-test-cases` → `vmodel-skill-derive-test-cases`
 - [ ] Update SKILL.md frontmatter
+
+*Test (eval design):*
+- [ ] Review existing evals — do they still test the right deltas after A1 reference updates?
+- [ ] Add/update eval scenarios if gaps found
+- [ ] Run evals against current skill as baseline (red — before changes)
+
+*Build:*
 - [ ] Replace `references/testing-anti-patterns.md` with updated version from Phase A1 (significant gap — 8 smells + AI failures missing)
 - [ ] Replace `references/derivation-strategies.md` with updated version from Phase A1
-- [ ] Audit SKILL.md body against `docs/guide/artifacts/unit-test.html`
-- [ ] Re-run evals, compare to iteration-3 results
+- [ ] Revise SKILL.md body based on audit findings
+
+*Verify:*
+- [ ] Re-run evals with updated skill, compare to baseline
 - [ ] Iterate if regression detected
 
 Context to load:
@@ -340,7 +351,7 @@ Context to load:
 
 #### Phase C: New craft skills
 
-Each skill follows: draft SKILL.md → create evals → run with skill-creator → iterate. Skills in this phase are independent of each other and can be built in any order.
+Each skill follows DRTDD: plan (draft scope from docs) → test (create eval scenarios) → build (write SKILL.md) → verify (run evals, iterate). Skills in this phase are independent of each other and can be built in any order.
 
 **C1. vmodel-skill-review-code** (combined code + test review)
 
@@ -608,9 +619,9 @@ Bottom-up, one V-model layer at a time. For each layer: documentation first, the
 ```
 See Component 4 "Lower V Skill Build Plan" for the detailed phased plan (A→F).
 Summary:
-  A. [NEXT] Foundation: reference files, config schema, eval scenarios
-  B. Revise existing craft skills (develop-code, derive-test-cases)
-  C. New craft skills (review-code, develop-dd, retrofit-dd, review-dd)
+  A. [DONE] Foundation: reference files, config schema
+  B. [NEXT] Revise existing craft skills — DRTDD per skill (develop-code, derive-test-cases)
+  C. New craft skills — DRTDD per skill (review-code, develop-dd, retrofit-dd, review-dd)
   D. Framework skills (dd-template, traceability, tool-checks)
   E. Agents (tdd-developer, code-reviewer, dd-developer, dd-reviewer, task-decomposer)
   F. Orchestration (research/plan skill, pipeline controller)

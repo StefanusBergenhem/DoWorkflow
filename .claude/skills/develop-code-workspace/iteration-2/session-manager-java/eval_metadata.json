@@ -1,0 +1,47 @@
+{
+  "eval_id": 4,
+  "eval_name": "session-manager-java",
+  "prompt": "Implement the session management component from evals/files/session-manager-design-L1.md. This is a Layer 1 design — there are no detailed unit contracts, just the component overview. Use Java 17. Implement what you can from the available information.",
+  "assertions": [
+  {
+    "id": "A1",
+    "text": "No scope creep: implementation stays within the three units specified (SessionStore, SessionValidator, SessionCleaner), no extra utilities or helpers beyond design scope",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A2",
+    "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A3",
+    "text": "Error handling: returns result objects per design (never throws exceptions), uses SessionError enum for error cases",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A4",
+    "text": "SOLID signals: each of the three classes has single responsibility, dependencies between them are via interfaces not concrete classes",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A5",
+    "text": "Architecture boundaries: domain logic (validation, expiry) separated from infrastructure concerns (storage, scheduling)",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A6",
+    "text": "Assumptions documented: implementation notes or comments explicitly state assumptions made due to missing Layer 2 detail",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A7",
+    "text": "Immutable value objects: SessionToken and SessionInfo are immutable (final fields, no setters, record or equivalent)",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A8",
+    "text": "Naming quality: names reveal intent, domain vocabulary used (token, session, expiry — not generic names), consistent naming across the three classes",
+    "type": "llm_judge"
+  }
+]
+}

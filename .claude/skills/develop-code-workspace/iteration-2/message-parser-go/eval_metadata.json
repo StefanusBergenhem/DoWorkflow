@@ -1,0 +1,47 @@
+{
+  "eval_id": 3,
+  "eval_name": "message-parser-go",
+  "prompt": "Implement the MessageParser from the design in evals/files/message-parser-design.md. Use Go.",
+  "assertions": [
+  {
+    "id": "A1",
+    "text": "No scope creep: no exported functions, types, or features beyond what the design specifies",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A2",
+    "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A3",
+    "text": "Error handling: uses Go error return pattern (result, error), distinct error codes per design, no ignored errors",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A4",
+    "text": "Architecture boundaries: parser logic has no I/O dependencies (no net, os, or io packages in core parsing functions)",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A5",
+    "text": "SOLID signals: parsing steps decomposed into focused functions, not one monolithic Parse function",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A6",
+    "text": "Pure logic separated from I/O: parse functions take []byte and return structs/errors, no side effects",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A7",
+    "text": "No dead code: no unused functions, no commented-out code, no unreachable branches",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A8",
+    "text": "Naming quality: Go naming conventions followed (exported vs unexported), names reveal intent, domain terms used",
+    "type": "llm_judge"
+  }
+]
+}

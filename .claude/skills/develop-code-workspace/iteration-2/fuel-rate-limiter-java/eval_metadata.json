@@ -1,0 +1,47 @@
+{
+  "eval_id": 1,
+  "eval_name": "fuel-rate-limiter-java",
+  "prompt": "Implement the FuelRateLimiter from the design in evals/files/fuel-rate-limiter-design.md. Use Java 17.",
+  "assertions": [
+  {
+    "id": "A1",
+    "text": "No scope creep: no public methods, classes, or features beyond what the design specifies",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A2",
+    "text": "Complexity within limits: no function exceeds 50 lines, no cyclomatic complexity above 10, no nesting beyond 3 levels",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A3",
+    "text": "Error handling: no null returns, no empty catch blocks, error messages include context (operation + input + expected state)",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A4",
+    "text": "Architecture boundaries: domain logic has zero imports of infrastructure packages (database, HTTP, filesystem, framework)",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A5",
+    "text": "Immutable result objects: output value objects use final/record fields, no setters",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A6",
+    "text": "SOLID signals: each class describable in one sentence without 'and'; dependencies injected via constructor, not created internally",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A7",
+    "text": "Pure logic separated from I/O: core calculation/decision functions take data in and return data out with no side effects",
+    "type": "llm_judge"
+  },
+  {
+    "id": "A8",
+    "text": "Naming quality: names reveal intent (no abbreviations unless universal), classes are nouns, methods are verbs, consistent vocabulary",
+    "type": "llm_judge"
+  }
+]
+}

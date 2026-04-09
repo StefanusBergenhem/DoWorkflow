@@ -2,11 +2,12 @@
 name: develop-code
 description: >
   Implement code from a design with V-model quality: design-before-code discipline, quantified
-  complexity limits, strict error handling, and clean architecture boundaries. Use this skill when
-  the user asks to implement a feature, write production code, implement a design, build a module,
-  or code a component. Also use when the user says "implement this", "write the code for this
-  design", "build this module", or mentions implementation, coding, or development of a unit or
-  component. Do NOT use for test code — use derive-test-cases instead.
+  complexity limits, strict error handling, clean architecture boundaries, SOLID principles, and
+  functional core/imperative shell separation. Use this skill when the user asks to implement a
+  feature, write production code, implement a design, build a module, or code a component. Also use
+  when the user says "implement this", "write the code for this design", "build this module", or
+  mentions implementation, coding, or development of a unit or component. Do NOT use for test
+  code — use derive-test-cases instead.
 user-invocable: true
 ---
 
@@ -71,7 +72,23 @@ AI-generated code:
 - **Resource cleanup is mandatory.** Use try-with-resources, defer, RAII — whatever the language
   provides. No leaked handles, connections, or streams.
 
-### 4. Architecture boundaries
+### 4. SOLID principles
+
+These are the structural properties that make code maintainable. Violations compound — one broken
+principle cascades into complexity, fragility, and test pain.
+
+- **Single Responsibility:** One reason to change per class. Litmus test: describe it in one sentence
+  without "and".
+- **Open/Closed:** New behavior through extension (new implementations, strategy objects), not editing
+  tested code.
+- **Liskov Substitution:** Subtypes must be substitutable for their base type without altering
+  correctness. If overriding a method changes the contract, the hierarchy is wrong.
+- **Interface Segregation:** Clients should not depend on methods they don't use. Prefer small,
+  focused interfaces over fat ones.
+- **Dependency Inversion:** High-level modules depend on abstractions, not low-level modules. Domain
+  defines interfaces; infrastructure implements them.
+
+### 5. Architecture boundaries
 
 Business logic must not depend on infrastructure. This is the single most important architectural
 rule — it enables testing, enables change, and maps cleanly to V-model traceability.
@@ -86,7 +103,13 @@ If the design doesn't specify architecture layers, apply this default:
 - **Application** — use cases, orchestration (calls domain, uses interfaces for I/O)
 - **Infrastructure** — adapters that implement interfaces (DB, HTTP, files)
 
-### 5. Naming
+**Functional core, imperative shell.** Separate pure logic (calculations, decisions, transformations)
+from impure I/O (database calls, HTTP requests, file access). The pure core is trivially testable
+with no mocks. The impure shell is thin — it wires the core to the outside world. When the design
+has both logic and I/O, structure the code so the logic functions take data in and return data out,
+and a separate function handles the I/O plumbing.
+
+### 6. Naming
 
 Names are the primary way both humans and AI agents understand code. Bad names cause
 misunderstanding, which causes bugs.
@@ -96,7 +119,7 @@ misunderstanding, which causes bugs.
 - Use domain vocabulary — the code should read like the domain, not like CS jargon
 - Classes are nouns, methods are verbs
 
-### 6. No dead code
+### 7. No dead code
 
 Every function, every branch, every variable must be reachable and used. Delete unused code —
 version control remembers.
@@ -106,14 +129,15 @@ the design doesn't specify.
 
 ## Self-check before delivering
 
-For each function you wrote:
+For each function/class you wrote:
 
 1. **Trace check:** Does it map to a specific design element?
-2. **Delete test:** Would removing this function break something the design requires?
+2. **Delete test:** Would removing this break something the design requires?
 3. **Complexity check:** Under 50 lines? Cyclomatic complexity under 10? Nesting under 4?
 4. **Error check:** Are all error paths handled? Any null returns? Any empty catches?
-5. **Boundary check:** Does domain code import infrastructure? Does it depend on a framework?
-6. **Name check:** Would someone unfamiliar with the code understand each name?
+5. **SOLID check:** Can you describe each class in one sentence without "and"? Do dependencies point inward? Are interfaces small and focused?
+6. **Boundary check:** Does domain code import infrastructure? Is pure logic separated from I/O?
+7. **Name check:** Would someone unfamiliar with the code understand each name?
 
 Read `references/code-quality-checks.md` for the detailed review checklist.
 

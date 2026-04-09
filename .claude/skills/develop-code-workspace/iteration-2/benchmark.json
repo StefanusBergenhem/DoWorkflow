@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "skill_name": "develop-code",
+    "skill_path": ".claude/skills/develop-code",
+    "executor_model": "claude-haiku-4-5",
+    "analyzer_model": "claude-haiku-4-5",
+    "timestamp": "2026-04-09T19:55:00Z",
+    "evals_run": ["fuel-rate-limiter-java", "temperature-controller-python", "message-parser-go", "session-manager-java"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_name": "fuel-rate-limiter-java",
+      "with_skill": {"pass_rate": 1.0, "passed": 8, "total": 8, "tokens": 25387, "duration_seconds": 40.4},
+      "old_skill": {"pass_rate": 0.75, "passed": 6, "total": 8, "tokens": 22983, "duration_seconds": 39.1},
+      "delta": {"pass_rate": "+0.25", "failed_assertions_baseline": ["A1: scope creep (reset/getPreviousRate)", "A2: limit() 123 lines, nesting 4"]}
+    },
+    {
+      "eval_name": "temperature-controller-python",
+      "with_skill": {"pass_rate": 1.0, "passed": 8, "total": 8, "tokens": 37943, "duration_seconds": 117.1},
+      "old_skill": {"pass_rate": 0.75, "passed": 6, "total": 8, "tokens": 23870, "duration_seconds": 66.1},
+      "delta": {"pass_rate": "+0.25", "failed_assertions_baseline": ["A2: control() 60 lines", "A4: mutable dataclass"]}
+    },
+    {
+      "eval_name": "message-parser-go",
+      "with_skill": {"pass_rate": 1.0, "passed": 8, "total": 8, "tokens": 28204, "duration_seconds": 46.3},
+      "old_skill": {"pass_rate": 0.75, "passed": 6, "total": 8, "tokens": 33948, "duration_seconds": 107.4},
+      "delta": {"pass_rate": "+0.25", "failed_assertions_baseline": ["A2: Parse() 114 lines", "A5: monolithic Parse, not decomposed"]}
+    },
+    {
+      "eval_name": "session-manager-java",
+      "with_skill": {"pass_rate": 0.625, "passed": 5, "total": 8, "tokens": 35031, "duration_seconds": 101.2},
+      "old_skill": {"pass_rate": 0.875, "passed": 7, "total": 8, "tokens": 30137, "duration_seconds": 91.5},
+      "delta": {"pass_rate": "-0.25", "failed_assertions_skill": ["A1: scope creep (RevokedTokenStore, SessionManager facade)", "A3: null return on createSession success", "A4: concrete dependencies, no interfaces"], "failed_assertions_baseline": ["A6: assumptions not documented"]}
+    }
+  ],
+  "run_summary": {
+    "with_skill": {"mean_pass_rate": 0.906, "total_passed": 29, "total_assertions": 32, "mean_tokens": 31641, "mean_duration_seconds": 76.25},
+    "old_skill": {"mean_pass_rate": 0.781, "total_passed": 25, "total_assertions": 32, "mean_tokens": 27735, "mean_duration_seconds": 76.03},
+    "delta": {
+      "pass_rate": "+12.5%",
+      "time_seconds": "+0.2",
+      "tokens": "+3906"
+    }
+  },
+  "notes": [
+    "Skill wins clearly on well-specified Layer 2 designs (+25% on all three). Complexity and decomposition are the strongest deltas.",
+    "Skill regresses on underspecified Layer 1 design (-25%). Agent adds classes beyond design scope when design is sparse.",
+    "Architecture boundaries (A4) and naming (A8) are non-discriminating — Haiku passes these without skill guidance.",
+    "Skill uses ~14% more tokens on average due to reading SKILL.md + reference file."
+  ]
+}
