@@ -1017,6 +1017,7 @@ findings:
     <p>Each project has a <code>.vmodel/config.yaml</code> that defines language, tool checks, and component-level overrides. Producer agents read this to know what checks to run. The configuration is project-specific but follows a standard schema.</p>
 
     <h3>Configuration Schema</h3>
+    <p>Formal schema: <code>schemas/core/vmodel-config.schema.yaml</code>. Example:</p>
     <div class="code-block">
       <span class="lang-label">YAML</span>
       <code># .vmodel/config.yaml
@@ -1040,9 +1041,6 @@ defaults:
       - name: "coverage"
         command: "./gradlew jacocoTestReport"
         required: true
-        threshold:
-          metric: "line"
-          minimum: 80
       - name: "traceability"
         command: "vmodel-trace validate"
         required: true
@@ -1101,7 +1099,7 @@ components:
       <li>Exit 0 on success, non-zero on failure</li>
       <li>Write output to stdout/stderr (agent captures and logs to <code>/tmp</code>)</li>
       <li>Be idempotent (safe to re-run)</li>
-      <li>Complete within a reasonable timeout (configured per-check, default 120s)</li>
+      <li>Complete within a reasonable time</li>
     </ul>
   </section>
 

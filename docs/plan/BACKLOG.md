@@ -244,7 +244,7 @@ Three-layer architecture: Layer 1 (craft + framework skills) → Layer 2 (agents
 - [x] Define orchestration pipeline contract schema (design-time reference)
 - [x] Skills architecture designed (`docs/guide/skills-architecture.html`, 2026-04-06)
 - [ ] Reconcile `schemas/core/craft-skill.schema.yaml` with agentskills.io SKILL.md format
-- [ ] Finalize `.vmodel/config.yaml` schema (Phase A2)
+- [x] Finalize `.vmodel/config.yaml` schema (Phase A2, `schemas/core/vmodel-config.schema.yaml`, 2026-04-09). Add layer categories as higher V-model layers are built.
 
 ---
 
@@ -256,32 +256,29 @@ Structured as six phases. Each phase lists tasks, context to load, and inputs ne
 
 Everything downstream depends on this phase. The reference `.md` files are the distilled knowledge that skills point to. Eval scenarios are needed to test every skill.
 
-**A1. Extract/update shared reference files from documentation**
+**A1. Extract/update shared reference files from documentation** (DONE — 2026-04-06 to 2026-04-08)
 
-Audit existing reference files against the comprehensive documentation, then create missing ones.
+All reference files audited against comprehensive documentation and updated/created.
 
-| Reference File | Status | Source Documentation | Gap Analysis |
-|---|---|---|---|
-| `code-quality-checks.md` | EXISTS — needs audit | `docs/guide/artifacts/source-code.html` §3 | Existing file covers functions, error handling, naming, architecture, dead code. May be missing: design patterns guidance, immutability depth, AI-specific pitfalls from §3.4 |
-| `testing-anti-patterns.md` | EXISTS — needs audit | `docs/guide/artifacts/unit-test.html` §3.5, §3.7 | Existing file has 6 anti-patterns + self-check. Documentation adds 8 test smells (fragile, obscure, eager, mystery guest, general fixture, conditional logic, erratic, slow) + AI failure modes (tautological, assertion-free, happy-path bias, over-mocking, hallucinated assertions, copy-paste). Significant gap. |
-| `derivation-strategies.md` | EXISTS — needs audit | `docs/guide/artifacts/unit-test.html` §3.2 | Existing file covers all 4 strategies. Check if decision table method for compound conditions and coverage matrix format need updating. |
-| `design-quality-criteria.md` | NEW | `docs/guide/artifacts/detailed-design.html` §3.1-§3.6 | Interface completeness (DbC), behavioral specification (decision tables, state machines), rationale requirements, error handling design, dynamic behavior/concurrency |
-| `review-checklist-code.md` | NEW | `docs/guide/artifacts/source-code.html` §3.5 + `unit-test.html` §3.5 | Combined code + test review. Three sections: code quality, test quality, cross-checks |
-| `review-checklist-dd.md` | NEW | `docs/guide/artifacts/detailed-design.html` §3 all | Interface completeness, behavioral specification, rationale, error handling, testability |
-| `retrofit-risks.md` | NEW | `docs/guide/artifacts/detailed-design.html` §3.8 | Post-hoc rationalization, code paraphrase trap, missing intent, human involvement triggers |
+| Reference File | Location | Status |
+|---|---|---|
+| `code-quality-checks.md` | `.claude/skills/develop-code/references/` | Updated: added SOLID/DRY/KISS/YAGNI one-liners, functional core/imperative shell, AI self-check section |
+| `testing-anti-patterns.md` | `.claude/skills/derive-test-cases/references/` | Updated: expanded from 6 to 13 items (added Meszaros smells: fragile, obscure, eager, mystery guest, general fixture, conditional logic, erratic, slow) |
+| `ai-testing-failures.md` | `.claude/skills/derive-test-cases/references/` | NEW: AI-specific test failures split from anti-patterns (tautological, assertion-free, happy-path bias, over-mocking, hallucinated assertions, copy-paste, code-to-test trap) |
+| `derivation-strategies.md` | `.claude/skills/derive-test-cases/references/` | Unchanged — adequate as-is. MC/DC deferred to higher assurance levels. |
+| `design-quality-criteria.md` | `.claude/skills/references/` (shared) | NEW: two-rules framing (don't duplicate code + be specific enough to implement/test), interface completeness (7 elements), behavioral specification forms, rationale, error handling design, Layer model alignment |
+| `review-checklist-code.md` | `.claude/skills/references/` (shared) | NEW: references code-quality-checks + testing-anti-patterns, adds cross-checks (code ↔ tests ↔ design) |
+| `review-checklist-dd.md` | `.claude/skills/references/` (shared) | NEW: references design-quality-criteria, adds upstream traceability, testability assessment, consistency checks |
+| `retrofit-risks.md` | `.claude/skills/references/` (shared) | NEW: "could the code have been written with this as input" test, invention as central failure mode, rationale only when sourced |
 
-Context to load:
-- `docs/guide/artifacts/source-code.html` (all of §3)
-- `docs/guide/artifacts/unit-test.html` (all of §3)
-- `docs/guide/artifacts/detailed-design.html` (all of §3)
-- Existing reference files: `.claude/skills/develop-code/references/code-quality-checks.md`, `.claude/skills/derive-test-cases/references/testing-anti-patterns.md`, `.claude/skills/derive-test-cases/references/derivation-strategies.md`
+Documentation synced:
+- `docs/guide/artifacts/detailed-design.html` §3.1 — added two-rules framing, test of specificity, box mental model, worked example
+- `docs/guide/artifacts/detailed-design.html` §3.8 — updated retrofit section with "could the code have been written from this" test, removed observed/inferred/unknown labels
+- `docs/guide/skills-architecture.html` §Configuration — removed threshold (YAGNI), removed per-check timeout, added schema reference
 
-**A2. Finalize `.vmodel/config.yaml` schema**
+**A2. Finalize `.vmodel/config.yaml` schema** (DONE — 2026-04-09)
 
-Define the project configuration schema per the architecture doc (§Configuration). Needed before `vmodel-skill-tool-checks` can be written.
-
-Context to load:
-- `docs/guide/skills-architecture.html` §Configuration section
+Schema at `schemas/core/vmodel-config.schema.yaml`. Check categories are per V-model layer (currently `code` and `detailed-design`), extended as higher layers are built. Component overrides fully replace defaults (no merging). Architecture doc updated to match.
 
 **A3. Create/update eval scenarios**
 

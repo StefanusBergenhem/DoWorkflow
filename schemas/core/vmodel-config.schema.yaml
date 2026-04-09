@@ -1,0 +1,192 @@
+# VModel Project Configuration Schema
+# =============================================================================
+#
+# Defines language, tooling, and automated checks for a VModelWorkflow project.
+# Lives at .vmodel/config.yaml in each consuming project. Agents read this to
+# determine what checks to run after producing artifacts.
+#
+# Check categories are per V-model layer. Currently defined:
+#   - code          (checks after code/test generation)
+#   - detailed-design (checks after design document generation)
+#
+# TODO: Add categories as higher V-model layers are built:
+#   - architecture, sw-requirements, system-test, etc.
+#
+# Resolution order for checks:
+#   1. Match file path against component prefixes (most specific match wins)
+#   2. If no component matches, use defaults
+#   3. Component config fully replaces defaults for that section (no merging)
+#
+# =============================================================================
+
+schema_version: "1.0"
+schema_id: vmodel-config
+
+# =============================================================================
+# PROJECT
+# =============================================================================
+
+project:
+  name:
+    type: string
+    required: true
+    description: "Project identifier. Used in artifact IDs and trace references."
+    example: "fuel-control-system"
+
+  description:
+    type: string
+    required: false
+    description: "One-line project description."
+    example: "Embedded fuel control for engine management unit"
+
+# =============================================================================
+# DEFAULTS
+# =============================================================================
+#
+# Apply to all files unless overridden by a component entry.
+
+defaults:
+  language:
+    type: string
+    required: true
+    description: "Primary programming language."
+    example: "java"
+
+  test_framework:
+    type: string
+    required: true
+    description: "Primary test framework."
+    example: "junit5"
+
+  build_tool:
+    type: string
+    required: false
+    description: "Build tool. Optional — some languages don't need one."
+    example: "gradle"
+
+  checks:
+    type: map<layer_name, list<check>>
+    required: true
+    description: >
+      Automated checks organized by V-model layer. Each key is a layer name,
+      each value is a list of check entries. The agent running a particular
+      layer skill looks up its layer key here to know what to run.
+
+    # --- Currently defined layers ---
+
+    code:
+      type: list<check>
+      description: >
+        Checks run after code and test generation. Typical entries:
+        unit-tests, static-analysis, coverage, traceability.
+
+    detailed-design:
+      type: list<check>
+      description: >
+        Checks run after design document generation. Typical entries:
+        schema-validation, traceability.
+
+# =============================================================================
+# CHECK ENTRY
+# =============================================================================
+
+check:
+  name:
+    type: string
+    required: true
+    description: "Identifier for this check (e.g., 'unit-tests', 'coverage')."
+
+  command:
+    type: string
+    required: true
+    description: >
+      Shell command to execute. Must exit 0 on success, non-zero on failure.
+      Must be idempotent (safe to re-run). Output goes to stdout/stderr.
+
+  required:
+    type: boolean
+    required: true
+    description: >
+      If true, the agent must not proceed past this check on failure.
+      If false, the check is advisory — failure is reported but does not block.
+
+# =============================================================================
+# COMPONENT OVERRIDES
+# =============================================================================
+#
+# Path-prefix-based overrides for multi-language or multi-module projects.
+# Most specific path match wins. A component entry fully replaces the
+# matching defaults section — no merging. What you see in the component
+# is what runs.
+
+components:
+  type: map<path_prefix, component_override>
+  required: false
+  description: >
+    Component-level overrides keyed by directory path prefix (with trailing /).
+    Only needed for projects with multiple languages or toolchains.
+
+component_override:
+  language:
+    type: string
+    required: false
+    description: "Overrides defaults.language for files under this path."
+
+  test_framework:
+    type: string
+    required: false
+    description: "Overrides defaults.test_framework for files under this path."
+
+  build_tool:
+    type: string
+    required: false
+    description: "Overrides defaults.build_tool for files under this path."
+
+  checks:
+    type: map<layer_name, list<check>>
+    required: false
+    description: >
+      Fully replaces defaults.checks for this component. Same structure
+      as defaults.checks.
+
+# =============================================================================
+# EXAMPLE
+# =============================================================================
+#
+# project:
+#   name: "fuel-control-system"
+#   description: "Embedded fuel control for engine management unit"
+#
+# defaults:
+#   language: "java"
+#   test_framework: "junit5"
+#   build_tool: "gradle"
+#
+#   checks:
+#     code:
+#       - name: "unit-tests"
+#         command: "./gradlew test"
+#         required: true
+#       - name: "static-analysis"
+#         command: "./gradlew spotbugsMain"
+#         required: true
+#       - name: "coverage"
+#         command: "./gradlew jacocoTestReport"
+#         required: true
+#     detailed-design:
+#       - name: "schema-validation"
+#         command: "vmodel-schema validate docs/design/"
+#         required: true
+#
+# components:
+#   ml-pipeline/:
+#     language: "python"
+#     test_framework: "pytest"
+#     checks:
+#       code:
+#         - name: "unit-tests"
+#           command: "pytest ml-pipeline/tests/"
+#           required: true
+#         - name: "type-check"
+#           command: "mypy ml-pipeline/"
+#           required: true
