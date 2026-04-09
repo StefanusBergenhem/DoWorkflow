@@ -4,7 +4,7 @@ Check every test against this list before delivering.
 
 ---
 
-## 1. No Assertion / Assert-Doesn't-Throw
+## 1. Assertion-Free / Assert-Doesn't-Throw
 
 The only "assertion" is that calling the function doesn't raise an exception — or there is no
 assertion at all. This test passes for *any* implementation, including an empty one.
@@ -22,17 +22,7 @@ implementation has a bug, the test has the same bug.
 
 ---
 
-## 3. The Untargeted Mock
-
-Mocking something without understanding what it does. The mock might not behave like the real
-dependency — your test passes against fiction.
-
-**Fix:** Every mock needs a one-line comment: what it replaces, what contract it follows.
-If you can't write that comment, don't mock it.
-
----
-
-## 4. Tautology / Structural-Only Assertion
+## 3. Tautology / Structural-Only Assertion
 
 Asserting something that is always true (e.g., `result != null`, `payload.isNotEmpty()`). The
 implementation could return garbage and the test passes. This is especially common with
@@ -44,7 +34,17 @@ variant-specific fields: error_code, byte_offset, message_type, decoded payload 
 
 ---
 
-## 5. The Giant Test
+## 4. The Untargeted Mock
+
+Mocking something without understanding what it does. The mock might not behave like the real
+dependency — your test passes against fiction.
+
+**Fix:** Every mock needs a one-line comment: what it replaces, what contract it follows.
+If you can't write that comment, don't mock it.
+
+---
+
+## 5. Eager Test (Giant Test)
 
 One test that sets up complex state, calls multiple methods, makes many unrelated assertions.
 When it fails, you don't know which behavior broke.
@@ -60,10 +60,74 @@ would still let the test pass, the test is worthless.
 
 ---
 
-## Quick self-check
+## 7. Fragile Test
+
+Test breaks when unrelated code changes. Four types of fragility:
+- **Interface sensitivity:** breaks when method signatures change (use builders, not positional constructors)
+- **Behavior sensitivity:** breaks when internal implementation changes but observable behavior does not (test behavior, not implementation; avoid strict mock verification of call sequences)
+- **Data sensitivity:** breaks when shared test data changes (isolate test data per test)
+- **Context sensitivity:** breaks in different environments (inject Clock, Locale; don't depend on timezone or machine state)
+
+Fragile tests are the most damaging smell — developers stop trusting the suite, stop refactoring.
+
+---
+
+## 8. Obscure Test
+
+Cannot see cause and effect between setup, action, and assertion. The reader must chase through
+helper hierarchies or external files to understand one test.
+
+**Fix:** Inline essential setup. Extract only irrelevant details to helpers.
+
+---
+
+## 9. Mystery Guest
+
+Test depends on data or resources not visible in the test body (external files, database state,
+environment variables).
+
+**Fix:** Make all relevant data visible in the test. Use inline test data or Test Data Builders.
+
+---
+
+## 10. General Fixture
+
+@BeforeEach / setUp creates far more state than any single test needs. Changes to the fixture
+break unrelated tests. Hard to understand what each test actually depends on.
+
+**Fix:** Move setup into individual tests or use Test Data Builders with sensible defaults.
+
+---
+
+## 11. Conditional Test Logic
+
+if/else or loops in test code. The test itself might have bugs.
+
+**Fix:** Tests should be straight-line code. Split into separate tests for each condition.
+
+---
+
+## 12. Erratic Test (Flaky)
+
+Passes sometimes, fails sometimes, without code changes. Erodes trust in the entire suite.
+
+**Fix:** Control non-determinism — inject Clock, seed Random, isolate shared state, avoid
+real I/O in unit tests.
+
+---
+
+## 13. Slow Test
+
+Test takes seconds instead of milliseconds. Developers run tests less often; bugs accumulate.
+
+**Fix:** Replace I/O with test doubles. Move slow tests to an integration tier.
+
+---
+
+## Quick Self-Check
 
 For each test:
 1. **Delete test:** Would this fail if I deleted the implementation?
 2. **Wrong answer test:** Would this catch a wrong but structurally valid answer?
 3. **Mock audit:** Can I explain each mock in one sentence?
-4. **Name check:** Does the name tell me the scenario?
+4. **Name check:** Does the test name tell me the scenario?

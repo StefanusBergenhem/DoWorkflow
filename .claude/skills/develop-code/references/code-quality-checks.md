@@ -35,10 +35,17 @@ verifiable check — not a vague aspiration.
 
 ## Classes and Modules
 
-- [ ] Single responsibility — one reason to change
+- [ ] Single Responsibility — one reason to change. Violating this is a defect, not a style choice.
+- [ ] Open/Closed — extend via new types, not by editing working code.
+- [ ] Liskov Substitution — subtypes must honor the base type's contract.
+- [ ] Interface Segregation — no fat interfaces forcing unused method implementations.
+- [ ] Dependency Inversion — depend on abstractions, not concretions.
 - [ ] High cohesion — all methods use most fields
 - [ ] Composition over inheritance (unless genuine "is-a")
 - [ ] No god classes — if the name is "Manager", "Processor", "Handler", "Utility", reconsider
+- [ ] DRY — every piece of knowledge has exactly one representation. Duplicated logic is a bug.
+- [ ] KISS — the simplest correct solution wins. Complexity is cost, not value.
+- [ ] YAGNI — do not build for hypothetical future requirements.
 
 ## Architecture
 
@@ -47,6 +54,7 @@ verifiable check — not a vague aspiration.
 - [ ] External dependencies accessed through interfaces defined by domain
 - [ ] No circular package/module dependencies
 - [ ] New code follows existing codebase patterns and conventions
+- [ ] Pure logic separated from I/O (functional core, imperative shell)
 
 ## Dead Code
 
@@ -78,3 +86,13 @@ verifiable check — not a vague aspiration.
 - [ ] Collections returned as unmodifiable views
 - [ ] Mutable state is minimal and localized
 - [ ] Thread-safety addressed if design requires concurrency
+
+## AI Self-Check
+
+- [ ] Every API call verified to exist in the actual library version — do not trust training data
+- [ ] Logic manually verified: check operators, boundary conditions, off-by-one errors
+- [ ] No plausible-but-wrong formulas (correct structure, wrong operator or constant)
+- [ ] No hallucinated configuration properties or method signatures
+- [ ] No shotgun abstraction (5 interfaces for 1 implementation is YAGNI)
+- [ ] Code follows project conventions, not generic tutorial style
+- [ ] No hardcoded secrets or credentials

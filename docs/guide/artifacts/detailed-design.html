@@ -172,6 +172,55 @@
       </tbody>
     </table>
 
+    <h4>Two Rules That Both Apply</h4>
+    <p>A detailed design must satisfy two rules simultaneously. They appear contradictory but operate at different abstraction levels.</p>
+    <p><strong>Rule 1 &mdash; Don&rsquo;t duplicate the code.</strong> The design must not paraphrase implementation logic. If a skilled developer could derive a fact by reading the code alone, that fact does not belong in the design. This is the Reeves/Parnas position above.</p>
+    <p><strong>Rule 2 &mdash; Be specific enough to implement and test.</strong> A junior developer reading the design must be able to produce a working implementation. A test engineer reading the design must be able to derive tests <em>without seeing the code</em>. This is what DO-178C means when it requires Low-Level Requirements to be detailed enough that &ldquo;source code can be directly implemented without further information.&rdquo;</p>
+    <p>These coexist because &ldquo;specific&rdquo; and &ldquo;duplicating code&rdquo; are different things. The design specifies <em>what must be true</em> of any valid implementation; the code specifies <em>which</em> implementation was chosen.</p>
+
+    <h4>The Test of Specificity</h4>
+    <p>A correctly written design has all three properties simultaneously:</p>
+    <ol>
+      <li>Two different developers reading it would produce different code (different names, different loop styles, possibly different data structures within the constraints)</li>
+      <li>Both implementations would pass the same test suite</li>
+      <li>A test engineer could write that test suite without ever seeing the code</li>
+    </ol>
+    <p>If property 3 fails, the design is too vague. If property 1 fails, the design is paraphrasing code.</p>
+
+    <h4>Mental Model: The Box</h4>
+    <p>Think of the design as defining a box in implementation space. The walls are the contract &mdash; what is required and what is forbidden. Inside the box are many valid implementations. Outside the box are bugs.</p>
+    <ul>
+      <li><strong>Too vague design:</strong> no walls &mdash; any implementation passes, including wrong ones</li>
+      <li><strong>Code paraphrase design:</strong> box collapsed to a single point &mdash; only one implementation fits, and the design is just code in another language</li>
+      <li><strong>Right level design:</strong> walls placed where correctness, performance, or safety demand them; the interior is left open</li>
+    </ul>
+
+    <h4>Worked Example: Three Levels of Specification</h4>
+    <div class="example-block bad">
+      <div class="example-label">Too vague &mdash; fails Rule 2</div>
+      <div class="code-block"><span class="lang-label">Design</span><code>The function sorts the input list.</code></div>
+    </div>
+    <p>A developer doesn&rsquo;t know: ascending or descending? Stable? What about nulls? What&rsquo;s the performance budget? A test engineer cannot derive meaningful tests.</p>
+
+    <div class="example-block bad">
+      <div class="example-label">Code paraphrase &mdash; fails Rule 1</div>
+      <div class="code-block"><span class="lang-label">Design</span><code>Declare a result list, iterate from 0 to length-1, compare elements
+using natural ordering, swap when out of order, return the result.</code></div>
+    </div>
+    <p>This tells the developer <em>which</em> implementation to write &mdash; but only one. It also tells the test engineer nothing the code wouldn&rsquo;t already show.</p>
+
+    <div class="example-block good">
+      <div class="example-label">Right level &mdash; passes both rules</div>
+      <div class="code-block"><span class="lang-label">Design</span><code>Returns a list containing exactly the elements of the input, in
+non-descending order according to the natural ordering of the element
+type. Equal elements preserve their relative order from the input
+(stability is required because downstream processing depends on
+insertion order as a tiebreaker). Performance: O(n log n) worst case
+is required for compliance with SYS-TIMING-003. Null inputs are
+rejected with IllegalArgumentException.</code></div>
+    </div>
+    <p>A developer can implement this &mdash; they know what to build. Two developers might produce mergesort vs Timsort, with different variable names. Both would pass the same test suite. A test engineer can derive boundary, stability, performance, and null-rejection tests without seeing any code.</p>
+
     <h4>Information Hiding: What a Module Must Document</h4>
     <p>Parnas&rsquo;s 1972 paper &ldquo;On the Criteria To Be Used in Decomposing Systems into Modules&rdquo; established that every module is characterized by a design decision it hides from all others. The design document for a module must describe: (1) what the module hides, (2) what the module reveals through its interface, and (3) why that particular boundary was drawn. <cite>&mdash; Parnas, <a href="https://dl.acm.org/doi/10.1145/361598.361623">CACM, 15(12), 1972</a></cite></p>
 
@@ -496,16 +545,34 @@ Verification: WCET analysis via static tool + instrumented measurement.</code></
     <p>A 2025 study found that LLMs &ldquo;often fail to properly understand existing design patterns and coding styles of a project,&rdquo; leading to generated artifacts that require extensive revision. <cite>&mdash; <a href="https://arxiv.org/html/2501.04835v1">&ldquo;Do Code LLMs Understand Design Patterns?&rdquo;, 2025</a></cite></p>
 
     <h4>Reverse-Engineering Design from Code (Legacy Retrofit)</h4>
-    <p>For legacy codebases, the question is whether AI can produce useful design documentation from existing code. The critical distinction:</p>
-    <ul>
-      <li><strong>Code paraphrase</strong> &mdash; the AI describes what the code does in English. This is not design documentation; it is a different encoding of the same information, with the same gaps.</li>
-      <li><strong>Recovered design intent</strong> &mdash; the AI identifies abstractions, boundaries, invariants, and contracts that the code implements, expressed above the implementation level. This is what design documentation should contain.</li>
-    </ul>
+    <p>For legacy codebases, the question is whether AI can produce useful design documentation from existing code. A retrofit design is not a special kind of design &mdash; it is a regular detailed design produced from code instead of from requirements. The two rules from &sect;3.1 still apply, and the test for whether something belongs in the design is the same:</p>
 
     <div class="card">
-      <h3>The Post-Hoc Paraphrase Trap</h3>
-      <p>The central failure mode: AI produces a sophisticated description of what the code does, not a design document that reveals intent, decisions, and constraints independently of the code. This is the exact anti-pattern that standards warn about &mdash; amplified by AI&rsquo;s ability to produce authoritative-sounding prose.</p>
-      <p><strong>Missing rationale is a structural failure, not a fixable omission.</strong> Rationale is not in code. Any AI-generated rationale for a legacy system is invention, not recovery.</p>
+      <h4>The Test for What Belongs</h4>
+      <p><strong>Could the current code have been written with this as the input specification?</strong></p>
+      <ul>
+        <li>If yes &rarr; it is real design content and belongs in the document</li>
+        <li>If no &rarr; it is either speculation or description at the wrong level, and does not belong</li>
+      </ul>
+      <p>This test cuts cleanly through the temptation to fill the document with plausible-sounding content. A well-written contract that the existing code satisfies is design. A paragraph speculating about why the author chose this approach is not.</p>
+    </div>
+
+    <h4>What the Code Evidences</h4>
+    <p>These are the parts of the design the code gives strong evidence for, and they pass the test above: interface signatures, observable preconditions and postconditions, behavior expressed as a contract (not pseudocode), error semantics, state machines if clearly implemented, invariants, dependencies. Writing these down as a contract is the design work, and a developer given that contract could reproduce working code that passes the same tests.</p>
+
+    <h4>Rationale: Only When Sourced</h4>
+    <p>Rationale is the hardest part of retrofit. It is not in the executable code, and it cannot be derived from code structure alone. But it is sometimes present in the surrounding evidence: comments that explain <em>why</em>, commit messages, ADRs, linked issues, external standards or APIs the code obviously conforms to.</p>
+    <p>If a rationale has a source in the evidence, capture it with citation. If it does not, omit it. Do not speculate. A retrofit design with no rationale section is a legitimate outcome when no rationale source exists &mdash; it is incomplete in the same way a house with no basement is incomplete, not in the way a fake ruin is.</p>
+
+    <div class="card">
+      <h4>The Central Failure Mode: Invention</h4>
+      <p>When asked to produce a design from code, the model is strongly tempted to fill gaps with plausible-sounding content. This is the failure to avoid above all others.</p>
+      <ul>
+        <li><strong>Inventing rationale</strong> &mdash; &ldquo;this was chosen because&hellip;&rdquo; You weren&rsquo;t there. The original author may not even have had a reason.</li>
+        <li><strong>Inventing constraints</strong> &mdash; only state a constraint if you can point to its source.</li>
+        <li><strong>Inventing alternatives considered</strong> &mdash; you have no idea what alternatives the author considered, or whether they considered any.</li>
+      </ul>
+      <p>Plausible-sounding invented content is worse than omission. Invented rationale gets cited as fact by future readers and creates fake constraints that prevent legitimate changes.</p>
     </div>
 
     <h4>Safety-Critical Implications</h4>
