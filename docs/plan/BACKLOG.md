@@ -340,19 +340,23 @@ Known improvement opportunities:
 
 Each skill follows DRTDD: plan (draft scope from docs) → test (create eval scenarios) → build (write SKILL.md) → verify (run evals, iterate). Skills in this phase are independent of each other and can be built in any order.
 
-**C1. vmodel-skill-review-code** (combined code + test review)
+**C1. vmodel-skill-review-code** (DONE — 2026-04-10)
 
-- [ ] Draft SKILL.md with three review sections: code quality, test quality, cross-checks
-- [ ] Include references: `review-checklist-code.md`, `code-quality-checks.md`, `testing-anti-patterns.md`
-- [ ] Create adversarial eval scenarios: good code, code with planted defects, code with test gaps
-- [ ] Output format: structured verdict (APPROVED / REJECTED with findings)
-- [ ] Eval and iterate with `/skill-creator`
+Three-pass review skill (code quality, test quality, cross-checks) with three verdicts (APPROVED, REJECTED, DESIGN_ISSUE). All findings block — no severity filtering. AI testing checks always-on. References: `review-checklist-code.md`, `code-quality-checks.md`, `testing-anti-patterns.md`, `ai-testing-failures.md`, `review-verdict-template.md`.
 
-Context to load:
-- `docs/guide/artifacts/source-code.html` §3.5 (Code Review)
-- `docs/guide/artifacts/unit-test.html` §3.5 (Test Smells), §3.7 (AI Testing Failures)
-- `docs/guide/skills-architecture.html` §Craft Skills → vmodel-skill-review-code
-- Reference files from Phase A1: `review-checklist-code.md`, `code-quality-checks.md`, `testing-anti-patterns.md`
+Eval results (Haiku, iteration 2, evals 2-4):
+| Eval | with_skill | without_skill | delta |
+|---|---|---|---|
+| CodeDefects (Java, L2) | 7/8 | 8/8 | -12% |
+| TestDefects (Go, L2) | 8/8 | 4/8 | +50% |
+| CrossCheck (Python, L1) | 7/8 | 7/8 | 0% |
+| **Overall (evals 2-4)** | **95.8%** | **70.8%** | **+25%** |
+
+Discriminating assertion: test anti-pattern detection (eval 3). Without comment breadcrumbs in the test file, Haiku without skill missed assertion-free tests, mirror tests, and framework tests. The skill's anti-pattern checklist guided systematic detection. Code defect detection (eval 2) is non-discriminating — Haiku catches planted code defects without help.
+
+Known: with_skill over-reports on test quality in eval 2 (flags indirect coverage of internal parsing steps as gaps). Accepted — precision tuning possible but diminishing returns.
+
+> Done: `.claude/skills/vmodel-skill-review-code/SKILL.md`, `references/`, `evals/`, `docs/guide/skills-architecture.html`
 
 **C2. vmodel-skill-develop-dd** (forward detailed design)
 

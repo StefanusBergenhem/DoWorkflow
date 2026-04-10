@@ -1,0 +1,208 @@
+{
+  "skill_name": "vmodel-skill-review-code",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this code and its tests against the design. The detailed design is at evals/files/fuel-rate-limiter-design.md. The implementation is at evals/files/fuel_rate_limiter.py. The tests are at evals/files/test_fuel_rate_limiter.py.",
+      "expected_output": "The code correctly implements the design and the tests are comprehensive. Verdict should be APPROVED with no findings.",
+      "files": [
+        "evals/files/fuel-rate-limiter-design.md",
+        "evals/files/fuel_rate_limiter.py",
+        "evals/files/test_fuel_rate_limiter.py"
+      ],
+      "assertions": [
+        {
+          "id": "verdict-approved",
+          "text": "Verdict is APPROVED — no REJECTED or DESIGN_ISSUE",
+          "grading": "The output must contain a verdict of APPROVED. If the verdict is REJECTED or DESIGN_ISSUE, this assertion fails."
+        },
+        {
+          "id": "no-false-positive-code",
+          "text": "No false positive findings against the code — the code correctly implements the design",
+          "grading": "The output should not flag any code defects. The code correctly implements all design behaviors (B1-B8), error handling (E1-E3), and configuration. If findings exist in the Code pass, check whether they are legitimate — if they are fabricated problems, this fails."
+        },
+        {
+          "id": "no-false-positive-tests",
+          "text": "No false positive findings against the tests — the tests are comprehensive and well-written",
+          "grading": "The output should not flag any test defects. Tests cover all behaviors, error paths, boundaries, and use specific assertions. If findings exist in the Test pass, check whether they are legitimate — if they are fabricated, this fails."
+        },
+        {
+          "id": "no-false-positive-cross",
+          "text": "No false positive findings in cross-checks — every design element has both code and tests",
+          "grading": "The output should not flag any cross-check gaps. Every design behavior (B1-B8), error (E1-E3), and configuration has both implementation and test coverage."
+        },
+        {
+          "id": "three-passes-performed",
+          "text": "Output shows evidence of all three review passes (code quality, test quality, cross-checks)",
+          "grading": "The output must reference or show results from all three passes, not just a summary verdict. Look for mentions of code quality checks, test quality checks, and cross-checks."
+        },
+        {
+          "id": "no-hallucinated-defects",
+          "text": "No hallucinated defects — reviewer does not invent problems that don't exist in the code",
+          "grading": "Check each finding (if any) against the actual code and tests. If the reviewer claims a method doesn't exist, an error path isn't handled, or a test is missing when it actually exists — this fails."
+        },
+        {
+          "id": "design-comprehension",
+          "text": "Reviewer demonstrates understanding of the design — references specific design elements (B1-B8, E1-E3, configuration)",
+          "grading": "The output should reference specific design identifiers or behavior descriptions, showing the reviewer actually read and understood the design document, not just the code."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this Java code against its design. The design is at evals/files/message-parser-design.md. The code is at evals/files/MessageParser.java. The tests are at evals/files/MessageParserTest.java.",
+      "expected_output": "Should find 4 code defects: (1) god method — parse() is too long with all B1-B10 steps inline, (2) missing E2 error handling — no check for raw_data shorter than HEADER_SIZE+CHECKSUM_SIZE, (3) null return instead of Error result for unknown message type at B8, (4) gold plating — formatMessage() method not in design. Verdict should be REJECTED.",
+      "files": [
+        "evals/files/message-parser-design.md",
+        "evals/files/MessageParser.java",
+        "evals/files/MessageParserTest.java"
+      ],
+      "assertions": [
+        {
+          "id": "verdict-rejected",
+          "text": "Verdict is REJECTED (not APPROVED)",
+          "grading": "The output must contain a verdict of REJECTED. APPROVED means the reviewer missed planted defects."
+        },
+        {
+          "id": "detects-god-method",
+          "text": "Identifies that parse() is a god method — too long, too many responsibilities, all B1-B10 steps inline",
+          "grading": "The output must flag the parse() method for excessive length, high complexity, or doing too many things. The method contains all parsing steps B1-B10 in one function."
+        },
+        {
+          "id": "detects-missing-e2",
+          "text": "Identifies missing E2 error handling — no check for raw_data shorter than HEADER_SIZE + CHECKSUM_SIZE",
+          "grading": "The design specifies E2: raw_data.length < HEADER_SIZE + CHECKSUM_SIZE should return Error(length_mismatch, 0). The code skips this check entirely. The reviewer must flag this missing error handling."
+        },
+        {
+          "id": "detects-null-return",
+          "text": "Identifies the null return at B8 — design says return Error(unknown_type, offset 5) but code returns null",
+          "grading": "At the unknown message type check (B8), the code returns null instead of a ParseResult.Error. The reviewer must flag this as a null return / error handling violation."
+        },
+        {
+          "id": "detects-gold-plating",
+          "text": "Identifies formatMessage() as gold plating — not specified in the design",
+          "grading": "The formatMessage() method is not in the design (DD-007 only specifies parse()). The reviewer must flag this as extra functionality / gold plating / orphan code."
+        },
+        {
+          "id": "findings-cite-checks",
+          "text": "Each finding references a specific checklist item or category (e.g., 'design compliance', 'error handling', 'complexity')",
+          "grading": "Findings should not just say 'this is wrong' — they should reference which quality check is violated."
+        },
+        {
+          "id": "findings-have-locations",
+          "text": "Each finding includes a file location (at minimum the file name, ideally with line numbers or method names)",
+          "grading": "Findings should point to where in the code the problem is, not just describe it abstractly."
+        },
+        {
+          "id": "no-false-positives",
+          "text": "No false positive findings — reviewer does not flag correct code or good tests as defective",
+          "grading": "The tests are well-written. The reviewer should not flag the test file for issues unless there are genuine problems. The CRC implementation, sync byte checking, and other correct code should not be flagged."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Review this Go code and tests against the design. The design is at evals/files/temperature-controller-design.md. The code is at evals/files/temperature_controller.go. The tests are at evals/files/temperature_controller_test.go.",
+      "expected_output": "Should find test defects: assertion-free test, mirror test, missing error path tests, testing-the-framework test. Code is clean. Verdict should be REJECTED.",
+      "files": [
+        "evals/files/temperature-controller-design.md",
+        "evals/files/temperature_controller.go",
+        "evals/files/temperature_controller_test.go"
+      ],
+      "assertions": [
+        {
+          "id": "verdict-rejected",
+          "text": "Verdict is REJECTED (not APPROVED)",
+          "grading": "The output must contain a verdict of REJECTED. APPROVED means the reviewer missed planted test defects."
+        },
+        {
+          "id": "detects-assertion-free",
+          "text": "Identifies TestEvaluateDoesNotPanic as assertion-free — discards results, only checks no panic",
+          "grading": "The test assigns results to _ (blank identifier) and makes no assertions. The reviewer must flag this as anti-pattern #1 (assertion-free test)."
+        },
+        {
+          "id": "detects-mirror-test",
+          "text": "Identifies TestIdleToHeat as a mirror test — recomputes threshold using same formula as implementation",
+          "grading": "The test computes lowerThreshold from cfg.TargetTemp - cfg.Deadband/2, mirroring the implementation logic. Expected values should be hardcoded from the design (e.g., 21.0 for default config). The reviewer must flag this as anti-pattern #2 (mirror test)."
+        },
+        {
+          "id": "detects-missing-error-tests",
+          "text": "Identifies that no error path tests exist — design specifies 4 error cases, none are tested",
+          "grading": "The design specifies: sensor out of range (return IDLE), target out of range (clamp), deadband below/above limits (clamp), deadband zero/negative (use default). None of these have tests. The reviewer must flag this as a coverage gap."
+        },
+        {
+          "id": "detects-framework-test",
+          "text": "Identifies TestConfigInitialization as testing the framework — verifies Go struct initialization, not controller behavior",
+          "grading": "The test only checks that struct fields hold the values they were assigned. This tests Go's struct literal syntax, not the controller. The reviewer must flag this as anti-pattern #6 (testing the framework)."
+        },
+        {
+          "id": "code-passes-review",
+          "text": "Code quality pass finds no major issues — the Go implementation is correct",
+          "grading": "The temperature_controller.go correctly implements the design. The reviewer should not flag code defects (the problems are all in the tests). Minor observations are OK, but no REJECTED-level code findings."
+        },
+        {
+          "id": "cross-check-error-coverage",
+          "text": "Cross-check identifies that design error cases have no corresponding tests",
+          "grading": "The cross-check pass should identify that the 4 error handling scenarios in the design have implementation in the code (sanitizeConfig, sensor range check) but no tests covering them."
+        },
+        {
+          "id": "findings-cite-antipatterns",
+          "text": "Test findings reference specific anti-pattern numbers or names from the checklist",
+          "grading": "Findings should reference the specific anti-pattern (e.g., '#1 assertion-free', '#2 mirror test', '#6 testing the framework') rather than generic descriptions."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Review this Python session management code against its design. Design: evals/files/session-manager-design-L1.md. Code: evals/files/session_manager.py. Tests: evals/files/test_session_manager.py.",
+      "expected_output": "Should find cross-check failures: (1) SessionCleaner from design is completely missing from code, (2) get_stats() method is gold plating — not in design, (3) no test for TTL expiry (design behavior with no test), (4) orphan test for get_stats() — tests functionality not in design. Verdict should be REJECTED or DESIGN_ISSUE.",
+      "files": [
+        "evals/files/session-manager-design-L1.md",
+        "evals/files/session_manager.py",
+        "evals/files/test_session_manager.py"
+      ],
+      "assertions": [
+        {
+          "id": "verdict-not-approved",
+          "text": "Verdict is REJECTED or DESIGN_ISSUE — not APPROVED",
+          "grading": "The output must not be APPROVED. There are clear cross-check failures that must be caught."
+        },
+        {
+          "id": "detects-missing-cleaner",
+          "text": "Identifies that SessionCleaner is specified in the design but completely absent from the code",
+          "grading": "The design's unit inventory lists SessionCleaner with specific behavior (iterate sessions, remove expired, don't block request threads). The code has no SessionCleaner class at all. The reviewer must flag this as a missing design element / orphan design specification."
+        },
+        {
+          "id": "detects-gold-plating-stats",
+          "text": "Identifies get_stats() as gold plating — method not in the design",
+          "grading": "The design specifies SessionStore with create() only. The get_stats() method is extra functionality not traced to any design element. The reviewer must flag this as orphan code / gold plating."
+        },
+        {
+          "id": "detects-missing-ttl-test",
+          "text": "Identifies that TTL expiry behavior has no test — design says sessions expire after 30 minutes",
+          "grading": "The design specifies 30-minute TTL and the SessionValidator correctly checks expiry, but no test advances the clock past TTL to verify this. The reviewer must flag this as a cross-check coverage gap."
+        },
+        {
+          "id": "detects-orphan-stats-test",
+          "text": "Identifies test_get_stats_returns_utilization as an orphan test — tests functionality not in the design",
+          "grading": "The test verifies get_stats() behavior, but get_stats() is not in the design. This is a test for gold-plated code — an orphan test. The reviewer must flag this."
+        },
+        {
+          "id": "correct-test-doubles",
+          "text": "Does not flag the test doubles (FakeClock, FakeTokenGenerator, real InMemorySessionRepository) as problems",
+          "grading": "The test doubles are correct: FakeClock and FakeTokenGenerator are appropriate fakes for infrastructure dependencies, and InMemorySessionRepository is used directly (real implementation, not mocked). The reviewer should not flag these as issues."
+        },
+        {
+          "id": "findings-have-locations",
+          "text": "Each finding includes file/location information",
+          "grading": "Findings should point to specific files and ideally line numbers or class/method names."
+        },
+        {
+          "id": "no-false-positives",
+          "text": "No false positive findings — reviewer does not flag correct code patterns as defective",
+          "grading": "The result type pattern (SessionSuccess/SessionFailure), the dependency injection, and the correct tests should not be flagged. Only the 4 planted issues should be findings."
+        }
+      ]
+    }
+  ]
+}

@@ -603,15 +603,16 @@
       <h4>vmodel-skill-review-code</h4>
       <p>Review source code and unit tests together against design specification and quality criteria. Produces a structured verdict.</p>
       <dl class="ref-grid">
-        <dt>Status</dt><dd>To build</dd>
-        <dt>Derived from</dt><dd><a href="artifacts/source-code.html">Source Code</a> (Section 3.5: Code Review) + <a href="artifacts/unit-test.html">Unit Test</a> (Section 3.5: Test Smells)</dd>
+        <dt>Status</dt><dd>Done (C1, 2026-04-10)</dd>
+        <dt>Derived from</dt><dd><a href="artifacts/source-code.html">Source Code</a> (Section 3.5: Code Review) + <a href="artifacts/unit-test.html">Unit Test</a> (Section 3.5: Test Smells, Section 3.7: AI Testing Failures)</dd>
         <dt>Input</dt><dd>Source code + test code + design document</dd>
-        <dt>Output</dt><dd>Review verdict (APPROVED / REJECTED with findings)</dd>
-        <dt>Key delta</dt><dd>Strict checklist enforcement across three areas: (1) code quality &mdash; design compliance, complexity, error handling, naming, architecture boundaries; (2) test quality &mdash; derivation completeness, anti-pattern detection, assertion quality, mock audit; (3) cross-checks &mdash; every design element has code, every design element has tests, no gold plating.</dd>
-        <dt>References</dt><dd><code>review-checklist-code.md</code>, <code>code-quality-checks.md</code>, <code>testing-anti-patterns.md</code></dd>
+        <dt>Output</dt><dd>Review verdict: APPROVED, REJECTED (with findings table + fix instructions), or DESIGN_ISSUE (escalate to human &mdash; the code is correct per a flawed design)</dd>
+        <dt>Key delta</dt><dd>Strict checklist enforcement across three passes: (1) code quality &mdash; design compliance, complexity, error handling, SOLID, architecture boundaries, naming, dead code; (2) test quality &mdash; derivation completeness, anti-pattern detection, assertion quality, mock audit, AI testing failure modes (always-on); (3) cross-checks &mdash; every design element has code, every design element has tests, no orphan code/tests, interface match, boundary consistency. All findings block &mdash; no severity filtering.</dd>
+        <dt>References</dt><dd><code>review-checklist-code.md</code>, <code>code-quality-checks.md</code>, <code>testing-anti-patterns.md</code>, <code>ai-testing-failures.md</code>, <code>review-verdict-template.md</code></dd>
         <dt>HALT conditions</dt><dd>Design document not available, unable to determine design intent</dd>
       </dl>
       <p><strong>Why combined:</strong> Code quality and test quality are interdependent. A reviewer cannot assess test coverage without seeing the code, and cannot assess code correctness without seeing what the tests actually verify. The checklist has clear sections for code-specific, test-specific, and cross-cutting concerns.</p>
+      <p><strong>Three verdicts:</strong> APPROVED means all checks pass. REJECTED means specific findings that the developer must fix. DESIGN_ISSUE means the reviewer found a problem that cannot be fixed without changing the design (wrong decomposition, missing interface, contradictory specification) &mdash; this escalates to human rather than cycling back to developer.</p>
     </div>
 
     <!-- develop-dd -->
@@ -1196,8 +1197,10 @@ escalated: []</code>
       SKILL.md
       references/
         review-checklist-code.md
+        review-verdict-template.md
         code-quality-checks.md          ← shared with develop-code
         testing-anti-patterns.md        ← shared with derive-test-cases
+        ai-testing-failures.md          ← shared with derive-test-cases
     vmodel-skill-develop-dd/
       SKILL.md
       references/
