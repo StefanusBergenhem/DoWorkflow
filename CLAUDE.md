@@ -37,8 +37,8 @@ Per V-model layer:
 
 Bottom-up, one V-model layer at a time. For each layer: **documentation first**, then template, then craft skill, then framework skill.
 
-Current: Phase A (foundation) and Phase B (revise existing skills) complete. Phase C (new craft skills) is next.
-Next: Phase C (new craft skills with DRTDD per skill: review-code, develop-dd, retrofit-dd, review-dd)
+Current: Lower V documentation (code, unit test, detailed design) and lower V skills (A, B, C1) complete. Direction changed to top-down documentation (2026-04-12). Scope expanded (2026-04-13) to include stakeholder analysis, ConOps, and completeness analysis above system requirements.
+Next: Phase 3 — Top-down documentation starting from stakeholder needs (3.4 → 3.5 ConOps → 3.6 completeness analysis → 3.7 system req → 3.8 SW req → 3.9 SW arch), then resume skills with full handoff knowledge. C2-C4 (DD skills) paused.
 
 See `docs/plan/BACKLOG.md` for full backlog and `docs/plan/TARGET_ARCHITECTURE.md` for architecture.
 
@@ -57,6 +57,7 @@ See `docs/plan/BACKLOG.md` for full backlog and `docs/plan/TARGET_ARCHITECTURE.m
 
 ## Domain
 
+- V-model as engineering infrastructure, not just safety compliance — safety is the highest-rigor application, but the techniques have value at any rigor level
 - Targets DO-178C/DO-330 (aviation), ASPICE/ISO 26262 (automotive), and other V-model standards
 - Uses **generic V-model terminology** with translation documentation per domain
 - EARS syntax is a craft skill preference, not a framework requirement

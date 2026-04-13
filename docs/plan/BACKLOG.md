@@ -1,6 +1,6 @@
 # Backlog
 
-Organized by component. Build order is bottom-up: start from the lowest V-model layer (code + unit tests) and work upward through each layer, completing documentation → template → craft skill → framework skill for each layer before moving to the next.
+Organized by component. Build order is top-down for documentation: start from system requirements and work down through the V-model layers to understand the complete information cascade and handoff contracts. Skills are built after documentation coverage is complete, informed by the full picture. For each layer: documentation first, then template, then craft skill, then framework skill.
 
 ---
 
@@ -16,7 +16,7 @@ Questions identified during architecture refinement (2026-04-05) that need resol
 
 4. **Orchestration commonality:** Each V-model layer gets its own implementation loop initially. After building 3-4 layers, what patterns emerge? When do we refactor to shared orchestration?
 
-5. **Documentation format:** ~~RESOLVED (2026-04-05).~~ Per-artifact documentation is HTML pages in `docs/guide/artifacts/`. Three-tier knowledge system: research (raw sources) → HTML docs (refined, single source of truth) → agent skills (LLM-distilled). No markdown intermediate layer — absorbed into HTML and deleted.
+5. ~~**Documentation format:**~~ RESOLVED (2026-04-05). Per-artifact documentation is HTML pages in `docs/guide/artifacts/`. Three-tier knowledge system: research (raw sources) → HTML docs (refined, single source of truth) → agent skills (LLM-distilled). No markdown intermediate layer — absorbed into HTML and deleted.
 
 6. **Test environment argumentation:** Host/target-like/target test environment selection and justification. Deferred until system test work begins.
 
@@ -38,6 +38,13 @@ Artifact definitions, envelopes, checklists. Usable by humans, agents, or both.
 
 ### 1.2 Artifact Type Schemas
 
+**Pre-requirements (project entry point):**
+- [ ] Stakeholder Register schema (stakeholders, role/authority/interest, elicitation method, concurrence status)
+- [ ] Stakeholder Need schema (captured need, source stakeholder, priority, validation status, trace to system req)
+- [ ] Concept of Operations (ConOps) schema (mission, operational environment, scenarios, mode state machine, support concept)
+- [ ] Completeness Analysis Record schema (method used, scope, findings, derived requirements generated, residual gaps — generic for FTA/FMEA/STPA/PBR)
+- [ ] Allocation Matrix schema (requirement-to-component mapping, rationale, budget decomposition, derived requirement flags)
+
 **Left side (development):**
 - [x] System Requirements schema
 - [x] SW Requirements schema
@@ -46,7 +53,8 @@ Artifact definitions, envelopes, checklists. Usable by humans, agents, or both.
 
 **Right side (verification):**
 - [x] System Test Case schema
-- [ ] Review Record schema (checklist, findings, verdict, reviewer qualification)
+- [ ] Review Record schema (checklist, findings, verdict, reviewer qualification — also used for PBR multi-perspective reviews and concurrence gates)
+- [ ] Requirements Baseline schema (baseline snapshot, version, included requirements, approval authority, change control ref)
 
 **Plans:**
 - [ ] Development Plan schema
@@ -127,80 +135,152 @@ Each artifact type gets a comprehensive HTML page (`docs/guide/artifacts/<artifa
 
 Priority: quality workproduct first, V-model fit second.
 
-### 3.1 Code Implementation Documentation (DONE — lowest V-level)
+### Completed Documentation (lower V, bottom-up)
 
-- [x] Complete artifact page: `docs/guide/artifacts/source-code.html` (1200+ lines)
-- [x] Section 1: What is source code (general intro)
-- [x] Section 2: V-model context (position, "implements" meaning, standards perspective)
-- [x] Section 3: Producing quality source code (coding standards, SOLID, clean code, DRY/KISS/YAGNI, function/class design, code smells, immutability, design patterns, architecture at code level, hexagonal/ports-adapters, testability, cohesion/coupling, AI-assisted development, code review checklist)
-- [x] Section 4: V-model specific considerations (traceability, dead code, gold plating, source-to-object, review independence)
-- [x] Section 5: Framework integration (detailed design input, trace links, artifact envelope, review record)
-- [x] Section 6: AI skills integration (stub)
-- [x] Absorbed and deleted `docs/guide/best-practices/implementation/` (5 markdown files)
+| Artifact | Output | Lines | Key features |
+|---|---|---|---|
+| 3.1 Code Implementation | `docs/guide/artifacts/source-code.html` | 1314 | 6 sections, SOLID, clean code, hexagonal, AI-assisted |
+| 3.2 Unit Test | `docs/guide/artifacts/unit-test.html` | 1211 | 7 knowledge-domain subsections, coverage matrix, AI test quality |
+| 3.3 Detailed Design | `docs/guide/artifacts/detailed-design.html` | 1096 | 8 knowledge domains, Layer 1/2/3 model, 2 worked examples, schema v2.0 |
 
-> Done: `docs/guide/artifacts/source-code.html`
+### Upper V Research (serves 3.4–3.9) — ALL DONE
 
-### 3.2 Unit Test Documentation (DONE — lowest V-level, reworked 2026-04-05)
+Six research efforts covering the full cascade from stakeholder needs through system requirements, SW requirements, and architecture down to the detailed design handoff, plus AI capabilities at the system level.
 
-- [x] Complete artifact page: `docs/guide/artifacts/unit-test.html` (1150+ lines)
-- [x] Section 1: What is unit testing (general intro)
-- [x] Section 2: V-model context ("tests verify design, not code", standards perspective, coverage criteria by assurance level)
-- [x] Section 3: Producing quality unit tests — 7 knowledge-domain subsections:
-  - [x] 3.1 Test design principles (behavior vs implementation, tests as specifications, assertion quality, testability as design signal, F.I.R.S.T. properties, economics)
-  - [x] 3.2 Test derivation strategies (4 strategies with examples, coverage matrix — reframed from procedure to knowledge)
-  - [x] 3.3 Test structure and readability (AAA, naming conventions, parameterized tests, @Nested, reducing noise)
-  - [x] 3.4 Test doubles (Meszaros taxonomy, state vs behavior verification, preference hierarchy, over-mocking, contract testing)
-  - [x] 3.5 Test smells and maintainability (8 smells, fragile test deep dive, anti-patterns, builders, custom assertions)
-  - [x] 3.6 Coverage and completeness (requirements vs structural, MC/DC, mutation testing as quality metric)
-  - [x] 3.7 AI-assisted test development (empirical data, failure modes, spec-to-test vs code-to-test, safety implications)
-- [x] Section 4: V-model specific considerations (independence, documentation, traceability, robustness, regression)
-- [x] Section 5: Framework integration (design artifact mapping, trace links, coverage matrix as trace validation)
-- [x] Section 6: AI skills integration (stub)
-- [x] Absorbed and deleted `docs/guide/best-practices/testing/` (3 markdown files)
-- [x] Backed by 6 research documents in `research/implementation/`
+| Research | Topic | Output | Lines |
+|---|---|---|---|
+| 1 | Standards — system-level processes | `research/system-level/01-standards-system-level-processes.md` | ~500 |
+| 2 | Stakeholder analysis and needs engineering | `research/system-level/02a` through `02d` (4 docs) | ~3100 |
+| 3 | System requirements engineering craft | `research/system-level/03a` through `03d` (4 docs) | ~3750 |
+| 4 | Safety analysis → requirements interface | `research/system-level/04a` through `04c` (3 docs) | ~2700 |
+| 5 | System and SW architecture craft | `research/system-level/05a` through `05f` (6 docs) | ~3100 |
+| 6 | AI at the system level (lighter) | `research/system-level/06a`, `06b` (2 docs) | ~700 |
 
-> Done: `docs/guide/artifacts/unit-test.html`
+Total: 20 research documents, ~13,850 lines. Key cross-cutting learnings absorbed into the research docs themselves.
 
-### 3.3 Detailed Design Documentation (DONE — one layer up)
+Codex ingestion pending from Research 2-4: Alexander 2005, Shull/Basili 2000 PBR, Kelly/Sherif/Hops 1992, Kamsties 2001, Rashid 2021, Gotel & Finkelstein 1994 (403), Leveson STPA handbook, MIL-STD-882E, Bosch FMEA booklet, FAA DOT/FAA/TC-24/16 (403), Wilkinson/Fleming (ECONNREFUSED).
 
-- [x] Complete artifact page: `docs/guide/artifacts/detailed-design.html` (1096 lines)
-- [x] Section 1: What is detailed design (general intro, test derivation litmus test)
-- [x] Section 2: V-model context (position, design-before-code, standards table: DO-178C, ASPICE, ISO 26262, IEC 62304)
-- [x] Section 3: Producing quality detailed designs — 8 knowledge-domain subsections:
-  - [x] 3.1 Design documentation fundamentals (Parnas, Reeves, IEEE 1016, what-to-document table)
-  - [x] 3.2 Interface specification (DbC, Hoare triples, complete contract checklist, good/bad examples, LSP)
-  - [x] 3.3 Behavioral specification (algorithm spec, decision tables, state machines, specification patterns, formalism spectrum)
-  - [x] 3.4 Design rationale and decisions (Kruchten, ADRs, constraint taxonomy)
-  - [x] 3.5 Error handling and fault containment (Bloch exception design, Nygard stability patterns, error handling matrix, safety-critical)
-  - [x] 3.6 Dynamic behavior and concurrency (Goetz thread safety, timing constraints, ARINC 653/FFI)
-  - [x] 3.7 Scaling: what needs a design and how much detail (economics, standards tiering, 3-tier model, metrics, legacy retrofit)
-  - [x] 3.8 AI-assisted detailed design (forward generation, legacy retrofit, post-hoc paraphrase trap, regulatory status)
-- [x] Section 4: V-model specific considerations (traceability, derived requirements, review independence, code-as-LLR, ASPICE failures)
-- [x] Section 5: Framework integration — full schema walkthrough (Layer 1/2/3 model, heading structure, table formats, ID conventions, principle-to-schema mapping)
-- [x] Section 6: AI skills integration (stub)
-- [x] Two complete worked examples: Fuel Control component (Layer 3 with embedded unit) and Configuration Loader (Layer 1 only)
-- [x] Backed by 7 research documents in `research/detailed-design/` + existing Category A doc
-- [x] Updated detailed-design.schema.yaml to v2.0 markdown format with Layer 1/2/3 model
+**Research quality bound:** Web-searchable sources are good for standards and frameworks. Core craft knowledge lives in books not fully available online — research captures frameworks and key ideas, with pointers to specific book chapters for deeper reading.
 
-> Done: `docs/guide/artifacts/detailed-design.html`
+---
 
-### 3.4 SW Architecture Documentation (later)
+### 3.4 Stakeholder Identification & Needs Documentation — NEXT
 
-- [ ] V-model context
-- [ ] Best practices (component decomposition, interface design, modularity, encapsulation)
-- [ ] Anti-patterns
-- [ ] Examples
-- [ ] Framework integration
+The true entry point to any project. Before requirements exist, you need to know who the stakeholders are, what they need, and how to validate that understanding. This is where every V-model project starts — or should start.
 
-### 3.5 SW Requirements Documentation (later)
+**Scope:** Stakeholder discovery, elicitation techniques, needs capture, conflict resolution, concurrence gates, validation. The artifact is the stakeholder register + captured needs. This is not just a safety concern — any project benefits from structured stakeholder analysis.
 
-- [ ] V-model context
-- [ ] Best practices (EARS syntax, testability, unambiguity, completeness)
-- [ ] Anti-patterns
-- [ ] Examples
-- [ ] Framework integration
+**Depends on:** Research 2 (02a, 02b, 02d) — done.
 
-### 3.6 System Requirements Documentation (later)
+- [ ] Complete artifact page: `docs/guide/artifacts/stakeholder-needs.html`
+  - [ ] Section 1: What are stakeholder needs (stakeholders, their concerns, the gap between needs and requirements)
+  - [ ] Section 2: V-model context (precedes all requirements; inputs from project initiation, outputs to ConOps and system requirements)
+  - [ ] Section 3: Producing quality stakeholder analysis (the bulk — stakeholder identification techniques, elicitation methods (interviews, observation, document analysis, workshops, assumptions analysis), silent stakeholder discovery, conflict resolution (AHP), concurrence gates, validation via PBR and operational scenarios)
+  - [ ] Section 4: V-model specific considerations (traceability from every requirement back to stakeholder source, concurrence as formal gate, stakeholder turnover as program risk, regulatory stakeholders)
+  - [ ] Section 5: Framework integration (stub — stakeholder register template, stakeholder need template, trace links)
+  - [ ] Section 6: AI skills integration (stub)
+
+**Handoff down:** Validated stakeholder needs with source attribution, priority, and concurrence status → feeds ConOps and system requirements.
+**Feedback up:** Derived requirements discovered downstream that may require stakeholder re-concurrence.
+
+### 3.5 Concept of Operations (ConOps) Documentation
+
+The operational picture before requirements exist. Translates stakeholder needs into an operational context that system requirements can be derived from. Defines what the system does in its environment, not how it does it internally.
+
+**Scope:** Mission/objectives, operational environment, operational scenarios, mode state machine, user organization, support concept, performance criteria. Environmental characterization. Operator workload analysis.
+
+**Depends on:** Research 2 (02c), Research 5 (05a for modes) — done.
+
+- [ ] Complete artifact page: `docs/guide/artifacts/conops.html`
+  - [ ] Section 1: What is a ConOps (the bridge between stakeholder needs and system requirements)
+  - [ ] Section 2: V-model context (receives stakeholder needs, outputs to system requirements and completeness analysis; CONOPS-to-requirements traceability mandatory)
+  - [ ] Section 3: Producing a quality ConOps (the bulk — mission/objective definition, operational environment characterization (physical, regulatory, interoperability), operational scenarios as testable conditions, mode state machine (startup/normal/degraded/emergency/shutdown/maintenance), mode transition timing, user organization and roles, support concept, performance criteria, operator workload analysis)
+  - [ ] Section 4: V-model specific considerations (ConOps as source for system test scenarios, mode completeness as requirements completeness technique, environmental constraints driving derived requirements)
+  - [ ] Section 5: Framework integration (stub — ConOps template, trace links to stakeholder needs above and system requirements below)
+  - [ ] Section 6: AI skills integration (stub)
+
+**Handoff down:** Operational scenarios, mode state machine, environmental constraints, performance criteria → feeds system requirements derivation and completeness analysis.
+**Feedback up:** Design constraints discovered during architecture that invalidate operational assumptions.
+
+### 3.6 Completeness Analysis Documentation
+
+Techniques that discover requirements stakeholders cannot articulate. Generalized from safety analysis — the goal is completeness discovery, applicable to any system quality goal. Safety is the highest-rigor application, but the techniques (asking "what could go wrong" and "what's implicit") have value at any rigor level.
+
+**Scope:** FTA, FMEA, STPA as requirement-generating methods (not just risk assessment). Three requirement classes: negative (prohibited states), implicit assumptions (timing, environmental, dependencies), interaction (cross-component). Mode analysis. PBR (Perspective-Based Reading) as validation technique. Scaling by rigor level — full safety analysis at high assurance, lightweight completeness checks at lower levels.
+
+**Depends on:** Research 4 (04a, 04b, 04c), Research 2 (02b for validation), Research 6 (06a for PBR, 06b for AI safety analysis limits) — done.
+
+- [ ] Complete artifact page: `docs/guide/artifacts/completeness-analysis.html`
+  - [ ] Section 1: What is completeness analysis (the gap between what stakeholders ask for and what the system actually needs)
+  - [ ] Section 2: V-model context (runs in parallel with requirements capture, not after; feeds requirements at every level; outputs to system requirements, SW requirements, architecture)
+  - [ ] Section 3: Producing quality completeness analysis (the bulk):
+    - [ ] 3.1 Deductive methods (FTA): top-down from undesired event, minimal cut sets, single-point-failure identification, failure rate budgets
+    - [ ] 3.2 Inductive methods (FMEA): bottom-up from components, five-step process, S/O/D scoring, Action Priority over RPN
+    - [ ] 3.3 Systems-theoretic methods (STPA): control-based, UCAs, loss scenarios, finds unsafe interactions between correctly-functioning components — addresses software blind spot
+    - [ ] 3.4 Perspective-Based Reading (PBR): multi-perspective validation (designer, tester, customer), systematic defect detection
+    - [ ] 3.5 Three requirement classes discovered by analysis (negative, implicit, interaction) with examples
+    - [ ] 3.6 Mode analysis as completeness technique (startup, degraded, emergency requirements)
+    - [ ] 3.7 Scaling by rigor level (full safety analysis → lightweight "what could go wrong" checklist)
+    - [ ] 3.8 FTTI timing decomposition as example of derived requirements chain
+  - [ ] Section 4: V-model specific considerations (safety analysis as source not just verification, derived requirements feedback loop, FDAL/IDAL allocation, independence of analysis, CMA requirements)
+  - [ ] Section 5: Framework integration (stub — completeness analysis record template, trace links to requirements)
+  - [ ] Section 6: AI skills integration (stub — honest about AI limits: brainstorming strong, completeness certification not viable)
+
+**Handoff down:** Derived requirements (negative, implicit, interaction) with method traceability → feeds into system requirements and SW requirements.
+**Feedback up:** Design decisions that create new failure modes requiring re-analysis.
+
+### 3.7 System Requirements Documentation
+
+How validated stakeholder needs, ConOps, and completeness analysis results become formal system requirements. The first formal specification layer — everything upstream is "what we need," this is "what the system shall do."
+
+**Depends on:** Research 1, 2, 3, 4 (and partially 5 for allocation context) — all done.
+
+- [ ] Complete artifact page: `docs/guide/artifacts/system-requirements.html`
+  - [ ] Section 1: What are system requirements (the bridge from needs/analysis to formal specification)
+  - [ ] Section 2: V-model context (receives from stakeholder needs, ConOps, completeness analysis; outputs to SW/HW allocation; bidirectional with completeness analysis)
+  - [ ] Section 3: Producing quality system requirements (the bulk — requirement writing craft (INCOSE rules, EARS patterns, performance requirement 5-element rule), completeness techniques (functional/structural/behavioral/constraint/interface), allocation as budgeting (timing, reliability, resources), operational scenario coverage, non-functional requirements, requirements management (baselines, change control, impact analysis), traceability to stakeholder needs)
+  - [ ] Section 4: V-model specific considerations (bidirectional traceability, derived requirements feedback loop (Peterson study: known to be broken in practice), safety requirements as first-class (carry ASIL/DAL), independence of verification, FTTI decomposition example)
+  - [ ] Section 5: Framework integration (stub — template, schema, allocation matrix, trace links)
+  - [ ] Section 6: AI skills integration (stub)
+
+**Handoff down:** Allocated system requirements with budget decomposition, verification criteria, and traceability obligations → feeds SW requirements and HW requirements.
+**Feedback up:** Derived requirements from SW/HW design that aren't traceable to parent requirements → must be classified (safety-relevant or internal design decision) and fed back into baseline.
+
+### 3.8 SW Requirements Documentation
+
+Directly receives allocated system requirements. The first purely software-scoped layer and where most of this project's tooling will begin operating.
+
+**Depends on:** Research 1, 3 (and partially 2 for upstream context) — all done.
+
+- [ ] Complete artifact page: `docs/guide/artifacts/sw-requirements.html`
+  - [ ] Section 1: What are SW requirements (system allocation → SW requirements → architecture input)
+  - [ ] Section 2: V-model context (receives from system, outputs to architecture + qualification tests)
+  - [ ] Section 3: Producing quality SW requirements (the bulk — EARS patterns, testability as quality gate, completeness checks, non-functional decomposition, interface requirements, behavioral vs declarative style, requirement granularity)
+  - [ ] Section 4: V-model specific considerations (derived requirements flow-up, traceability, review independence, safety-critical requirements handling)
+  - [ ] Section 5: Framework integration (template, schema, trace links to system req above and architecture below)
+  - [ ] Section 6: AI skills integration (stub)
+
+**Handoff down:** SW requirements with verification criteria and traceability to system requirements → feeds architecture decomposition.
+**Feedback up:** Derived requirements from architecture/design decisions → classified and fed back to system requirements if safety-relevant.
+
+### 3.9 SW Architecture Documentation
+
+Receives SW requirements, decomposes into components, defines interfaces, allocates requirements to components. Produces the structure that detailed design fills in.
+
+**Depends on:** Research 1, 5 — all done.
+
+- [ ] Complete artifact page: `docs/guide/artifacts/sw-architecture.html`
+  - [ ] Section 1: What is SW architecture (component decomposition, interface definition, allocation)
+  - [ ] Section 2: V-model context (receives SW requirements, outputs to detailed design + integration tests)
+  - [ ] Section 3: Producing quality architecture (the bulk — volatility-based decomposition, Parnas information hiding, cohesion/coupling metrics, interface specification (Design by Contract), dependency principles (DIP, SDP, SAP), architecture evaluation (lightweight ATAM, fitness functions), fault tolerance patterns, error propagation strategy, modular monolith as underused pattern, architectural patterns for critical systems, partitioning)
+  - [ ] Section 4: V-model specific considerations (derived requirements, deactivated code, partitioning for safety, traceability to requirements, review independence, integration test derivation from interface contracts)
+  - [ ] Section 5: Framework integration (template, schema, trace links to SW req above and DD below)
+  - [ ] Section 6: AI skills integration (stub)
+
+**Handoff down:** Component specifications with interface contracts, allocated requirements, and design rationale → feeds detailed design.
+**Feedback up:** Design impossibilities, constraint violations, derived requirements → feeds back to SW requirements and potentially system requirements.
+
+### 3.10 System Test Documentation (later)
 
 - [ ] V-model context
 - [ ] Best practices
@@ -208,26 +288,18 @@ Priority: quality workproduct first, V-model fit second.
 - [ ] Examples
 - [ ] Framework integration
 
-### 3.7 System Test Documentation (later)
-
-- [ ] V-model context
-- [ ] Best practices
-- [ ] Anti-patterns
-- [ ] Examples
-- [ ] Framework integration
-
-### 3.8 Review Documentation (later)
+### 3.11 Review Documentation (later)
 
 - [ ] V-model context for reviews (independent review requirements, what reviews verify)
-- [ ] Best practices per artifact type being reviewed
+- [ ] Best practices per artifact type being reviewed (including PBR multi-perspective reviews)
 - [ ] Anti-patterns
 - [ ] Examples
 
-### 3.9 General Documentation
+### 3.12 General Documentation
 
-- [ ] V-model overview (what the V-model is, philosophy, layers, how they connect)
+- [ ] V-model overview (what the V-model is, philosophy, layers, how they connect — generalized beyond safety)
 - [ ] DRTDD explanation (Design-Requirement-Test Driven Development)
-- [ ] Safety analysis basics (FMEA, FTA — how they feed into requirements)
+- [ ] Completeness analysis overview (FTA, FMEA, STPA — as engineering tools, not just safety tools)
 - [ ] Framework user manual (how to use VModelWorkflow)
 
 ---
@@ -248,115 +320,29 @@ Three-layer architecture: Layer 1 (craft + framework skills) → Layer 2 (agents
 
 ---
 
-### Lower V Skill Build Plan (Detailed Design + Code + Unit Tests)
+### Completed Lower V Skill Work
 
-Structured as six phases. Each phase lists tasks, context to load, and inputs needed.
+**Phase A: Foundation** — DONE (2026-04-06 to 2026-04-09)
+Reference files extracted/updated from documentation. Config schema finalized. 8 reference files created/updated in `.claude/skills/` directories.
 
-#### Phase A: Foundation (reference files, config schema)
+**Phase B: Revise existing craft skills** — DONE (2026-04-09 to 2026-04-10)
 
-Everything downstream depends on this phase. The reference `.md` files are the distilled knowledge that skills point to.
-
-**A1. Extract/update shared reference files from documentation** (DONE — 2026-04-06 to 2026-04-08)
-
-All reference files audited against comprehensive documentation and updated/created.
-
-| Reference File | Location | Status |
+| Skill | Key changes | Eval (Haiku) |
 |---|---|---|
-| `code-quality-checks.md` | `.claude/skills/develop-code/references/` | Updated: added SOLID/DRY/KISS/YAGNI one-liners, functional core/imperative shell, AI self-check section |
-| `testing-anti-patterns.md` | `.claude/skills/derive-test-cases/references/` | Updated: expanded from 6 to 13 items (added Meszaros smells: fragile, obscure, eager, mystery guest, general fixture, conditional logic, erratic, slow) |
-| `ai-testing-failures.md` | `.claude/skills/derive-test-cases/references/` | NEW: AI-specific test failures split from anti-patterns (tautological, assertion-free, happy-path bias, over-mocking, hallucinated assertions, copy-paste, code-to-test trap) |
-| `derivation-strategies.md` | `.claude/skills/derive-test-cases/references/` | Unchanged — adequate as-is. MC/DC deferred to higher assurance levels. |
-| `design-quality-criteria.md` | `.claude/skills/references/` (shared) | NEW: two-rules framing (don't duplicate code + be specific enough to implement/test), interface completeness (7 elements), behavioral specification forms, rationale, error handling design, Layer model alignment |
-| `review-checklist-code.md` | `.claude/skills/references/` (shared) | NEW: references code-quality-checks + testing-anti-patterns, adds cross-checks (code ↔ tests ↔ design) |
-| `review-checklist-dd.md` | `.claude/skills/references/` (shared) | NEW: references design-quality-criteria, adds upstream traceability, testability assessment, consistency checks |
-| `retrofit-risks.md` | `.claude/skills/references/` (shared) | NEW: "could the code have been written with this as input" test, invention as central failure mode, rationale only when sourced |
+| B1. `develop-code` | Added SOLID principles, functional core/imperative shell, 7-point self-check | 91% (+13% over baseline) |
+| B2. `derive-test-cases` | Added 8 principles, coverage matrix, HALT for >2 mocks, 6-point self-check | 100% (+3% over old skill) |
 
-Documentation synced:
-- `docs/guide/artifacts/detailed-design.html` §3.1 — added two-rules framing, test of specificity, box mental model, worked example
-- `docs/guide/artifacts/detailed-design.html` §3.8 — updated retrofit section with "could the code have been written from this" test, removed observed/inferred/unknown labels
-- `docs/guide/skills-architecture.html` §Configuration — removed threshold (YAGNI), removed per-check timeout, added schema reference
-
-**A2. Finalize `.vmodel/config.yaml` schema** (DONE — 2026-04-09)
-
-Schema at `schemas/core/vmodel-config.schema.yaml`. Check categories are per V-model layer (currently `code` and `detailed-design`), extended as higher layers are built. Component overrides fully replace defaults (no merging). Architecture doc updated to match.
-
-~~**A3. Create/update eval scenarios**~~ — ELIMINATED. Eval scenarios are designed alongside each skill as the first step of its development cycle (DRTDD: plan → eval → build → verify). Folded into Phases B and C.
+**Phase C1: vmodel-skill-review-code** — DONE (2026-04-10)
+Three-pass review (code quality, test quality, cross-checks), three verdicts (APPROVED, REJECTED, DESIGN_ISSUE). Eval (Haiku): 95.8% (+25% over baseline). Discriminating assertion: test anti-pattern detection.
 
 ---
 
-#### Phase B: Revise existing craft skills
+### Phase C2-C4: Detailed Design Skills — PAUSED
 
-The existing skills were created before the comprehensive documentation existed. Need to audit, rename, update references, and re-evaluate.
+Waiting for top-down documentation (3.4-3.6) to establish handoff contracts between V-model layers.
 
-Each skill follows DRTDD: plan (audit against docs) → test (create/update evals) → build (revise SKILL.md) → verify (run evals, compare to baseline).
-
-**B1. vmodel-skill-develop-code** (DONE — 2026-04-09)
-
-Added SOLID principles (SRP, OCP, LSP, ISP, DIP with litmus tests) and functional core/imperative shell pattern. Updated self-check from 6 to 7 points. Added 8 code-specific assertions per eval scenario (32 total). Directory rename to `vmodel-skill-develop-code` deferred — mechanical, do when convenient.
-
-Eval results (Haiku, iteration 2):
-| Eval | with_skill | baseline | delta |
-|---|---|---|---|
-| FuelRateLimiter (Java, L2) | 8/8 | 6/8 | +25% |
-| TempController (Python, L2) | 8/8 | 6/8 | +25% |
-| MessageParser (Go, L2) | 8/8 | 6/8 | +25% |
-| SessionManager (Java, L1) | 5/8 | 7/8 | -25% |
-| **Overall** | **91%** | **78%** | **+13%** |
-
-Known: regression on sparse Layer 1 designs — skill-guided agent adds classes beyond design scope when design is underspecified. Accepted as design completeness issue, not skill issue.
-
-Non-discriminating assertions: architecture boundaries and naming pass without skill guidance on Haiku.
-
-> Done: `.claude/skills/develop-code/SKILL.md`, `evals/evals.json`, `develop-code-workspace/iteration-2/benchmark.json`
-
-**B2. vmodel-skill-derive-test-cases** (DONE — 2026-04-10)
-
-Audited SKILL.md against `docs/guide/artifacts/unit-test.html` and engineering-codex (7 relevant pages). Added Principles section (8 concise rules: spec-to-test, behavior-not-implementation, assertion specificity, test double preference hierarchy, state-over-behavior verification, AAA structure, parameterization, FIRST). Mandated coverage matrix as output with defined format. Expanded self-check from 4 to 6 points. Added HALT for >2 mocked dependencies. Updated `derivation-strategies.md` (coverage matrix format, parameterized test patterns). Updated `skills-architecture.html` (output spec, references, HALT conditions). Reworked eval 4 (SessionManager) with explicit injectable dependencies to test mocking decisions. Directory rename deferred — mechanical, do when convenient.
-
-Eval results (Haiku, iteration 4):
-| Eval | with_skill (revised) | old_skill | without_skill |
-|---|---|---|---|
-| FuelRateLimiter (pytest, L2) | 8/8 | 8/8 | 8/8 |
-| MessageParser (JUnit5, L2) | 8/8 | 7/8 | 7/8 |
-| TempController (Go, L2) | 8/8 | 8/8 | 8/8 |
-| SessionManager (pytest, L1) | 8/8 | 8/8 | 8/8 |
-| **Overall** | **100%** | **97%** | **97%** |
-
-Revised skill is strictly better: higher score (+3%), fewer tokens (56k vs 65k avg), no regressions.
-
-Discriminating assertion: assertion-specificity on eval 2 — both old_skill and without_skill produced `assertNotNull` as sole assertion in JUnit5 tests. Revised skill's explicit principle eliminated this.
-
-Non-discriminating on Haiku: coverage matrix, behavior rules, error handling, boundary values, test naming, mocking decisions. Well-structured designs make it easy for Haiku to do the right thing without guidance.
-
-Known improvement opportunities:
-- Add a "dirty" eval scenario (vague design, implicit dependencies) to test HALT conditions and principle value on ambiguous inputs
-- Run 3x per config on evals 2 and 4 for statistical confidence on the assertion-specificity delta
-
-> Done: `.claude/skills/derive-test-cases/SKILL.md`, `references/derivation-strategies.md`, `evals/evals.json`, `evals/files/session-manager-design-L1.md`, `docs/guide/skills-architecture.html`
-
----
-
-#### Phase C: New craft skills
-
-Each skill follows DRTDD: plan (draft scope from docs) → test (create eval scenarios) → build (write SKILL.md) → verify (run evals, iterate). Skills in this phase are independent of each other and can be built in any order.
-
-**C1. vmodel-skill-review-code** (DONE — 2026-04-10)
-
-Three-pass review skill (code quality, test quality, cross-checks) with three verdicts (APPROVED, REJECTED, DESIGN_ISSUE). All findings block — no severity filtering. AI testing checks always-on. References: `review-checklist-code.md`, `code-quality-checks.md`, `testing-anti-patterns.md`, `ai-testing-failures.md`, `review-verdict-template.md`.
-
-Eval results (Haiku, iteration 2, evals 2-4):
-| Eval | with_skill | without_skill | delta |
-|---|---|---|---|
-| CodeDefects (Java, L2) | 7/8 | 8/8 | -12% |
-| TestDefects (Go, L2) | 8/8 | 4/8 | +50% |
-| CrossCheck (Python, L1) | 7/8 | 7/8 | 0% |
-| **Overall (evals 2-4)** | **95.8%** | **70.8%** | **+25%** |
-
-Discriminating assertion: test anti-pattern detection (eval 3). Without comment breadcrumbs in the test file, Haiku without skill missed assertion-free tests, mirror tests, and framework tests. The skill's anti-pattern checklist guided systematic detection. Code defect detection (eval 2) is non-discriminating — Haiku catches planted code defects without help.
-
-Known: with_skill over-reports on test quality in eval 2 (flags indirect coverage of internal parsing steps as gaps). Accepted — precision tuning possible but diminishing returns.
-
-> Done: `.claude/skills/vmodel-skill-review-code/SKILL.md`, `references/`, `evals/`, `docs/guide/skills-architecture.html`
+<details>
+<summary>C2-C4 original scope (preserved for when work resumes)</summary>
 
 **C2. vmodel-skill-develop-dd** (forward detailed design)
 
@@ -398,9 +384,11 @@ Context to load:
 - `docs/guide/skills-architecture.html` §Craft Skills → vmodel-skill-review-dd
 - Reference files from Phase A1: `review-checklist-dd.md`, `design-quality-criteria.md`
 
+</details>
+
 ---
 
-#### Phase D: Framework skills
+### Phase D: Framework skills
 
 Thin schema adapters. No craft knowledge. Validation is primarily "does the output match the schema?"
 
@@ -436,7 +424,7 @@ Context to load:
 
 ---
 
-#### Phase E: Agents (integration)
+### Phase E: Agents (integration)
 
 Agent `.md` files define subagent system prompts that compose skills. Testing is integration-level: does the composition work correctly?
 
@@ -445,12 +433,6 @@ Agent `.md` files define subagent system prompts that compose skills. Testing is
 - [ ] Write agent definition: system prompt loading develop-code + derive-test-cases + traceability + tool-checks
 - [ ] Define TDD process (red-green-refactor) in agent prompt
 - [ ] Integration test: give task contract + design, verify agent produces code + tests + traces + check results
-- [ ] Verify context window stays manageable for a single task
-
-Context to load:
-- `docs/guide/skills-architecture.html` §Agent Definitions → vmodel-agent-tdd-developer
-- All craft skills this agent composes (B1, B2 outputs)
-- All framework skills this agent loads (D1-D3 outputs)
 
 **E2. vmodel-agent-code-reviewer**
 
@@ -458,41 +440,25 @@ Context to load:
 - [ ] Read-only tool access enforced
 - [ ] Integration test: give task contract + design + developer output, verify structured verdict
 
-Context to load:
-- `docs/guide/skills-architecture.html` §Agent Definitions → vmodel-agent-code-reviewer
-- C1 output (review-code skill)
-- D2, D3 outputs (framework skills)
-
 **E3. vmodel-agent-dd-developer**
 
 - [ ] Write agent definition: loads develop-dd OR retrofit-dd (mode selection), dd-template, traceability, tool-checks
 - [ ] Integration test: forward mode with requirements input, retrofit mode with code input
 
-Context to load:
-- `docs/guide/skills-architecture.html` §Agent Definitions → vmodel-agent-dd-developer
-- C2, C3 outputs (develop-dd, retrofit-dd skills)
-- D1, D2, D3 outputs
-
 **E4. vmodel-agent-dd-reviewer**
 
 - [ ] Write agent definition: loads review-dd + dd-template + traceability + tool-checks
 - [ ] Read-only tool access
-- [ ] Integration test: give design + requirements, verify verdict
 
 **E5. vmodel-agent-task-decomposer**
 
 - [ ] Write agent definition: reads implementation plan, produces task contracts
 - [ ] No craft skills loaded — architectural reasoning task
 - [ ] Tier 1 (Reasoning) model required
-- [ ] Test: give implementation plan, verify task contracts are correctly scoped
-
-Context to load:
-- `docs/guide/skills-architecture.html` §Agent Definitions → vmodel-agent-task-decomposer
-- Contract schemas from architecture doc (§Contract Schemas)
 
 ---
 
-#### Phase F: Orchestration
+### Phase F: Orchestration
 
 Wire everything together. This is the final phase for the lower V.
 
@@ -500,12 +466,6 @@ Wire everything together. This is the final phase for the lower V.
 
 - [ ] Write skill for interactive research/plan phase
 - [ ] Output: `implementation-plan.yaml` per architecture doc schema
-- [ ] Test: simulate a planning session, verify plan artifact is complete
-
-Context to load:
-- `docs/guide/skills-architecture.html` §Pipeline → Phase 1
-- `research/pillar3/02_humanlayer_repo.md` (interactive planning patterns)
-- `research/pillar3/03_hitl_and_composition.md` (HITL patterns)
 
 **F2. Pipeline controller skill**
 
@@ -513,37 +473,75 @@ Context to load:
 - [ ] Implements state machine from architecture doc
 - [ ] Human gates: after decomposition, after all tasks
 - [ ] Retry discipline: 3 attempts, different approach each time, root-cause before attempt 3
-- [ ] Test: end-to-end with mock task contracts
-
-Context to load:
-- `docs/guide/skills-architecture.html` §Pipeline, §Contract Schemas
-- `research/pillar3/03_hitl_and_composition.md` (orchestration patterns)
-- `research/pillar3/04_state_eval_versioning.md` (state machine, artifact-as-state)
-- Existing wf-skill-orchestrate for pattern reference (user's `~/.claude/skills/`)
 
 ---
 
 ### Higher V-Model Layer Skills (later — same pattern)
 
-### 4.4 SW Architecture Skills
+### 4.4 Stakeholder Analysis Skills
+
+**Interaction mode: Advisory** — AI helps identify stakeholder categories, suggests elicitation questions, checks for silent stakeholder gaps. Human drives all content (only humans know the real stakeholders).
 
 **Craft skills:**
-- [ ] vmodel-skill-develop-arch
-- [ ] vmodel-skill-review-arch
+- [ ] vmodel-skill-stakeholder-analysis (advisory — identify categories, suggest elicitation questions, check gaps)
+- [ ] vmodel-skill-review-stakeholder-needs (check completeness, conflict detection, concurrence readiness)
 
 **Framework skills:**
-- [ ] vmodel-skill-arch-template
+- [ ] vmodel-skill-stakeholder-register-template
+- [ ] vmodel-skill-stakeholder-need-template
 
-**Agents:**
-- [ ] vmodel-agent-arch-developer
-- [ ] vmodel-agent-arch-reviewer
+> Requires: Documentation 3.4 (Stakeholder Needs) first.
 
-> Requires: Documentation 3.4 (SW Architecture) first.
+### 4.5 ConOps Skills
 
-### 4.5 SW Requirements Skills
+**Interaction mode: Advisory** — AI helps structure operational scenarios, checks mode completeness, flags missing environmental characterization. Human drives the operational vision.
 
 **Craft skills:**
-- [ ] vmodel-skill-write-req (EARS approach)
+- [ ] vmodel-skill-develop-conops (advisory — structure scenarios, check mode completeness, flag gaps)
+- [ ] vmodel-skill-review-conops (scenario coverage, mode state machine completeness, environmental characterization)
+
+**Framework skills:**
+- [ ] vmodel-skill-conops-template
+
+> Requires: Documentation 3.5 (ConOps) first.
+
+### 4.6 Completeness Analysis Skills
+
+**Interaction mode: Advisory/Collaborative** — AI brainstorms failure modes (its strong suit), guides structured analysis methods, identifies requirement classes. Human owns the judgment calls (what's a real hazard vs. noise).
+
+**Craft skills:**
+- [ ] vmodel-skill-completeness-analysis (guide through FTA/FMEA/STPA for requirement discovery, brainstorm failure modes, identify negative/implicit/interaction requirements)
+- [ ] vmodel-skill-pbr-review (Perspective-Based Reading — simulate designer/tester/customer perspectives on requirements or designs)
+- [ ] vmodel-skill-review-completeness (check analysis coverage, flag gaps in requirement classes)
+
+**Framework skills:**
+- [ ] vmodel-skill-completeness-record-template
+
+> Requires: Documentation 3.6 (Completeness Analysis) first.
+> Note: AI limits are real here — brainstorming strong, completeness certification not viable (<70% on benchmarks). Skills must be honest about this.
+
+### 4.7 System Requirements Skills
+
+**Interaction mode: Advisory** — agent structures human thinking, checks completeness/consistency against upstream artifacts (stakeholder needs, ConOps, completeness analysis). Human drives content.
+
+**Craft skills:**
+- [ ] vmodel-skill-write-system-req (advisory — check against INCOSE rules, EARS patterns, allocation budgets, traceability to needs/ConOps/analysis)
+- [ ] vmodel-skill-review-system-req (completeness checks: functional/structural/behavioral/constraint/interface)
+- [ ] vmodel-skill-allocate-req (help decompose requirements to components with budget tracking, suggest allocation criteria)
+
+**Framework skills:**
+- [ ] vmodel-skill-system-req-template
+- [ ] vmodel-skill-allocation-matrix-template
+- [ ] vmodel-skill-baseline-template
+
+> Requires: Documentation 3.7 (System Requirements) first.
+
+### 4.8 SW Requirements Skills
+
+**Interaction mode: Advisory** — agent structures human thinking, checks completeness/consistency, suggests EARS patterns. Human drives content (captures stakeholder intent that only humans know).
+
+**Craft skills:**
+- [ ] vmodel-skill-write-req (EARS approach, advisory — structures and checks, human drives)
 - [ ] vmodel-skill-review-req
 - [ ] vmodel-skill-decompose-req
 
@@ -554,15 +552,32 @@ Context to load:
 - [ ] vmodel-agent-req-developer
 - [ ] vmodel-agent-req-reviewer
 
-> Requires: Documentation 3.5 (SW Requirements) first.
+> Requires: Documentation 3.8 (SW Requirements) first.
 
-### 4.6-4.7 System Level Skills (later)
+### 4.9 SW Architecture Skills
 
-- [ ] System requirements craft + framework skills
+**Interaction mode: Collaborative** — agent proposes decomposition and checks consistency, human decides trade-offs (system-wide consequences).
+
+**Craft skills:**
+- [ ] vmodel-skill-develop-arch (collaborative — proposes, human decides)
+- [ ] vmodel-skill-review-arch
+- [ ] vmodel-skill-evaluate-arch (lightweight ATAM, fitness functions, quality attribute scenarios)
+
+**Framework skills:**
+- [ ] vmodel-skill-arch-template
+
+**Agents:**
+- [ ] vmodel-agent-arch-developer
+- [ ] vmodel-agent-arch-reviewer
+
+> Requires: Documentation 3.9 (SW Architecture) first.
+
+### 4.10 System Test Skills (later)
+
 - [ ] System test craft + framework skills
 - [ ] Corresponding agents
 
-### 4.8 Legacy Retrofit Skills (use case — combines other skills)
+### 4.11 Legacy Retrofit Skills (use case — combines other skills)
 
 Specialized analysis/inference craft skills for reverse-engineering. `vmodel-skill-retrofit-dd` (Phase C3) is the first of these.
 
@@ -573,13 +588,13 @@ Specialized analysis/inference craft skills for reverse-engineering. `vmodel-ski
 - [ ] Gap analysis skill
 - [ ] Cross-session handoff documents for large analysis work
 
-### 4.9 Integration Skills (after craft + framework skills proven)
+### 4.12 Integration Skills (after craft + framework skills proven)
 
 - [ ] Trace link creation skill
 - [ ] Trace validation skill (temporary engine — see 2A-temp)
 - [ ] Schema compliance checking
 
-### 4.10 Orchestration Pipelines (after per-layer orchestration proven)
+### 4.13 Orchestration Pipelines (after per-layer orchestration proven)
 
 - [ ] DRTDD pipeline (phase sequencing, handoffs, gates)
 - [ ] Legacy scan pipeline (module-by-module analysis)
@@ -589,76 +604,108 @@ Specialized analysis/inference craft skills for reverse-engineering. `vmodel-ski
 
 ## Build Order
 
-Bottom-up, one V-model layer at a time. For each layer: documentation first, then template, then craft skills, then framework skills.
+Top-down for documentation: understand the complete information cascade from customer request to code. Skills are built after documentation gives us the full picture of handoff contracts between layers.
 
-### Phase 1+2: Lowest V-Level Documentation — DONE
-
-```
-1. [DONE] Documentation for code implementation (3.1)
-   └── docs/guide/artifacts/source-code.html — 1314 lines, 6 sections
-2. [DONE] Documentation for unit testing (3.2)
-   └── docs/guide/artifacts/unit-test.html — 1211 lines, 7 knowledge-domain subsections
-3. [DONE] Documentation for detailed design (3.3)
-   └── docs/guide/artifacts/detailed-design.html — 1096 lines, 8 knowledge domains
-   └── Schema v2.0 with Layer 1/2/3 model, two worked examples
-4. [DONE] Skills architecture designed
-   └── docs/guide/skills-architecture.html — three-layer model, all contracts defined
-```
-
-### Phase 1+2 continued: Skills for Lower V — NEXT
+### Completed Work
 
 ```
-See Component 4 "Lower V Skill Build Plan" for the detailed phased plan (A→F).
-Summary:
-  A. [DONE] Foundation: reference files, config schema
-  B. [DONE] Revise existing craft skills — DRTDD per skill (develop-code, derive-test-cases)
-  C. [NEXT] New craft skills — DRTDD per skill (review-code, develop-dd, retrofit-dd, review-dd)
-  D. Framework skills (dd-template, traceability, tool-checks)
-  E. Agents (tdd-developer, code-reviewer, dd-developer, dd-reviewer, task-decomposer)
-  F. Orchestration (research/plan skill, pipeline controller)
-  G. Traceability: link type rules for code ↔ detailed design (2A partial)
-  H. Wire full V-pair: detailed design → code + unit tests (end-to-end)
+Lower V documentation (bottom-up, done before direction change):
+  [DONE] Documentation for code implementation (3.1) — source-code.html, 1314 lines
+  [DONE] Documentation for unit testing (3.2) — unit-test.html, 1211 lines
+  [DONE] Documentation for detailed design (3.3) — detailed-design.html, 1096 lines, schema v2.0
+  [DONE] Skills architecture designed — skills-architecture.html
+
+Upper V research (top-down):
+  [DONE] Research 1-6 — 20 docs, ~13,850 lines in research/system-level/
+
+Lower V skills (partial):
+  A.    [DONE] Foundation: reference files, config schema
+  B.    [DONE] Revise existing craft skills (develop-code, derive-test-cases)
+  C1.   [DONE] New craft skill: review-code
+  C2-C4.[PAUSED] develop-dd, retrofit-dd, review-dd — waiting for top-down handoff knowledge
 ```
 
-### Phase 3: SW Architecture Layer
+### Phase 3: Top-Down Documentation — NEXT
+
+Work down from the true top of the V — stakeholder identification — through the complete cascade to architecture. Each layer's documentation explicitly captures what it hands off to the layer below AND what feedback flows back up. The V-model is generalized beyond safety: these techniques have value at any rigor level.
 
 ```
-1. Documentation for SW architecture (3.4)
-2. Craft + framework skills (4.4)
-3. Traceability extensions
-4. Wire V-pair: architecture → detailed design → code
+1. [NEXT] Stakeholder Identification & Needs documentation (3.4)
+   └── Understand: who are the stakeholders, how to capture and validate their needs
+   └── Handoff down: validated needs → ConOps + system requirements
+   └── Feedback up: derived requirements requiring re-concurrence
+2. Concept of Operations documentation (3.5)
+   └── Understand: operational picture before requirements exist (scenarios, modes, environment)
+   └── Handoff down: operational scenarios, mode state machine, constraints → system requirements
+   └── Feedback up: design constraints invalidating operational assumptions
+3. Completeness Analysis documentation (3.6)
+   └── Understand: techniques for discovering requirements stakeholders can't articulate
+   └── Generalized from safety: FTA/FMEA/STPA as completeness tools + PBR for validation
+   └── Handoff down: derived requirements (negative, implicit, interaction) → system/SW requirements
+   └── Feedback up: design decisions creating new failure modes
+4. System Requirements documentation (3.7)
+   └── Understand: needs + ConOps + analysis results → formal system specification
+   └── Allocation as budgeting, FTTI decomposition, requirements management
+   └── Handoff down: allocated requirements with budgets → SW requirements
+   └── Feedback up: derived requirements from design → baseline update
+5. SW Requirements documentation (3.8)
+   └── Understand: system allocation → SW requirements → qualification test derivation
+   └── Handoff down: SW requirements with verification criteria → architecture
+6. SW Architecture documentation (3.9)
+   └── Understand: SW requirements → component decomposition → interface definition → allocation
+   └── Volatility-based decomposition, lightweight ATAM, fitness functions
+   └── Handoff down: component specs with interface contracts → detailed design
+7. Review and refine detailed-design.html (3.3) based on what we learned about the cascade
 ```
 
-### Phase 4: SW Requirements Layer
+### Phase 4: Skills with Full Handoff Knowledge
+
+With the complete documentation cascade in place, build skills knowing exactly what flows between layers. **Key principle:** agent autonomy varies by V-level. Upper V skills are interactive advisors (human drives, agent assists). Lower V skills are autonomous executors (agent drives, human reviews). Skill design must match the autonomy level.
 
 ```
-1. Documentation for SW requirements (3.5)
-2. Craft + framework skills (4.5)
-3. Traceability extensions
-4. Wire V-pair: requirements → architecture → detailed design → code
+1. Stakeholder analysis skills (4.4): stakeholder-analysis, review-stakeholder-needs
+   └── Advisory mode — AI suggests categories and questions, human drives all content
+2. ConOps skills (4.5): develop-conops, review-conops
+   └── Advisory mode — AI structures scenarios, human drives operational vision
+3. Completeness analysis skills (4.6): completeness-analysis, pbr-review, review-completeness
+   └── Advisory/collaborative — AI brainstorms failure modes (strong suit), human owns judgment
+   └── PBR as early experiment (novel, measurable, no published study)
+4. System requirements skills (4.7): write-system-req, review-system-req, allocate-req
+   └── Advisory mode — AI checks against rules and upstream artifacts
+5. SW Requirements skills (4.8): write-req, review-req, decompose-req
+   └── Advisory mode — human drives content, agent structures and checks
+6. SW Architecture skills (4.9): develop-arch, review-arch, evaluate-arch
+   └── Collaborative mode — agent proposes, human decides trade-offs
+7. Resume C2-C4: detailed design skills (develop-dd, retrofit-dd, review-dd)
+   └── Now informed by architecture→DD handoff contract
+   └── Agent-driven with human validation
+8. Framework skills across all layers (D1-D3 + higher layer equivalents)
+9. Agents across all layers (E1-E5 + higher layer equivalents)
+10. Orchestration (F1-F2)
 ```
 
-### Phase 5: System Level + Legacy Retrofit
+### Phase 5: Traceability + Integration
 
 ```
-1. System requirements documentation + skills (3.6, 4.6)
-2. System test documentation + skills (3.7, 4.7)
-3. Legacy retrofit skills (4.8)
-4. General documentation (3.9 — V-model overview, DRTDD, safety analysis)
-5. Deterministic traceability engine (2B)
+1. Traceability: link type rules across all layers including new upper V artifacts (2A completion)
+2. Wire full V-pairs: stakeholder needs → ConOps → system req → SW req → architecture → DD → code (end-to-end)
+3. Legacy retrofit skills (4.11) — informed by full V knowledge
+4. General documentation (3.12 — V-model overview, DRTDD, completeness analysis overview)
 ```
 
 ### Phase 6: Polish + Tooling
 
 ```
-1. Review documentation + skills (3.8)
-2. Plan schemas (1.2 plans)
-3. Assurance level configuration (1.3)
-4. Translation layer (1.4)
-5. Scaffold tool (1.5)
-6. Integration skills (4.9)
-7. Orchestration pipelines (4.10)
-8. Web GUI (2C)
+1. System test documentation + skills (3.10)
+2. Review documentation + skills (3.11)
+3. Plan schemas (1.2 plans)
+4. Assurance level configuration (1.3)
+5. Translation layer (1.4)
+6. Scaffold tool (1.5)
+7. Integration skills (4.12)
+8. Orchestration pipelines (4.13)
+9. Deterministic traceability engine (2B)
+10. Web GUI (2C)
 ```
 
 ---
@@ -666,7 +713,7 @@ Summary:
 ## Guiding Principles
 
 1. **Documentation is the foundation.** Write the documentation first, derive everything else from it. If we can't explain it in documentation, we can't claim the AI skills will produce compliant output.
-2. **Bottom-up build order.** Start from code, work up through each V-model layer. Prove each layer end-to-end.
+2. **Top-down documentation, then skills.** Understand the full information cascade (stakeholder needs → ConOps → completeness analysis → system req → SW req → architecture → detailed design → code) before building skills. Each documentation layer captures what it hands off down AND what feedback flows back up.
 3. **Components are independent (SOLID).** No forced coupling. But designed to compose.
 4. **Individual loops per layer.** Each V-model layer gets its own orchestration. Refactor to shared patterns only after building 3-4 layers.
 5. **Human drives, AI executes, human verifies.** Not an autonomous pipeline. Mid-senior engineers orchestrating AI agents.
@@ -675,8 +722,10 @@ Summary:
 8. **Discuss before writing.** Explain approach, show visually, motivate, get approval.
 9. **Model-tier aware.** Skills must work on cheapest viable tier (Tier 3 Fast). Test with baseline comparison. Vendor-neutral tiers: Tier 1 Reasoning / Tier 2 Workhorse / Tier 3 Fast.
 10. **Incremental always.** Module-by-module. Layer-by-layer.
-11. **Follow agentskills.io spec.** SKILL.md format, progressive disclosure, scripts for determinism.
-12. **Use `/skill-creator` for development.** Draft, test, evaluate, iterate.
+11. **Value is at the top of the V.** Agents already perform well at code/test level given clear input (eval data: +3% to +13% over baseline). The real gains come from helping produce quality designs and requirements — the upper V is where ambiguity, trade-offs, and human judgment live. Upper V skills are interactive advisors, not autonomous executors.
+12. **V-model is engineering infrastructure, not just safety compliance.** Safety is the highest-rigor application, but the techniques (structured requirements, completeness analysis, traceability, formal verification) have value at any rigor level. The framework generalizes — safety-critical projects scale up, non-safety projects still benefit from the structure.
+13. **Follow agentskills.io spec.** SKILL.md format, progressive disclosure, scripts for determinism.
+14. **Use `/skill-creator` for development.** Draft, test, evaluate, iterate.
 
 ---
 
@@ -696,86 +745,37 @@ Each artifact documentation page covers six sections. Research must support all 
 
 #### Category A: V-Model Standards Research
 **What:** What do DO-178C, ISO 26262, ASPICE, and IEC 62304 specifically require or recommend for this artifact type? Cross-standard comparison tables. Scaling by assurance level.
-
-**Already done for:** Source code (`research/implementation/v-model-standards-implementation.md`), Unit tests (`research/implementation/v-model-standards-unit-testing.md`).
-
-**Typical output:** One research document, 300-500 lines. Covers each standard's specific sections, then a cross-standard comparison.
+**Typical output:** One research document, 300-500 lines.
 
 #### Category B: Craft Best Practices Research
-**What:** The professional engineering knowledge needed to produce a high-quality artifact of this type, independent of any V-model or safety standard. This is the equivalent of "Clean Code" for source code — the authoritative body of knowledge from recognized experts.
-
-**This is the bulk of the research and the most commonly underestimated.** For each artifact type, identify:
-
-1. **Foundational authors and works** — who are the recognized authorities? (e.g., for source code: Martin, Fowler, Beck, Meszaros, Freeman/Pryce. For requirements: Robertson, Wiegers, Hull/Jackson/Dick, Mavin for EARS.)
-2. **Core principles and philosophy** — the "why" behind the practices, not just the "how"
-3. **Patterns and anti-patterns** — with concrete examples, attributed to sources
-4. **Quality metrics** — measurable indicators of quality for this artifact type
-5. **Common mistakes** — what goes wrong in practice, with empirical data where available
-
-**Expect 3-5 research documents per artifact type for this category.** The source code chapter needed: SOLID/clean code, architecture patterns, design patterns, AI-assisted development. The unit test chapter needs: test design philosophy, test doubles, test smells/maintainability, test organization, AI test quality.
-
-**Typical output per document:** 300-600 lines. Specific claims attributed to specific sources with URLs.
+**What:** The professional engineering knowledge needed to produce a high-quality artifact of this type, independent of any V-model or safety standard.
+**Expect 3-5 research documents per artifact type.** Each 300-600 lines, with attributed claims and specific sources.
 
 #### Category C: AI-Specific Research
-**What:** How does AI-assisted development specifically affect this artifact type? Empirical data on AI quality for this artifact. Common AI failure modes. Mitigation strategies.
-
-**Typical output:** One research document, 200-400 lines. Must include quantitative data where available (2023-2025 studies preferred).
+**What:** How does AI-assisted development specifically affect this artifact type? Empirical data on AI quality. Common AI failure modes. Mitigation strategies.
+**Typical output:** One research document, 200-400 lines.
 
 ### Research Quality Bar
 
-Each research document must meet these criteria:
-
 - **Attributed claims.** Every factual claim cites a specific source. No "it is generally accepted that..." without a source.
-- **Real sources.** Web-searchable, verifiable. Published books, peer-reviewed papers, recognized industry blogs (Fowler, Google Testing Blog), official standards documents. Never present LLM training knowledge as research.
+- **Real sources.** Web-searchable, verifiable. Never present LLM training knowledge as research.
 - **Cross-referenced.** Where multiple sources address the same topic, note agreement or disagreement.
 - **Practical examples.** Key concepts illustrated with concrete code or artifact examples.
-- **Honest about gaps.** If a claim's provenance is questionable, say so (e.g., the IBM "100x cost" data).
+- **Honest about gaps.** If a claim's provenance is questionable, say so.
 
-### Procedure Steps
+### Research Needs Per Upcoming Artifact
 
-For each artifact documentation page:
-
-```
-1. IDENTIFY research needs
-   - List the knowledge domains needed for Section 3 (quality workproduct)
-   - Check what research already exists in research/
-   - Gap analysis: what's covered vs. what's needed
-
-2. RESEARCH (parallelizable)
-   - Category A: V-model standards (if not already done)
-   - Category B: Craft best practices (typically 3-5 parallel research efforts)
-   - Category C: AI-specific concerns (1 research effort)
-   - All research written to research/ directory
-
-3. REVIEW research with human
-   - Present findings summary
-   - Identify gaps or areas needing deeper investigation
-   - Get approval before proceeding to documentation
-
-4. WRITE documentation
-   - Section 3 first (the bulk — craft knowledge)
-   - Sections 1-2 (intro and V-model context)
-   - Section 4 (V-model considerations)
-   - Section 5 (framework integration)
-   - Section 6 (AI skills — stub until skills are built)
-
-5. REVIEW documentation against source code chapter caliber
-   - Is Section 3 organized by knowledge domains (not procedures)?
-   - Does every principle have a concrete example (good and bad)?
-   - Is the depth comparable to source-code.html?
-   - Would this be useful to a human engineer with no AI agent context?
-```
-
-### Research Needs Per Upcoming Artifact (preliminary)
-
-| Artifact (Section) | Cat A: Standards | Cat B: Craft (estimated docs) | Cat C: AI |
+| Artifact (Section) | Cat A: Standards | Cat B: Craft | Cat C: AI |
 |---|---|---|---|
-| Unit Test (3.2 rework) | Done | 5 docs (done) | 1 doc (done) |
-| Detailed Design (3.3) | Done (08-detailed-design-realism-and-compliance.md) | 6 docs (done): design-documentation-craft, interface-specification-design-by-contract, behavioral-specification-techniques, dynamic-behavior-concurrency, design-scaling-tiering, error-handling-specification | 1 doc (done): ai-assisted-detailed-design |
-| SW Architecture (3.4) | Needed | ~3-4 (component decomposition, architecture styles, interface design, modularity/coupling metrics) | Needed |
-| SW Requirements (3.5) | Partially done (EARS research exists) | ~3-4 (requirements engineering, EARS deep dive, testability/verifiability, requirements management) | Needed |
-| System Requirements (3.6) | Needed | ~2-3 (system-level requirements, allocation, derived requirements) | Needed |
-| System Test (3.7) | Needed | ~3-4 (system test strategy, test environment, acceptance criteria, regression strategy) | Needed |
-| Review (3.8) | Needed | ~2-3 (review techniques, inspection process, review psychology) | Needed |
+| Unit Test (3.2) | Done | Done (5 docs) | Done (1 doc) |
+| Detailed Design (3.3) | Done | Done (6 docs) | Done (1 doc) |
+| Stakeholder Needs (3.4) | Done (Research 1+2) | Done (02a, 02b, 02d) | Done (Research 6: 06a) |
+| ConOps (3.5) | Done (Research 1+2) | Done (02c, 05a) | Done (Research 6: 06a) |
+| Completeness Analysis (3.6) | Done (Research 1+4) | Done (04a, 04b, 04c, 02b) | Done (Research 6: 06a, 06b) |
+| System Requirements (3.7) | Done (Research 1+2+3) | Done (03a-03d, partially 05f) | Done (Research 6: 06a) |
+| SW Requirements (3.8) | Done (Research 1+3) | Done (03a-03d) | Done (Research 6: 06a) |
+| SW Architecture (3.9) | Done (Research 1+5) | Done (05a-05f) | Done (Research 6: 06b) |
+| System Test (3.10) | Needed | ~3-4 docs | Needed |
+| Review (3.11) | Needed | ~2-3 docs | Needed |
 
 These estimates will be refined when each artifact's research phase begins.

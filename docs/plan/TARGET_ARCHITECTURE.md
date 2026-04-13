@@ -2,7 +2,7 @@
 
 ## Vision
 
-A framework for V-model compliant software development that combines documentation, templates, traceability, and AI skills into a coherent system. Each component is independently usable but designed to work together. The end goal: V-model compliant software, developed by AI agents, fully understood and verified by human engineers.
+A framework for V-model structured software development that combines documentation, templates, traceability, and AI skills into a coherent system. Each component is independently usable but designed to work together. The V-model is treated as engineering infrastructure, not just safety compliance — safety is the highest-rigor application, but the techniques have value at any rigor level. The end goal: well-structured software, developed by AI agents, fully understood and verified by human engineers.
 
 ## Components
 
@@ -65,6 +65,11 @@ body:                               # type-specific content
 
 **Artifact Type Schemas** — YAML definitions for each V-level:
 
+Pre-requirements (project entry point):
+- Stakeholder Register, Stakeholder Need, Concept of Operations (ConOps)
+- Completeness Analysis Record (generic for FTA/FMEA/STPA/PBR results)
+- Allocation Matrix, Requirements Baseline
+
 Left side (development):
 - System Requirements, SW Requirements, Architecture, Detailed Design
 - Source code is real files, linked via traceability trace files
@@ -73,7 +78,7 @@ Right side (verification):
 - System Test Cases (YAML artifact — often manual procedures)
 - Lower-level tests are real test files (unit, integration, qualification), linked via trace files
 - Test results and coverage are tool output (JUnit XML, jacoco), linked via trace files
-- Review Records (separate artifact type)
+- Review Records (separate artifact type — also used for PBR multi-perspective reviews)
 
 Plans:
 - Development, Verification, CM, QA
@@ -124,9 +129,9 @@ The single source of truth for all domain knowledge. Everything else (templates,
 
 **Each documentation page requires thorough research before writing** — see "Procedure: Research Before Documentation" in BACKLOG.md. Typical research: 1 standards doc + 3-5 craft best practices docs + 1 AI-specific doc.
 
-**Scope:** Not a summary — equivalent in depth to the union of major V-model standards (DO-178C, ISO 26262, ASPICE, IEC 62304, EN 50128), expressed in generic V-model terms. This is a major content effort but is non-negotiable: the documentation proves the framework is sound, and AI skills are derived from it.
+**Scope:** Not a summary — equivalent in depth to the union of major V-model standards (DO-178C, ISO 26262, ASPICE, IEC 62304, EN 50128), expressed in generic V-model terms. Covers the full cascade from stakeholder identification through ConOps and completeness analysis to system requirements, SW requirements, architecture, detailed design, and code. This is a major content effort but is non-negotiable: the documentation proves the framework is sound, and AI skills are derived from it.
 
-**Long-term goal:** Could serve as a standalone "generic V-model standard" reference.
+**Long-term goal:** Could serve as a standalone "generic V-model engineering" reference — not just safety compliance, but structured engineering at any rigor level.
 
 **Documentation-to-skill pipeline:**
 ```
@@ -200,6 +205,23 @@ HUMAN-DRIVEN                      AGENT-ORCHESTRATED                HUMAN-DRIVEN
 
 **Key principle:** This is NOT an autonomous pipeline with human checkpoints. It is a human-orchestrated workflow where AI handles implementation within each layer. The human transitions between layers, participates in research/planning, and does final review.
 
+**Agent autonomy varies by V-level (refined 2026-04-12):**
+
+The interaction model above is the general pattern, but the balance of effort shifts across the V. Eval data from lower V skills shows agents already perform well at code/test level given clear design input (+3% to +13% over baseline). The real value is at the upper V, where ambiguity, trade-offs, and stakeholder intent live.
+
+| V-Level | Agent Role | Human Role | Agent Autonomy |
+|---|---|---|---|
+| Stakeholder Analysis | Suggests categories, elicitation questions, gap checks | Drives all content (only humans know real stakeholders) | Low |
+| ConOps | Structures scenarios, checks mode completeness | Drives operational vision | Low |
+| Completeness Analysis | Brainstorms failure modes (strong suit), guides methods | Owns judgment (what's a real hazard vs. noise) | Low-Medium |
+| System Requirements | Consistency checker, allocation assistant, scribe | Drives content, captures stakeholder intent | Low-Medium |
+| SW Requirements | Structures, checks completeness, suggests patterns | Drives content, validates against system intent | Medium |
+| SW Architecture | Proposes decomposition, checks consistency | Decides trade-offs (system-wide consequences) | Medium |
+| Detailed Design | Heavy lifting on specification | Validates trade-offs, approves | Medium-High |
+| Code + Unit Tests | Autonomous executor (given good design) | Reviews output | High |
+
+**Implication for skill design:** Upper V skills must be designed as interactive advisors (structure human thinking, check consistency, suggest completions), not autonomous producers. Lower V skills can be autonomous executors.
+
 **Research/Plan phase produces a handoff artifact** — a structured "implementation contract" that scopes what the agent-orchestrated loop does. This captures design decisions and rationale from the discussion.
 
 ## Use Cases
@@ -263,10 +285,13 @@ Traceability validation is a tool concern, not an agent concern. Agents create, 
 ### 8. Generic V-Model + Translation
 Internal terms are generic. Domain-specific vocabulary applied via translation layer.
 
-### 9. Bottom-Up Build Order
-Start from code + unit tests (lowest V-level), work upward through detailed design, architecture, requirements. Prove each layer end-to-end before moving to the next.
+### 9. Top-Down Documentation, Then Skills
+Documentation follows the V-model top-down: stakeholder needs → ConOps → completeness analysis → system requirements → SW requirements → architecture → detailed design → code. This reveals the complete information cascade, including both downward handoffs and upward feedback loops. Skills are built after documentation coverage is complete, informed by the full picture. (Note: initial lower-V documentation was built bottom-up; direction changed 2026-04-12 to prioritize understanding the complete flow. Scope expanded 2026-04-13 to include stakeholder analysis, ConOps, and completeness analysis as the true project entry point.)
 
-### 10. Target User: Mid-Senior Engineers with AI
+### 10. V-Model as Engineering Infrastructure, Not Just Safety
+The framework generalizes V-model techniques beyond safety compliance. Safety is the highest-rigor application, but structured requirements, completeness analysis, traceability, and formal verification have value at any rigor level. Completeness analysis (FTA, FMEA, STPA, PBR) is framed as "techniques for discovering what's missing" — applicable to any quality goal, not just hazard mitigation. The assurance level configuration scales rigor: safety-critical projects get full analysis, non-safety projects benefit from lightweight versions of the same techniques.
+
+### 11. Target User: Mid-Senior Engineers with AI
 Not autonomous AI. Not manual-only humans. Engineers who orchestrate AI agents and verify output. Human at strategic level, AI at tactical level, human at quality gate.
 
 ## Quality Attributes
