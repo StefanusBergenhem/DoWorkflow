@@ -206,6 +206,13 @@
     </div>
 
     <div class="nav-group">
+      <span class="nav-group-label">Authoring Contract</span>
+      <a class="nav-link" href="#sa-ground-rules">Ground Rules</a>
+      <a class="nav-link" href="#sa-enforcement">Enforcement Catalog</a>
+      <a class="nav-link" href="#sa-halt">HALT Pattern</a>
+    </div>
+
+    <div class="nav-group">
       <span class="nav-group-label">Layer 1: Skills</span>
       <a class="nav-link" href="#sa-craft">Craft Skills</a>
       <a class="nav-link" href="#sa-framework">Framework Skills</a>
@@ -557,6 +564,274 @@
         <tr><td>Research/plan</td><td>Tier 1 (Reasoning)</td><td>Strategic discussion, design decisions, trade-off analysis</td></tr>
       </tbody>
     </table>
+  </section>
+
+
+  <!-- ===================== SECTION: GROUND RULES ===================== -->
+  <section id="sa-ground-rules">
+    <h2>Ground Rules</h2>
+    <p class="lead">Authoring rules that govern every skill, agent, reference, and orchestration prompt shipped by this framework. Derived from research on LLM context management, prompt-persuasion patterns, empirical skill performance, and lessons about what models can be trusted to do deterministically versus what must be pushed to tools.</p>
+
+    <p><strong>Scope.</strong> These rules apply to what this framework <em>ships</em>: <code>SKILL.md</code> files, references, agent definitions, orchestration prompts, handover and HALT schemas. They explicitly do <strong>not</strong> constrain the host <code>CLAUDE.md</code>, host-level hooks, user MCP servers, or any context a downstream user adds on top &mdash; those are out of our control and deliberately out of scope.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th style="width: 4rem;">#</th><th style="width: 14rem;">Rule</th><th>Detail</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="field-name">GR-1</td>
+          <td>Prime, don&rsquo;t teach</td>
+          <td>Reference known concepts by name. Add reasoning only where the model doesn&rsquo;t default to the desired behavior. Save budget for the delta that matters.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-2</td>
+          <td>Instruction budget: 100 commands</td>
+          <td>Across all framework artifacts at run-time combined (composed skills + agent bodies + orchestration prompts). <em>Counts:</em> <code>MUST</code>, <code>MUST NOT</code>, <code>NEVER</code>, <code>ALWAYS</code>, <code>SHOULD</code>, or a checklist item. <em>Excludes:</em> definitions, rationale, examples, references. Host <code>CLAUDE.md</code> and user MCPs are out of scope. Starting target &mdash; revisit empirically.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-3</td>
+          <td>One instruction = one enforceable directive</td>
+          <td>Compound sentences split per obligation. A single bullet should carry a single obligation the agent can act on.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-4</td>
+          <td>Minimalism in framework artifacts</td>
+          <td>Thin skills. Controlled skill count. No deeply nested references &mdash; at most one level deep from <code>SKILL.md</code>. Applies only to what we ship; host-side <code>CLAUDE.md</code> and MCP layout are out of scope.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-5</td>
+          <td>Match persuasion profile to skill role</td>
+          <td>
+            <em>Lower-V / discipline:</em> Authority + Commitment + Social Proof.<br>
+            <em>Upper-V / advisory:</em> Unity + Commitment, moderate Authority.<br>
+            <em>Framework / template:</em> Clarity only.<br>
+            <strong>Never use Liking or Reciprocity.</strong>
+          </td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-6</td>
+          <td>HALT option on every skill</td>
+          <td>Every skill must give the agent an explicit HALT path when instructions or inputs don&rsquo;t fit the situation. Every HALT produces a versioned <code>halt.yaml</code> (schema v1). See <a href="#sa-halt">HALT Pattern</a>.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-7</td>
+          <td>Implementation intentions over general instructions</td>
+          <td>&ldquo;When X, do Y&rdquo; beats &ldquo;generally do Y.&rdquo; Trigger + response pairs survive context pressure better than abstract principles.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-8</td>
+          <td>Strict typed handover artifacts at every agent entry/exit</td>
+          <td>Every agent reads a contract on entry and writes a handover artifact on exit &mdash; success, failure, or HALT. All handovers carry <code>schema_version</code>. No untyped in-memory state survives across agents.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-9</td>
+          <td><em>[Hypothesis]</em> Progressive disclosure via staggered loading</td>
+          <td><code>SKILL.md</code> is thin; references load only when the agent reaches the phase that needs them. <em>Expected benefit:</em> stay in the very-smart zone, degrade only to normal-smart. <strong>To be validated empirically.</strong> If we measure no effect, revisit.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-10</td>
+          <td>Deterministic enforcement by default</td>
+          <td>Anything checkable by schema, lint, regex, or AST <strong>must not</strong> be prose in a skill &mdash; push it to a tool. See <a href="#sa-enforcement">Deterministic Enforcement Catalog</a>. What we can&rsquo;t mechanize gets an ADR in the architecture doc.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-11</td>
+          <td>Evaluation is a consideration, not a gate</td>
+          <td>Reality: eval-scenario derivation methodology is an open problem in this project; existing evals in this repo are acknowledged as weak; upper-V skills need reasoning beyond Tier 3, so the Haiku baseline doesn&rsquo;t apply universally. When building or revising a skill, discuss whether and how to evaluate it. <strong>Do not claim uplift we can&rsquo;t measure.</strong></td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-12</td>
+          <td>Separation of concerns</td>
+          <td>No &ldquo;do everything&rdquo; skills &mdash; each skill owns one role. Tight coupling between orchestrator and craft-skill internals is banned.</td>
+        </tr>
+        <tr>
+          <td class="field-name">GR-13</td>
+          <td>Restart over repeated correction</td>
+          <td>When an agent is stuck &mdash; retry budget exhausted, off-track, or the same failure is being patched repeatedly &mdash; restart in fresh context with an updated contract. Don&rsquo;t keep patching a drifted reasoning trace.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+
+  <!-- ===================== SECTION: ENFORCEMENT CATALOG ===================== -->
+  <section id="sa-enforcement">
+    <h2>Deterministic Enforcement Catalog</h2>
+    <p><strong>GR-10 in action.</strong> Anything on this list is enforced by a tool, not prose in a skill. Skills reference the rule and delegate; they don&rsquo;t re-implement it in English. Every time a new skill is drafted, check this catalog first &mdash; if the rule is here, the skill delegates.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th style="width: 3rem;">#</th><th style="width: 14rem;">Enforcement</th><th style="width: 14rem;">Scope</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="field-name">1</td>
+          <td>YAML/JSON schema validation</td>
+          <td>All artifacts, contracts, trace files, HALT files</td>
+          <td>Via <code>schemas/</code></td>
+        </tr>
+        <tr>
+          <td class="field-name">2</td>
+          <td>Language linter</td>
+          <td>Source code</td>
+          <td>Per-language, no suppression directives allowed (CLAUDE.md rule)</td>
+        </tr>
+        <tr>
+          <td class="field-name">3</td>
+          <td>Type checker</td>
+          <td>Source code (where the language supports it)</td>
+          <td>Same no-suppression rule</td>
+        </tr>
+        <tr>
+          <td class="field-name">4</td>
+          <td>Test runner + exit code</td>
+          <td>Unit tests, integration tests</td>
+          <td>Pipe to <code>/tmp</code> to protect the context window (CLAUDE.md rule)</td>
+        </tr>
+        <tr>
+          <td class="field-name">5</td>
+          <td>Test meaningfulness</td>
+          <td>Unit / integration tests</td>
+          <td><strong>Mutation score is the primary signal.</strong> Line / branch coverage is a gameable floor only &mdash; AI will happily write assertion-free tests that hit 100&nbsp;% lines. Mutation below threshold &rarr; reject. Coverage-matrix cross-check still required.</td>
+        </tr>
+        <tr>
+          <td class="field-name">6</td>
+          <td>Trace link validator</td>
+          <td>Trace files</td>
+          <td>Checks (a) target exists, (b) content-hash is not stale</td>
+        </tr>
+        <tr>
+          <td class="field-name">7</td>
+          <td>Content-hash staleness</td>
+          <td>All traced artifacts</td>
+          <td>Deterministic &mdash; no LLM needed</td>
+        </tr>
+        <tr>
+          <td class="field-name">8</td>
+          <td>File boundary guard</td>
+          <td>Every agent task</td>
+          <td>Only files in <code>files_to_touch</code> are editable (CLAUDE.md rule)</td>
+        </tr>
+        <tr>
+          <td class="field-name">9</td>
+          <td>Structured-output parser</td>
+          <td>All agent output claiming YAML / JSON</td>
+          <td>Reject on parse failure</td>
+        </tr>
+        <tr>
+          <td class="field-name">10</td>
+          <td>Requirement regex checks</td>
+          <td>Requirement artifacts</td>
+          <td>EARS patterns; subset of INCOSE&nbsp;42 rules (absolute quantifiers, passive voice, vague adjectives)</td>
+        </tr>
+        <tr>
+          <td class="field-name">11</td>
+          <td>Secret / credential detector</td>
+          <td>Pre-commit</td>
+          <td>Standard tool</td>
+        </tr>
+        <tr>
+          <td class="field-name">12</td>
+          <td>Schema-version guard</td>
+          <td>All handover / HALT files</td>
+          <td>Refuse unknown <code>schema_version</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Known non-automatable</h3>
+    <p>These stay with humans. Each gets an ADR in the architecture doc explaining why.</p>
+    <ul>
+      <li>Requirement <em>semantic</em> correctness &mdash; &ldquo;does this capture what the stakeholder meant.&rdquo;</li>
+      <li>Design judgment and trade-off reasoning.</li>
+      <li>Review judgment on clarity and writing quality.</li>
+      <li>Safety analysis completeness certification &mdash; AI measured empirically at &lt;&nbsp;70&nbsp;%; humans required.</li>
+      <li>Stakeholder interpretation and concurrence.</li>
+    </ul>
+  </section>
+
+
+  <!-- ===================== SECTION: HALT PATTERN ===================== -->
+  <section id="sa-halt">
+    <h2>HALT Pattern</h2>
+    <p class="lead">Every skill gives the agent an explicit HALT path when its instructions or inputs don&rsquo;t fit the situation. HALT is not failure &mdash; it is a deliberate pause that produces a versioned, typed artifact a human can resume from.</p>
+
+    <h3>When to HALT</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th style="width: 14rem;">Category</th><th>Trigger</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="field-name">uncertain</td><td>Multiple viable options with no defensible default from context.</td></tr>
+        <tr><td class="field-name">missing-input</td><td>Contract depends on an artifact that is not available or not trustworthy.</td></tr>
+        <tr><td class="field-name">off-track</td><td>Reasoning has drifted from the task&rsquo;s scope or intent. Stop rather than compound the drift.</td></tr>
+        <tr><td class="field-name">conflict</td><td>Instructions or inputs contradict each other and the agent cannot resolve it.</td></tr>
+        <tr><td class="field-name">out-of-scope</td><td>Correctness requires changes outside <code>files_to_touch</code>.</td></tr>
+        <tr><td class="field-name">design-issue</td><td>An architectural problem blocks implementation &mdash; needs a design decision, not a code change.</td></tr>
+        <tr><td class="field-name">retry-exhausted</td><td>Retry budget has been hit (see GR-13). Restart in fresh context rather than continue patching.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>HALT Schema v1</h3>
+    <div class="code-block">
+      <span class="lang-label">YAML</span>
+      <code># .workflow/halts/&lt;ISO-timestamp&gt;_&lt;halt_id&gt;.yaml
+# Pointer to most recent: .workflow/halt.yaml (symlink or copy)
+
+schema_version: 1
+
+halt_id: halt-2026-04-16-001
+timestamp: 2026-04-16T14:32:11Z
+
+# Who halted
+agent: vmodel-agent-tdd-developer           # agent that halted
+skill: vmodel-skill-develop-code            # skill active at halt (optional)
+task_contract: .workflow/current_task.yaml  # pointer, not inline
+
+# Why
+category: uncertain | missing-input | off-track | conflict | out-of-scope | design-issue | retry-exhausted
+trigger: "one-line description of what triggered the halt"
+context_summary: |
+  2-5 lines: what the agent was doing, how far it got, what state
+  it's leaving behind.
+
+# What was tried (for retry-exhausted or off-track)
+what_was_tried:
+  - attempt: 1
+    approach: "brief description"
+    outcome: "what happened"
+  # ...
+
+# What the agent needs from human
+specific_question: "single crisp question, or null if category is design-issue/retry-exhausted"
+options:                                    # null if open-ended
+  - name: "option-a-slug"
+    summary: "1-2 lines"
+    consequence: "1-2 lines on downstream impact"
+  - name: "option-b-slug"
+    summary: "..."
+    consequence: "..."
+
+# Enables clean resume
+work_in_progress:
+  files_touched: ["src/foo.py", "tests/test_foo.py"]   # for rollback/commit decisions
+  uncommitted: true
+  references: [".workflow/current_task.yaml", "design/foo-dd.md"]
+
+resume_instructions: |
+  Human provides: answer to specific_question (or selected option).
+  Resuming agent loads: task_contract, halt.yaml, files_touched.
+  Recommended: restart in fresh context per GR-13 if category is
+  off-track or retry-exhausted.</code>
+    </div>
+
+    <h3>Rules of Use</h3>
+    <ul>
+      <li>Every agent entry reads and references a contract; every agent exit &mdash; success, failure, or HALT &mdash; writes a handover artifact (GR-8).</li>
+      <li><code>schema_version: 1</code>. Bump on any field rename or semantic change. Agents <strong>must</strong> refuse to parse a HALT with an unknown <code>schema_version</code> (catalog item&nbsp;12).</li>
+      <li>Stored under <code>.workflow/halts/</code> with full history. <code>.workflow/halt.yaml</code> always points to the most recent.</li>
+      <li><strong>Resume default for <code>off-track</code> and <code>retry-exhausted</code>:</strong> restart in fresh context (GR-13). Patching a drifted trace compounds the drift.</li>
+    </ul>
   </section>
 
 
