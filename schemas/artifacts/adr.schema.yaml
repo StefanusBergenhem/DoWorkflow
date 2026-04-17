@@ -1,0 +1,258 @@
+# ADR — Architecture Decision Record — Markdown Format Specification
+#
+# Defines the conventions for ADR artifacts written as Markdown.
+#
+# An ADR captures a load-bearing decision made at decision-time. It is a
+# first-class output across V-model layers (system architecture, SW
+# architecture, detailed design, even component-level when a load-bearing
+# pattern is selected). ADRs are NOT a separate pillar — they are an
+# output type within the existing Documentation, Templates & Schemas,
+# Traceability, and AI Skills pillars.
+#
+# This schema is part of Pillar 1 (V-Model Compliance / Templates & Schemas).
+# It has no dependency on Pillar 2 (Traceability) or Pillar 3 (Agentic Skills).
+
+schema_version: "1.0"
+schema_id: adr
+
+file_format: markdown    # .md files with YAML frontmatter
+
+# =============================================================================
+# WHEN TO CREATE AN ADR (THRESHOLD)
+# =============================================================================
+#
+# A decision warrants an ADR when ALL of these are true:
+#   - Load-bearing: changing it later could break the system or invalidate
+#     downstream design.
+#   - Multiple real options existed: this is a chosen alternative, not the
+#     only path.
+#   - Rests on assumptions or drivers that may change.
+#
+# A decision does NOT warrant an ADR when:
+#   - It is the mechanical application of an established pattern.
+#   - It is a taste call with no system impact.
+#   - It is internal to a single unit with no architectural reach.
+#
+# Self-test: "Could a future maintainer who changes this break the system?"
+#   - Yes → ADR.
+#   - No  → no ADR.
+#
+# Trigger: either human or AI may propose an ADR. Both should recognise
+# load-bearing decisions during conversation. Build-phase agents that hit
+# a load-bearing decision they cannot make alone HALT (category=design-issue);
+# the resolving conversation produces the ADR; the agent resumes with the
+# ADR + updated design as input.
+#
+# Forward-only: ADRs capture decisions made AT decision-time. Reconstructing
+# rationale for legacy code is forbidden — the Provenance field has no
+# legal value other than 'recorded' precisely to enforce this.
+
+# =============================================================================
+# FRONTMATTER (YAML between --- delimiters)
+# =============================================================================
+
+frontmatter:
+
+  artifact_id:
+    type: string
+    required: true
+    description: "Sequential identifier; one global sequence per project."
+    pattern: "^ADR-\\d{3,}$"
+    examples:
+      - "ADR-001"
+      - "ADR-042"
+
+  artifact_type:
+    type: string
+    required: true
+    value: "adr"
+
+  title:
+    type: string
+    required: true
+    description: "Short noun phrase. The decision in headline form."
+    examples:
+      - "Token bucket for fuel-rate limiting"
+      - "Hexagonal split for fuel-control component"
+
+  status:
+    type: enum
+    required: true
+    description: "Lifecycle state of the decision."
+    values:
+      - proposed         # Drafted but not yet ratified by a human decider
+      - accepted         # Ratified by a human decider
+      - superseded       # Replaced by a newer ADR (use related.superseded_by)
+
+  deciders:
+    type: list<string>
+    required: true
+    description: >
+      Human(s) who ratified the decision. AI may draft the ADR but is
+      NOT a decider. At least one human name required.
+    examples:
+      - ["Stefanus Bergenhem"]
+      - ["Stefanus Bergenhem", "Project Lead"]
+
+  date:
+    type: string
+    required: true
+    description: "ISO date when the ADR was accepted (or proposed if not yet ratified)."
+    pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+
+  provenance:
+    type: enum
+    required: true
+    description: >
+      Recording mode. ALWAYS 'recorded'. This field exists as a forcing
+      function: there is no legal value for reconstructed rationale.
+      Forward-only is the framework's policy; a missing or non-'recorded'
+      value is a schema violation.
+    values:
+      - recorded
+
+  layer:
+    type: enum
+    required: false
+    description: >
+      Which V-model layer this decision applies to. Optional but recommended
+      for cross-layer filtering and trace linking. ADRs span layers — the
+      threshold filters, the layer doesn't.
+    values:
+      - system-architecture
+      - sw-architecture
+      - detailed-design
+      - component
+      - cross-cutting
+
+  related:
+    type: object
+    required: false
+    description: "Lightweight links into the trace graph. Each field is optional."
+    fields:
+      - requirements: "list of REQ / SR / SWREQ artifact IDs the decision implements or constrains"
+      - supersedes: "ADR-nnn that this ADR replaces"
+      - superseded_by: "ADR-nnn that replaces this one (set when status moves to superseded)"
+      - refines: "ADR-nnn that this decision narrows or specialises"
+      - produces: "design artifact IDs / file paths the decision shapes (e.g., CD-001, DD-017, schemas/...)"
+    example: |
+      related:
+        requirements: [SWREQ-042, SWREQ-044]
+        supersedes: ADR-012
+        produces: [CD-001, DD-017]
+
+# =============================================================================
+# DOCUMENT STRUCTURE
+# =============================================================================
+#
+# Required headings, in order. Body length budget: 1-2 pages of plain
+# prose. The order is deliberate — Context sets the situation, Assumptions
+# state what is being taken as given, Drivers state what we are optimising
+# for, Options enumerate what was on the table, Outcome states the choice,
+# Consequences state the result. Each section is short.
+#
+# The capture-cost master constraint applies: an ADR that takes as long
+# to write as the design it justifies will not be written. Keep prose tight.
+
+required_headings:
+
+  - heading: "# ADR-{nnn}: {title}"
+    description: "Document title combines artifact_id and title from frontmatter."
+
+  - heading: "## Context and Problem Statement"
+    content: >
+      What is the issue, what changed, why is a decision needed now?
+      Neutral language — describe the forces at play, not solutions.
+      2-5 sentences.
+
+  - heading: "## Key Assumptions"
+    content: >
+      Bullet list. The grounds on which this decision rests. If any of
+      these change, the ADR may need to be revisited or superseded.
+      Surfacing assumptions as their own section — rather than burying
+      them in Context — is what makes "circumstances that might change"
+      directly inspectable later by maintainers (human or AI).
+    format: "bulleted list"
+
+  - heading: "## Decision Drivers"
+    content: >
+      Bullet list. The criteria, quality attributes, or constraints that
+      weighed on the choice. Drivers are what distinguishes essential
+      from accidental constraints in the design that follows.
+    format: "bulleted list"
+
+  - heading: "## Considered Options"
+    content: >
+      Bullet list. The real alternatives that were on the table — at
+      least two. An ADR with a single option is a description, not a
+      decision; either reject and rewrite, or skip the ADR entirely.
+    format: "bulleted list"
+
+  - heading: "## Decision Outcome"
+    content: >
+      One short paragraph. "Chosen option: <name>, because <justification
+      tied to drivers>." The justification must reference the named
+      drivers — not generic praise of the option.
+
+  - heading: "## Positive Consequences"
+    content: "Bullet list of expected benefits."
+    format: "bulleted list"
+
+  - heading: "## Negative Consequences (Trade-offs)"
+    content: >
+      Bullet list of accepted costs, risks, or constraints introduced by
+      this decision. An ADR with no negative consequences listed is
+      almost certainly missing them — there is no free lunch.
+    format: "bulleted list"
+
+# =============================================================================
+# SUCCESS CRITERION (FITNESS TEST)
+# =============================================================================
+
+success_criterion: |
+  "Could a different engineer, reading only this ADR, derive the same
+  design from it?"
+    - If yes → the ADR is sufficient.
+    - If no  → it under-specifies the decision; the design contains
+      decisions not actually captured. Revise.
+
+# =============================================================================
+# IMMUTABILITY AND SUPERSESSION
+# =============================================================================
+
+immutability: |
+  An accepted ADR is append-only. To change a decision:
+    1. Write a new ADR with status=accepted whose related.supersedes
+       points at the old one.
+    2. Update the old ADR's status to 'superseded' and set
+       related.superseded_by to the new ADR.
+  Never edit the body of an accepted ADR. The historical decision graph
+  is what makes informed change possible later.
+
+# =============================================================================
+# TRACEABILITY ID CONVENTIONS
+# =============================================================================
+
+traceability:
+  description: >
+    ADRs are first-class trace nodes. Other artifacts cite an ADR by
+    its artifact_id (e.g., ADR-042). Trace links are managed by Pillar 2
+    (Traceability), not embedded in the ADR body. The 'related' frontmatter
+    is the lightweight in-document mirror of the formal trace links.
+  forward_links:
+    - "Requirement → ADR — the decision constrains or interprets the requirement"
+    - "Design artifact → ADR — the design implements the decision"
+    - "ADR → ADR — supersedes / refines"
+
+# =============================================================================
+# FILE CONVENTIONS
+# =============================================================================
+
+file_convention:
+  extension: ".md"
+  naming: "{artifact_id}.md   (e.g., ADR-001.md, ADR-042.md)"
+  organization: "docs/artifacts/adr/"
+  note: >
+    Single global ADR sequence per project (not per layer). The 'layer'
+    frontmatter field handles per-layer filtering. ADR numbers are
+    monotonic and never reused, even when superseded.

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture Decision Records (ADR) &mdash; VModelWorkflow Guide</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>VModelWorkflow</h1>
+    <div class="subtitle">V-Model Development Guide</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-group-label">Navigation</span>
+      <a class="nav-link" href="../index.html">Back to Main Guide</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">ADR</span>
+      <a class="nav-link" href="#adr-intro">What Is an ADR?</a>
+      <a class="nav-link" href="#adr-vmodel">V-Model Context</a>
+      <a class="nav-link" href="#adr-quality">Producing a Quality ADR</a>
+      <a class="nav-link" href="#adr-considerations">V-Model Considerations</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">V-Model &amp; Framework</span>
+      <a class="nav-link" href="#adr-framework">Framework Integration <span class="status-badge stub">stub</span></a>
+      <a class="nav-link" href="#adr-skills">AI Skills <span class="status-badge stub">stub</span></a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Related Artifacts</span>
+      <a class="nav-link" href="system-requirements.html">System Requirements</a>
+      <a class="nav-link" href="detailed-design.html">Detailed Design</a>
+      <a class="nav-link" href="../skills-architecture.html">Skills Architecture</a>
+      <a class="nav-link" href="#adr-references">References</a>
+    </div>
+  </nav>
+
+  <div class="domain-switcher">
+    <label for="domain-select">Domain Vocabulary</label>
+    <select id="domain-select">
+      <option value="generic">Generic V-Model</option>
+      <option value="do178c">DO-178C (Aviation)</option>
+      <option value="aspice">ASPICE / ISO 26262 (Automotive)</option>
+    </select>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content" style="margin-left: var(--sidebar-width); padding: var(--space-3xl) var(--space-2xl); max-width: calc(var(--content-max) + var(--space-2xl) * 2 + var(--sidebar-width));">
+
+  <!-- ===================== SECTION 1: INTRO ===================== -->
+  <section id="adr-intro">
+    <div class="level-indicator left">Cross-Cutting &mdash; Decision Capture</div>
+    <h2>What Is an Architecture Decision Record?</h2>
+    <p class="lead">An Architecture Decision Record (ADR) is a short, version-controlled document that captures one load-bearing decision &mdash; the context that forced it, the options considered, the option chosen, and the consequences accepted. ADRs are the only artifact in the development stack that distinguishes <em>essential</em> constraints from <em>accidental</em> ones. Without them, code, tests, and design documents all flatten into &ldquo;this is how it is&rdquo; and a future maintainer (human or AI) cannot tell which parts of the system are load-bearing and which are incidental.</p>
+
+    <div class="card">
+      <h3>The Threshold</h3>
+      <p>An ADR is created when <strong>all</strong> of the following hold:</p>
+      <ul>
+        <li><strong>Load-bearing.</strong> Changing the decision later could break the system or invalidate downstream design.</li>
+        <li><strong>Multiple real options existed.</strong> Two or more alternatives were on the table and one was picked.</li>
+        <li><strong>Rests on assumptions or drivers that may change.</strong> The decision is contingent on something specific to the present context.</li>
+      </ul>
+      <p>An ADR is <em>not</em> created for routine choices, taste calls, or the mechanical application of an established pattern. The threshold is deliberately high: ADRs that are written for everything stop being written at all (the capture-cost master constraint &mdash; see References).</p>
+      <p><strong>Self-test:</strong> &ldquo;Could a future maintainer who changes this break the system?&rdquo; &mdash; if yes, ADR; if no, no ADR.</p>
+    </div>
+
+    <h3>The ADR Is the Artifact of the Decision Conversation</h3>
+    <p>An ADR is not a justification written after a design is drafted. It is the record of the conversation in which the decision was made. The order is:</p>
+    <ol>
+      <li>A conversation (human-AI, or human-human) surfaces options and weighs them against drivers.</li>
+      <li>A decision is reached.</li>
+      <li>The ADR is drafted capturing that decision.</li>
+      <li>The design derives from the ADR.</li>
+    </ol>
+    <p>If the design is drafted first and the ADR is written afterwards to justify it, the option space has already collapsed and the ADR is reconstruction rather than recording. The same failure mode &mdash; confident invention rather than faithful capture &mdash; that makes legacy rationale recovery prone to fabrication also corrupts post-hoc ADRs in greenfield work.</p>
+
+    <h3>What an ADR Is Not</h3>
+    <ul>
+      <li><strong>Not a design document.</strong> An ADR captures a decision; the design captures the structure that implements it. The two are linked but distinct.</li>
+      <li><strong>Not a meeting record.</strong> Discussion is summarised &mdash; the decision and the reasons are what survive, not the conversation transcript.</li>
+      <li><strong>Not a justification for a chosen technology.</strong> If only one option was ever considered, there is no decision and no ADR &mdash; just a note in the design.</li>
+      <li><strong>Not a retrofitted record.</strong> Reconstructing rationale for legacy code is forbidden. See &sect;3 Forward-Only Policy.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== SECTION 2: V-MODEL CONTEXT ===================== -->
+  <section id="adr-vmodel">
+    <h2>ADRs in the V-Model</h2>
+    <p class="lead">ADRs are <strong>cross-cutting</strong>. They are not owned by a single V-model layer. A load-bearing decision can occur at any layer at which design happens &mdash; system architecture, software architecture, detailed design, or component-level when a load-bearing pattern is selected. The threshold filters which decisions become ADRs; the layer just labels them.</p>
+
+    <h3>Where ADRs Originate</h3>
+    <p>Two sources, both legitimate:</p>
+    <ul>
+      <li><strong>Research / plan phase.</strong> The interactive conversation in which a human and an AI agent shape the approach to a piece of work. Decisions reached during this phase that meet the threshold become ADRs as part of the plan output.</li>
+      <li><strong>Build phase, via HALT.</strong> A developer agent executing a task contract may encounter a load-bearing decision it cannot make alone. It writes a HALT artifact with category <code>design-issue</code>; the resolving human-AI conversation produces the ADR; the agent resumes with the ADR + updated design as input. See <a href="../skills-architecture.html#sa-halt">HALT Pattern</a> in the Skills Architecture.</li>
+    </ul>
+
+    <h3>Trigger: Either Side</h3>
+    <p>Both human and AI may propose an ADR. Each shares the discipline:</p>
+    <ul>
+      <li>The AI is instructed (in skill prompts) to recognise when a load-bearing decision is being made and <strong>suggest</strong> capturing an ADR.</li>
+      <li>The human exercises the same recognition independently and may call for an ADR even when the AI did not suggest one.</li>
+    </ul>
+    <p>The decision to <em>accept</em> an ADR is always the human's. AI may draft the body; only a named human appears in <code>deciders</code>.</p>
+
+    <h3>Cross-Reference into Other Artifact Pages</h3>
+    <p>System Requirements <a href="system-requirements.html#sr-management">&sect;3.6 Decision Rationale and the ADR Discipline</a> covers the use of ADRs for non-trivial requirement changes. Detailed Design <a href="detailed-design.html">Layer 3 &sect;Design Rationale</a> covers per-unit rationale that may either be inline or, when load-bearing, escalated to a stand-alone ADR. This page is the canonical treatment; the artifact-specific pages reference it for the cross-cutting discipline.</p>
+  </section>
+
+  <!-- ===================== SECTION 3: PRODUCING A QUALITY ADR ===================== -->
+  <section id="adr-quality">
+    <h2>Producing a Quality ADR</h2>
+    <p class="lead">Quality, for an ADR, is not literary. The ADR is good when a different engineer can read only the ADR and derive the same design from it. If they cannot, the ADR has under-specified the decision and the design contains commitments that were not actually captured.</p>
+
+    <h3>Template</h3>
+    <p>Markdown with YAML frontmatter. One file per decision under <code>docs/artifacts/adr/ADR-nnn.md</code>. The full schema is in <code>schemas/artifacts/adr.schema.yaml</code>; the template content is reproduced here for reference.</p>
+
+    <div class="card">
+      <h4>Frontmatter</h4>
+      <pre><code>---
+artifact_id: ADR-001
+artifact_type: adr
+title: "Token bucket for fuel-rate limiting"
+status: accepted              # proposed | accepted | superseded
+deciders: ["Stefanus Bergenhem"]
+date: 2026-04-17
+provenance: recorded          # only legal value — see Forward-Only below
+layer: detailed-design        # optional; system-arch | sw-arch | detailed-design | component | cross-cutting
+related:
+  requirements: [SWREQ-042, SWREQ-044]
+  produces: [DD-017]
+  # supersedes: ADR-012       # when this replaces an earlier decision
+---</code></pre>
+
+      <h4>Body (required headings, in order)</h4>
+      <pre><code># ADR-001: Token bucket for fuel-rate limiting
+
+## Context and Problem Statement
+2-5 sentences on what changed, why a decision is needed now,
+and the forces at play. Neutral language, no solutions yet.
+
+## Key Assumptions
+- Bullet list. Grounds on which this decision rests.
+- If any of these change, the ADR may need to be revisited or superseded.
+
+## Decision Drivers
+- Bullet list. Criteria, quality attributes, or constraints
+  that weigh on the choice.
+
+## Considered Options
+- Option A — short description
+- Option B — short description
+- (At least two. A single-option ADR is a description, not a decision.)
+
+## Decision Outcome
+Chosen option: B, because [justification tied explicitly to named drivers].
+One short paragraph.
+
+## Positive Consequences
+- Bullet list of expected benefits.
+
+## Negative Consequences (Trade-offs)
+- Bullet list of accepted costs, risks, or constraints.
+- An ADR with no negatives listed is almost certainly missing them.</code></pre>
+    </div>
+
+    <h3>The Conversation Pattern</h3>
+    <p>A typical run from problem to ADR:</p>
+    <ol>
+      <li><strong>Surface options.</strong> Either side names two or more candidate approaches. The AI is good at brainstorming; the human is good at filtering for context-fit.</li>
+      <li><strong>Name the drivers.</strong> Quality attributes, constraints, deadlines, dependencies. Make them explicit before evaluating options &mdash; otherwise post-hoc weighting creeps in.</li>
+      <li><strong>State assumptions.</strong> What does each option assume about the world? These are the future revisit triggers; surfacing them early makes them inspectable.</li>
+      <li><strong>Pick.</strong> The decision emerges from how options score against drivers. The justification line in the ADR cites the drivers by name.</li>
+      <li><strong>Capture, then design.</strong> Write the ADR. Then derive the design from it &mdash; not the other way around.</li>
+    </ol>
+
+    <h3>Forward-Only: Never Reconstruct Rationale</h3>
+    <div class="card">
+      <p>An ADR records a decision <em>at decision time</em>. Reconstructing rationale for legacy code is forbidden by this framework. The <code>provenance</code> field has exactly one legal value, <code>recorded</code>, precisely so that there is nowhere to put &ldquo;reconstructed.&rdquo; The schema itself enforces the policy.</p>
+      <p>Why: an LLM (or a human guessing from code) asked to recover the original rationale produces confident invention &mdash; plausible-sounding justifications, fabricated constraint sources, false-precision trade-offs. The failure mode is not silence (which would be detectable) but confident invention (which looks like rationale and isn't). Once invented rationale enters the trace graph, every downstream artifact that cites it inherits the contamination.</p>
+      <p><strong>Honest alternative for legacy:</strong> mark the decisions &ldquo;rationale unknown&rdquo; in whatever index the project uses. Begin the ADR stream from baseline-day forward. Pretending to recover rationale is worse than admitting it is gone.</p>
+    </div>
+
+    <h3>Fitness Test</h3>
+    <p>One question, applied after the ADR is drafted:</p>
+    <p style="padding-left: var(--space-lg); border-left: 4px solid var(--accent-trace); margin-left: var(--space-md);"><em>&ldquo;Could a different engineer, reading only this ADR, derive the same design from it?&rdquo;</em></p>
+    <ul>
+      <li>If <strong>yes</strong> &mdash; the ADR is sufficient.</li>
+      <li>If <strong>no</strong> &mdash; the ADR under-specifies the decision; the design contains commitments that were not actually captured. Revise the ADR before accepting it.</li>
+    </ul>
+
+    <h3>Common Anti-Patterns</h3>
+    <ul>
+      <li><strong>Single-option ADR.</strong> Lists one option and a justification. This is a description, not a decision &mdash; either rewrite with the alternatives that were actually considered, or skip the ADR entirely.</li>
+      <li><strong>Generic justification.</strong> &ldquo;Chosen because it is more flexible / more modern / industry standard.&rdquo; The justification must reference the named drivers from this ADR &mdash; not generic praise of the option.</li>
+      <li><strong>Missing negatives.</strong> Positive consequences listed; negatives empty or hand-waved. Every load-bearing decision has trade-offs; if you cannot name them, you have not understood the decision.</li>
+      <li><strong>Buried assumptions.</strong> Assumptions implicit in Context prose rather than listed in Key Assumptions. Future maintainers will miss them.</li>
+      <li><strong>Post-hoc rationalisation.</strong> Design drafted first, ADR written to match. Detectable by the absence of any options that would have produced a different design &mdash; the option space has already been pruned to one.</li>
+      <li><strong>ADRs for routine choices.</strong> Capturing every variable name and method signature as an ADR. Ratio of signal to noise collapses; nothing gets read.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== SECTION 4: V-MODEL CONSIDERATIONS ===================== -->
+  <section id="adr-considerations">
+    <h2>V-Model Considerations</h2>
+
+    <h3>Traceability</h3>
+    <p>ADRs are first-class trace nodes. Other artifacts cite an ADR by its <code>artifact_id</code>. Trace links are managed by the Traceability pillar (Pillar 2), not embedded in the ADR body. The <code>related</code> frontmatter is a lightweight in-document mirror of the formal trace links.</p>
+    <table class="field-table">
+      <thead>
+        <tr><th>From</th><th>To</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Requirement</td><td>ADR</td><td>The decision constrains or interprets the requirement</td></tr>
+        <tr><td>Design artifact</td><td>ADR</td><td>The design implements the decision</td></tr>
+        <tr><td>ADR</td><td>ADR</td><td>Supersedes / refines</td></tr>
+      </tbody>
+    </table>
+    <p>The interesting open question &mdash; whether ADRs sit in the standard trace chain (requirement &rarr; ADR &rarr; design &rarr; code &rarr; test) or as a parallel rationale graph anchored to design elements &mdash; is being worked separately. See backlog item under Component 2.</p>
+
+    <h3>Immutability and Supersession</h3>
+    <p>An accepted ADR is append-only. Decisions change; the historical record does not. To change a decision:</p>
+    <ol>
+      <li>Write a new ADR. Set its <code>status</code> to <code>accepted</code> and its <code>related.supersedes</code> to the old ADR's id.</li>
+      <li>Update the old ADR: change <code>status</code> to <code>superseded</code>; set <code>related.superseded_by</code> to the new ADR.</li>
+    </ol>
+    <p>Never edit the body of an accepted ADR. Preserving the decision graph is what makes informed change possible later &mdash; including the ability to revisit a decision when one of its key assumptions turns out to have changed.</p>
+
+    <h3>Build-Phase Integration via HALT</h3>
+    <p>The <a href="../skills-architecture.html#sa-halt">HALT pattern</a> in the Skills Architecture defines a <code>design-issue</code> category for when an agent encounters a load-bearing decision it cannot make alone. The flow:</p>
+    <ol>
+      <li>Agent hits the design issue &mdash; writes <code>halt.yaml</code> with <code>category: design-issue</code> and the candidate options listed.</li>
+      <li>Human is notified, opens a conversation with the agent (or a fresh one) to resolve.</li>
+      <li>Resolution produces an ADR. The HALT and the ADR are separate artifacts &mdash; the HALT records the pause; the ADR records the decision.</li>
+      <li>Agent resumes with the ADR and the updated design as input.</li>
+    </ol>
+    <p>This is the only sanctioned way for build-phase decisions to enter the trace graph. An agent that makes a load-bearing decision unilaterally and continues is in violation of the framework discipline; build agents are instructed to HALT.</p>
+  </section>
+
+  <!-- ===================== SECTION 5: FRAMEWORK INTEGRATION (STUB) ===================== -->
+  <section id="adr-framework">
+    <h2>Framework Integration <span class="status-badge stub">stub</span></h2>
+    <p>To be expanded as templates and traceability link-rules are finalised.</p>
+    <ul>
+      <li><strong>Schema:</strong> <code>schemas/artifacts/adr.schema.yaml</code> &mdash; defines frontmatter fields, required body sections, immutability rules, and file conventions.</li>
+      <li><strong>Template skill (planned):</strong> <code>vmodel-skill-adr-template</code> under Phase D &mdash; thin schema adapter producing well-formed ADR drafts.</li>
+      <li><strong>Traceability link types (planned):</strong> see Component 2 backlog &mdash; ADR added as trace node type with <code>requirement &rarr; ADR</code>, <code>design &rarr; ADR</code>, <code>ADR &rarr; ADR</code> link rules.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== SECTION 6: AI SKILLS INTEGRATION (STUB) ===================== -->
+  <section id="adr-skills">
+    <h2>AI Skills Integration <span class="status-badge stub">stub</span></h2>
+    <p>To be expanded as design-producing skills are built (Phase 4 in the backlog).</p>
+    <ul>
+      <li><strong>Cross-cutting discipline.</strong> Every craft skill that produces design output (system architecture, software architecture, detailed design) and every skill that runs a research/plan conversation must recognise load-bearing decisions and propose ADRs. Captured as Guiding Principle 15 in the backlog.</li>
+      <li><strong>Conversation pattern.</strong> Skills implement the option &rarr; driver &rarr; assumption &rarr; pick &rarr; capture &rarr; design ordering. The conversation is the rationale-capture mechanism; the ADR is its persistent artifact.</li>
+      <li><strong>Open empirical question</strong> from the engineering codex (<code>q-ai-rationale-capture-workflow</code>): does forcing rationale-first generation in agents produce more faithful records than post-hoc emission? This framework's answer is the conversation pattern; whether it measurably reduces invention is a future evaluation target.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <section id="adr-references">
+    <h2>References</h2>
+    <p style="color: var(--fg-muted); font-size: 0.9em;">Primary backing for this page from the engineering-codex (read-only knowledge bank at <code>/home/stefanus/repos/engineering-codex/</code>):</p>
+    <ul>
+      <li><code>concept-design-rationale</code> &mdash; the codex's mature treatment; load-bearing argument that rationale is the only artifact that distinguishes essential from accidental constraints.</li>
+      <li><code>src-nygard-adr-2011</code> &mdash; original ADR template (5 fields, immutability principle, capture-at-decision-time).</li>
+      <li><code>src-tyree-akerman-adr-2005</code> &mdash; richer 14-field practitioner template (IEEE Software). Source of the &ldquo;decisions are the most important concept&rdquo; framing.</li>
+      <li><code>src-potts-bruns-design-decisions-1988</code> &mdash; ICSE'88 origin of the capture-cost master constraint (&ldquo;non-intrusive tool support is vital&rdquo;).</li>
+      <li><code>src-kruchten-decision-ontology-2004</code> &mdash; richer ontology (existence/property/executive decisions, 7-state lifecycle, 11 relationship types). Not adopted in this framework's lightweight template; cited for completeness.</li>
+      <li><code>q-ai-rationale-capture-workflow</code> &mdash; open question on faithful rationale capture by AI agents; the framework's conversation pattern is one candidate answer.</li>
+      <li><code>q-v-model-design-rationale-gap</code> &mdash; open question on whether V-model standards treat rationale as a first-class traceable artifact; this framework treats it as such regardless of standards coverage.</li>
+      <li><code>concept-brownfield-baseline</code> &mdash; the &ldquo;forward-only&rdquo; rationale policy in the legacy retrofit context; basis for the &sect;3 Forward-Only Policy.</li>
+    </ul>
+    <p style="color: var(--fg-muted); font-size: 0.9em;">Codex query log: <code>engineering-codex/log.md</code> entry <code>2026-04-17 query | ADR as central building block for VModelWorkflow</code>.</p>
+  </section>
+
+</main>
+
+<script src="../js/domain.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>

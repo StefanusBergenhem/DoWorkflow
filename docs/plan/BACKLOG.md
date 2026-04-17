@@ -62,6 +62,14 @@ Artifact definitions, envelopes, checklists. Usable by humans, agents, or both.
 - [ ] Configuration Management Plan schema
 - [ ] Quality Assurance Plan schema
 
+**Cross-cutting (spans V-model layers):**
+- [x] ADR (Architecture Decision Record) schema — `schemas/artifacts/adr.schema.yaml` (2026-04-17)
+  - Markdown with YAML frontmatter; lightweight MADR-adjacent template (Context / Key Assumptions / Decision Drivers / Considered Options / Decision Outcome / Positive Consequences / Negative Consequences)
+  - Threshold: only load-bearing decisions with multiple real options
+  - Forward-only: `provenance: recorded` is the only legal value (forcing function vs retrofit)
+  - Cross-layer: applies at system-arch / sw-arch / detailed-design / component / cross-cutting
+  - Immutable; supersession via new ADR + back-link, never in-place edit
+
 ### 1.3 Assurance Level Configuration
 
 - [ ] Define generic assurance level scale (1-5, mapping to DAL A-E / ASIL D-QM)
@@ -98,6 +106,7 @@ Coupled to our templates. Link model, validation rules, coverage analysis, impac
 - [ ] Define coverage metrics definitions
 - [x] Define staleness detection (content hash comparison)
 - [ ] Define trace matrix output format
+- [ ] **ADR integration** — add ADR as trace node type. Link types: `requirement → ADR` (constrains/interprets), `design → ADR` (implements), `ADR → ADR` (supersedes/refines). Discussion needed on whether ADRs sit in the standard chain or as a parallel rationale graph anchored to design elements.
 
 ### 2A-temp: Agent Skill as Temporary Engine
 
@@ -244,21 +253,32 @@ Techniques that discover requirements stakeholders cannot articulate. Generalize
 **Handoff down:** Derived requirements (negative, implicit, interaction) with method traceability → feeds into system requirements and SW requirements.
 **Feedback up:** Design decisions that create new failure modes requiring re-analysis.
 
-### 3.7 System Requirements Documentation
+### 3.7 System Requirements Documentation — DONE (sections 1–4; 5–6 stubbed pending templates/skills)
 
 How validated stakeholder needs, ConOps, and completeness analysis results become formal system requirements. The first formal specification layer — everything upstream is "what we need," this is "what the system shall do."
 
 **Depends on:** Research 1, 2, 3, 4 (and partially 5 for allocation context) — all done.
 
-- [ ] Complete artifact page: `docs/guide/artifacts/system-requirements.html`
-  - [ ] Section 1: What are system requirements (the bridge from needs/analysis to formal specification)
-  - [ ] Section 2: V-model context (receives from stakeholder needs, ConOps, completeness analysis; outputs to SW/HW allocation; bidirectional with completeness analysis)
-  - [ ] Section 3: Producing quality system requirements (the bulk — requirement writing craft (INCOSE rules, EARS patterns, performance requirement 5-element rule), completeness techniques (functional/structural/behavioral/constraint/interface), allocation as budgeting (timing, reliability, resources), operational scenario coverage, non-functional requirements, requirements management (baselines, change control, impact analysis), traceability to stakeholder needs)
-  - [ ] Section 4: V-model specific considerations (bidirectional traceability, derived requirements feedback loop (Peterson study: known to be broken in practice), safety requirements as first-class (carry ASIL/DAL), independence of verification, FTTI decomposition example)
-  - [ ] Section 5: Framework integration (stub — template, schema, allocation matrix, trace links)
-  - [ ] Section 6: AI skills integration (stub)
+- [x] Artifact page: `docs/guide/artifacts/system-requirements.html`
+  - [x] Section 1: What are system requirements — bridge across the specification gap, three properties (verifiability, singularity, solution-freedom), language-discipline carry-over from stakeholder needs (ubiquitous-language), what system requirements are not
+  - [x] Section 2: V-model context — position diagram, what this layer receives (stakeholder needs / ConOps / completeness analysis) and produces (SW/HW reqs / system tests), bidirectional obligations (derived requirements flow up; completeness findings flow up)
+  - [x] Section 3: Producing quality system requirements
+    - [x] 3.1 Requirement-writing craft — INCOSE 9/15 quality characteristics, 42-rule framework summary, EARS five patterns, five-element performance-requirement rule, nine killer anti-patterns, six automatable CI checks; worked insulin-pen examples
+    - [x] 3.2 Completeness techniques — five-lens model (functional/structural/behavioural/constraint/interface), worked behavioural-coverage matrix on insulin-pen modes (with visible GAPs), lightweight/full-rigor card
+    - [x] 3.3 Allocation as budgeting — allocation matrix as sub-artifact, single-discipline vs multi-discipline allocation, worked dose-dispatch latency decomposition with named margin, five allocation rules, beyond-timing budgets, lightweight/full-rigor card
+    - [x] 3.4 Operational scenario coverage — coverage map artifact, worked SC-MEAL/SC-LINK-LOST scenarios, what scenario coverage catches that other lenses miss
+    - [x] 3.5 Non-functional requirements — two failure modes (untestable adjective, missing category), quality-attribute scenario pattern (worked availability example), ISO 25010 coverage check, operationally-visible test
+    - [x] 3.6 Requirements management — baselines and approval lifecycle, CCB and change control, impact analysis (worked SR-DISP-1 budget revision example), decision rationale and ADR discipline, volatility as leading indicator, lightweight/full-rigor card
+    - [x] 3.7 Traceability — three trace directions (upward/downward/lateral), satisfies vs derived-from distinction, four properties of useful traceability, Gotel & Finkelstein framing, lightweight/full-rigor card
+  - [x] Section 4: V-model considerations — five obligations (bidirectional traceability, derived-requirements feedback loop with Peterson NASA study citation, safety-relevant requirements as first-class with worked SR-OD-1 integrity-travel example, independence of verification with scaling table, worked FTTI cascade with feedback case) + summary card
+  - [ ] Section 5: Framework integration (stub — pending templates/schema for system-requirement artifact, allocation matrix, trace-link types)
+  - [ ] Section 6: AI skills integration (stub — pending skills; already telegraphed about boundaries: rule-application strong, correctness/integrity-assignment weak)
+- [x] Linked into main guide sidebar (docs/guide/index.html Artifacts nav group); old in-page stub `#artifact-system-requirement` deprecated by removing nav link (the old `<section>` block at index.html:919 still exists and should be removed in a future cleanup)
+- [x] Worked example: connected insulin-pen dose calculator (IEC 62304 Class C; software-heavy; used across all subsections for continuity)
 
-**Handoff down:** Allocated system requirements with budget decomposition, verification criteria, and traceability obligations → feeds SW requirements and HW requirements.
+**Codex sources cited:** concept-requirement-quality (INCOSE 42-rule, nine anti-patterns, six regex checks, PBR), concept-ears, concept-ubiquitous-language (language discipline carry-over), src-incose-42-rule-guide-reqi-2026, src-arch-readiness-promwad-latency-budget, src-ftti-iso26262-nvdungx-2026, src-arch-readiness-nasa-logical-decomposition, src-gotel-finkelstein-traceability-1994, src-arch-evaluation-quality-attribute-scenarios, src-kunz-rittel-ibis-1970, src-potts-bruns-design-decisions-1988, src-tyree-akerman-adr-2005, src-nygard-adr-2011, pat-traceability-as-code.
+
+**Handoff down:** Allocated system requirements with budget decomposition, verification criteria, integrity attributes, and traceability obligations → feeds SW requirements and HW requirements.
 **Feedback up:** Derived requirements from SW/HW design that aren't traceable to parent requirements → must be classified (safety-relevant or internal design decision) and fed back into baseline.
 
 ### 3.8 SW Requirements Documentation
@@ -316,6 +336,35 @@ Receives SW requirements, decomposes into components, defines interfaces, alloca
 - [ ] DRTDD explanation (Design-Requirement-Test Driven Development)
 - [ ] Completeness analysis overview (FTA, FMEA, STPA — as engineering tools, not just safety tools)
 - [ ] Framework user manual (how to use VModelWorkflow)
+
+### 3.13 ADR Documentation — IN PROGRESS (cross-cutting interrupt)
+
+Architecture Decision Records as a first-class output across V-model layers. Cross-cutting interrupt to the top-down 3.4–3.9 sequence; the framework needs ADRs in place before the design-producing skills are built so those skills know how to recognise and propose decisions worth recording.
+
+**Scope:** what an ADR is, threshold for creating one, the conversation→ADR→design pattern, forward-only policy (never reconstruct rationale for legacy code), template fields, traceability integration, build-phase HALT integration.
+
+**Depends on:** engineering-codex `concept-design-rationale` (mature draft); user's own template and decisions captured 2026-04-17.
+
+- [~] Artifact page: `docs/guide/artifacts/adr.html` — DRAFT (lightweight per user direction)
+  - [x] Section 1: What is an ADR — threshold; capture-at-decision-time; ADR as artifact of the decision conversation
+  - [x] Section 2: V-model context — cross-layer position; where ADRs originate (research/plan + build-phase HALT); cross-link to system-requirements §3.6 ADR discipline
+  - [x] Section 3: Producing a quality ADR — threshold test, conversation pattern, template fields, forward-only/never-retrofit, fitness test
+  - [x] Section 4: V-model considerations — traceability extension, immutability + supersession, build-phase HALT integration
+  - [ ] Section 5: Framework integration (stub — schema link + template skill, pending D-phase work)
+  - [ ] Section 6: AI skills integration (stub — ADR-recognition discipline, pending Phase 4 skill work)
+- [x] Schema: `schemas/artifacts/adr.schema.yaml` — DONE (see Component 1.2 Cross-cutting)
+- [ ] Add to main guide sidebar (`docs/guide/index.html` Artifacts nav group)
+- [ ] Cross-link forward references from existing artifact pages (system-requirements §3.6 already mentions ADRs; detailed-design Layer 3 §Design Rationale is the natural cross-link)
+
+**Key design decisions captured 2026-04-17 (anchor for later skills):**
+1. **Threshold**: only load-bearing decisions where multiple real options existed and one was picked.
+2. **Cross-layer scope**: system-arch / sw-arch / detailed-design / component (filtered by threshold, not by layer).
+3. **Trigger**: either human or AI; both share the discipline of recognising load-bearing decisions.
+4. **Lifecycle**: research/plan phase AND build phase (ties to `design-issue` HALT category).
+5. **Assumptions**: not a separate artifact — they're the grounds inside an ADR (Key Assumptions field).
+6. **Pillar status**: first-class output within existing pillars, not a fifth pillar.
+
+**Codex reference:** `concept-design-rationale` (mature), `q-ai-rationale-capture-workflow` (open: faithful capture at AI generation time), `q-v-model-design-rationale-gap` (open: rationale as first-class traceable artifact in V-model standards). Codex log entry filed 2026-04-17.
 
 ---
 
@@ -645,25 +694,25 @@ Lower V skills (partial):
 Work down from the true top of the V — stakeholder identification — through the complete cascade to architecture. Each layer's documentation explicitly captures what it hands off to the layer below AND what feedback flows back up. The V-model is generalized beyond safety: these techniques have value at any rigor level.
 
 ```
-1. [NEXT] Stakeholder Identification & Needs documentation (3.4)
+1. [DONE] Stakeholder Identification & Needs documentation (3.4)
    └── Understand: who are the stakeholders, how to capture and validate their needs
    └── Handoff down: validated needs → ConOps + system requirements
    └── Feedback up: derived requirements requiring re-concurrence
-2. Concept of Operations documentation (3.5)
+2. [DONE] Concept of Operations documentation (3.5)
    └── Understand: operational picture before requirements exist (scenarios, modes, environment)
    └── Handoff down: operational scenarios, mode state machine, constraints → system requirements
    └── Feedback up: design constraints invalidating operational assumptions
-3. Completeness Analysis documentation (3.6)
+3. [DONE] Completeness Analysis documentation (3.6)
    └── Understand: techniques for discovering requirements stakeholders can't articulate
    └── Generalized from safety: FTA/FMEA/STPA as completeness tools + PBR for validation
    └── Handoff down: derived requirements (negative, implicit, interaction) → system/SW requirements
    └── Feedback up: design decisions creating new failure modes
-4. System Requirements documentation (3.7)
+4. [DONE] System Requirements documentation (3.7)
    └── Understand: needs + ConOps + analysis results → formal system specification
    └── Allocation as budgeting, FTTI decomposition, requirements management
    └── Handoff down: allocated requirements with budgets → SW requirements
    └── Feedback up: derived requirements from design → baseline update
-5. SW Requirements documentation (3.8)
+5. [NEXT] SW Requirements documentation (3.8)
    └── Understand: system allocation → SW requirements → qualification test derivation
    └── Handoff down: SW requirements with verification criteria → architecture
 6. SW Architecture documentation (3.9)
@@ -741,6 +790,7 @@ With the complete documentation cascade in place, build skills knowing exactly w
 12. **V-model is engineering infrastructure, not just safety compliance.** Safety is the highest-rigor application, but the techniques (structured requirements, completeness analysis, traceability, formal verification) have value at any rigor level. The framework generalizes — safety-critical projects scale up, non-safety projects still benefit from the structure.
 13. **Follow agentskills.io spec.** SKILL.md format, progressive disclosure, scripts for determinism.
 14. **Use `/skill-creator` for development.** Draft, test, evaluate, iterate.
+15. **ADR discipline is cross-cutting.** Every skill that produces design output (system-arch, sw-arch, develop-dd, etc.) and every skill that runs a research/plan conversation must recognise load-bearing decisions and propose ADRs. The ADR is the artifact of the decision conversation; design derives from it. Forward-only — never reconstruct rationale for legacy code.
 
 ---
 
