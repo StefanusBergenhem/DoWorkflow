@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Requirements &mdash; VModelWorkflow Guide</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>VModelWorkflow</h1>
+    <div class="subtitle">V-Model Development Guide</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-group-label">Navigation</span>
+      <a class="nav-link" href="../index.html">Back to Main Guide</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">System Requirements</span>
+      <a class="nav-link" href="#sr-intro">What Are System Requirements?</a>
+      <a class="nav-link" href="#sr-vmodel">V-Model Context</a>
+      <a class="nav-link" href="#sr-quality">Producing Quality Requirements</a>
+      <a class="nav-link" href="#sr-craft">3.1 Requirement-Writing Craft</a>
+      <a class="nav-link" href="#sr-completeness">3.2 Completeness Techniques</a>
+      <a class="nav-link" href="#sr-allocation">3.3 Allocation as Budgeting</a>
+      <a class="nav-link" href="#sr-scenarios">3.4 Operational Scenario Coverage</a>
+      <a class="nav-link" href="#sr-nfr">3.5 Non-Functional Requirements</a>
+      <a class="nav-link" href="#sr-management">3.6 Requirements Management</a>
+      <a class="nav-link" href="#sr-traceability">3.7 Traceability</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">V-Model &amp; Framework</span>
+      <a class="nav-link" href="#sr-vmodel-considerations">V-Model Considerations</a>
+      <a class="nav-link" href="#sr-framework">Framework Integration <span class="status-badge stub">stub</span></a>
+      <a class="nav-link" href="#sr-skills">AI Skills <span class="status-badge stub">stub</span></a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Related Artifacts</span>
+      <a class="nav-link" href="#sr-references">References</a>
+    </div>
+  </nav>
+
+  <div class="domain-switcher">
+    <label for="domain-select">Domain Vocabulary</label>
+    <select id="domain-select">
+      <option value="generic">Generic V-Model</option>
+      <option value="do178c">DO-178C (Aviation)</option>
+      <option value="aspice">ASPICE / ISO 26262 (Automotive)</option>
+    </select>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content" style="margin-left: var(--sidebar-width); padding: var(--space-3xl) var(--space-2xl); max-width: calc(var(--content-max) + var(--space-2xl) * 2 + var(--sidebar-width));">
+
+  <!-- ===================== SECTION 1: INTRO ===================== -->
+  <section id="sr-intro">
+    <div class="level-indicator left">Left Side &mdash; First Formal Specification Layer</div>
+    <h2>What Are System Requirements?</h2>
+    <p class="lead">System requirements are the first artifact in the development lifecycle that a verifier can sign off against. Stakeholder needs describe what people want; the Concept of Operations describes how the system will be used; completeness analysis surfaces what would otherwise be missed. System requirements are where those three streams converge into a set of unambiguous, verifiable, traceable &ldquo;shall&rdquo; statements about what the system &mdash; treated as a black box &mdash; will do. Everything upstream is &ldquo;what we need.&rdquo; This is &ldquo;what the system shall do.&rdquo;</p>
+
+    <div class="card">
+      <h3>The Bridge Across the Specification Gap</h3>
+      <p>Three distinct streams arrive at the system requirements layer. Stakeholder needs arrive in user vocabulary (&ldquo;the device must be safe to use without a clinician present&rdquo;). ConOps arrives as scenarios, modes, and operational envelopes (&ldquo;the user delivers a meal-time bolus from the phone app while the pen is paired and within 5&nbsp;m&rdquo;). Completeness analysis arrives as derived requirements with method-of-origin tags (&ldquo;FTA cut-set DC-3: occlusion not detected within 30&nbsp;s leads to under-dose hazard&rdquo;). Each stream uses different language, different abstractions, and different units of analysis.</p>
+      <p>System requirements are where these streams are reconciled into a single specification that downstream layers (SW requirements, HW requirements, system test) can consume without consulting the upstream artifacts. Reconciliation is not just a translation activity &mdash; it is a normalisation activity. The output is uniform in structure, vocabulary, granularity, and quality, even though the inputs are not. Failure to do this work shows up downstream as SW teams and test teams independently re-interpreting the upstream artifacts, with predictable divergence.</p>
+    </div>
+
+    <h3>Three Properties That Distinguish System Requirements From Their Inputs</h3>
+    <p>Requirements at this layer differ from their upstream inputs in three structural ways. Keeping the differences explicit is the discipline that prevents the layer from collapsing into a paraphrase of stakeholder needs or a transcription of ConOps scenarios.</p>
+    <ul>
+      <li><strong>Verifiability.</strong> Each requirement specifies a property that can be confirmed by test, analysis, inspection, or demonstration. A stakeholder need (&ldquo;the device shall not over-dose the user&rdquo;) and the corresponding system requirement (&ldquo;the system shall reject any single bolus instruction that exceeds the user-configured maximum-single-dose parameter&rdquo;) both express the same intent &mdash; only the second can be the subject of a pass/fail test.</li>
+      <li><strong>Singularity.</strong> Each requirement expresses one testable behaviour. Stakeholder needs and ConOps scenarios are commonly compound (&ldquo;the user shall be able to deliver a bolus, view their dose history, and pair a new pen&rdquo;); system requirements decompose these into atomic statements so that the failure of one does not invalidate the test evidence for the others.</li>
+      <li><strong>Solution-freedom.</strong> Each requirement specifies <em>what</em> the system shall do, not <em>how</em> it shall do it. The architectural and design layers exist precisely to choose the &ldquo;how.&rdquo; A system requirement that names a specific algorithm, data structure, or implementation technique either disguises an architectural decision as a requirement (taking the choice away from the design layer that should make it) or pins the system to an implementation that downstream layers may have good reason to revise. INCOSE Rule&nbsp;31 &mdash; &ldquo;requirements shall be solution-free&rdquo; &mdash; is the most-violated rule in practice and the one whose violation has the largest downstream cost.</li>
+    </ul>
+
+    <div class="card">
+      <h3>The Language-Discipline Carry-Over</h3>
+      <p>System requirements inherit a vocabulary obligation from stakeholder needs. The terms used in the needs artifact &mdash; named users, named modes, named operational concepts &mdash; must be the same terms used in the system requirements. Translating &ldquo;meal-time bolus&rdquo; (need) into &ldquo;rapid-acting glucose-correction injection&rdquo; (requirement) breaks the trace, even when the two phrases denote the same concept. This is the same discipline that domain-driven design names <em>ubiquitous language</em>: a single vocabulary shared by stakeholders, requirements authors, designers, and verifiers.</p>
+      <p>The language obligation runs in both directions. New terms introduced at the system requirements layer (because the engineering work needs precision the user vocabulary lacks) must be recorded in a glossary that the downstream artifacts use uniformly, and the introduction itself is visible to the upstream stakeholder review &mdash; new vocabulary is a flag that the engineering interpretation may have drifted from the user intent. Vocabulary discipline is cheap to maintain when introduced at this layer and costly to restore once different layers have diverged.</p>
+    </div>
+
+    <h3>What System Requirements Are Not</h3>
+    <ul>
+      <li><strong>They are not stakeholder needs.</strong> Stakeholder needs are what users want. System requirements are what the system shall do to satisfy those wants. Conflating the two produces a baseline that is either untestable (it inherits the loose user vocabulary) or unmotivated (it loses the trace to the underlying need). The needs and requirements documents both exist precisely because the transformation between them is non-trivial and worth recording.</li>
+      <li><strong>They are not architecture.</strong> Architecture decomposes the system into components and assigns requirements to them. System requirements treat the system as a black box: every &ldquo;shall&rdquo; is observable at the system boundary. The boundary between &ldquo;what the system shall do&rdquo; (this layer) and &ldquo;how the system shall be structured to do it&rdquo; (architecture) is the most important boundary on the left side of the V; failing to hold it is the principal source of premature design commitment.</li>
+      <li><strong>They are not test cases.</strong> Test cases verify requirements; they do not replace them. A baseline of tests without requirements is what legacy projects often discover when they begin retrofit, and the resulting reconstruction is structurally a degraded mode &mdash; tests describe what the system does, not what it shall do, and the difference matters when something has to change. Every system requirement is the parent of one or more system test cases; the relationship is one-way.</li>
+      <li><strong>They are not the place to write business rules in prose.</strong> A system requirement that paragraphs through a regulatory clause, a clinical protocol, or a domain ontology is recording a constraint without making it actionable. Constraints belong in a constraints register; the requirement cites the register and specifies the system behaviour that satisfies the constraint. Mixing the two layers makes both harder to maintain.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== SECTION 2: V-MODEL CONTEXT ===================== -->
+  <section id="sr-vmodel">
+    <h2>System Requirements in the V-Model</h2>
+    <p class="lead">System requirements occupy the first formal-specification position on the left side of the V. The three pre-requirements artifacts feed into them; SW and HW requirements decompose out of them; system test cases on the right side verify them. The position is structurally load-bearing &mdash; almost every other artifact in the lifecycle traces to or through this one &mdash; and the layer carries explicit obligations that the upstream artifacts do not.</p>
+
+    <h3>Position in the Flow</h3>
+    <div class="trace-flow">
+      <span class="artifact-ref" data-term="stakeholder-needs">Stakeholder Needs</span>
+      <span class="arrow">&rarr;</span>
+      <span class="artifact-ref" data-term="conops">ConOps</span>
+      <span class="arrow">&rarr;</span>
+      <span class="artifact-ref" data-term="system-requirements" style="font-weight: 600;">System Requirements</span>
+      <span class="arrow">&rarr;</span>
+      <span class="artifact-ref" data-term="sw-requirements">SW Requirements</span>
+      <span class="arrow">&rarr;</span>
+      <span class="artifact-ref" data-term="sw-architecture">SW Architecture</span>
+    </div>
+    <p>The flow understates two important relationships. Completeness analysis is a parallel stream that feeds derived requirements directly into this layer (see &sect;sr-vmodel-considerations: Derived-Requirement Feedback Loop). System test cases on the right side of the V are derived from this layer and verify it &mdash; the &ldquo;shall&rdquo; statements at this layer are the contract that system test confirms.</p>
+
+    <h3>What This Layer Receives</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>From</th><th>What it provides</th><th>What this layer must do with it</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="stakeholder-needs.html">Stakeholder Needs</a></td>
+          <td>Validated needs in user vocabulary, prioritised, with concurrence status and trace anchors.</td>
+          <td>Translate each need into one or more verifiable, singular, solution-free system requirements. Preserve the trace; preserve the vocabulary where possible; introduce new vocabulary visibly when the engineering interpretation requires precision the user vocabulary lacks.</td>
+        </tr>
+        <tr>
+          <td><a href="conops.html">ConOps</a></td>
+          <td>Operational scenarios, mode state machine, operational environment, support concept, performance criteria envelope.</td>
+          <td>Cover every scenario with at least one functional requirement; cover every mode with the requirements that govern transitions into and behaviour within it; cover the environmental envelope with constraint requirements; respect the support-concept boundaries when scoping the system.</td>
+        </tr>
+        <tr>
+          <td><a href="completeness-analysis.html">Completeness Analysis</a></td>
+          <td>Derived requirements from FTA, FMEA, STPA, PBR; method-of-origin tags; integrity allocations.</td>
+          <td>Fold derived requirements into the baseline as first-class entries with the same obligations (verifiability, traceability, change control) as elicited requirements. Carry the integrity allocation forward as requirement metadata.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>What This Layer Produces</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>To</th><th>What this layer hands off</th><th>What the receiving layer expects</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="#">SW Requirements</a> (next)</td>
+          <td>System requirements allocated to software, with their share of any decomposed budgets (timing, reliability, resources) and their carried integrity level.</td>
+          <td>An allocation that names the receiving discipline (SW, HW, operational), with budgets that sum correctly and rationale that survives downstream questioning.</td>
+        </tr>
+        <tr>
+          <td>HW Requirements (out of scope for this guide)</td>
+          <td>System requirements allocated to hardware with their decomposed budgets and carried integrity.</td>
+          <td>Same as SW requirements; the allocation matrix is symmetric across disciplines.</td>
+        </tr>
+        <tr>
+          <td>System Test (right side)</td>
+          <td>The full set of approved system requirements with verification-criteria attributes; an inventory of which requirements are verified by which test method (test, analysis, inspection, demonstration).</td>
+          <td>A specification that test design can derive concrete cases from without consulting the upstream needs or ConOps.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>The Bidirectional Obligations</h3>
+    <p>The flow of artifacts is left-to-right, but two obligations run in the opposite direction.</p>
+    <p><strong>Derived requirements flow up.</strong> When SW requirements or architecture work surfaces a requirement that has no parent at the system level (a constraint the design discovered, a behaviour the implementation needs but the system specification did not anticipate), the derived requirement is either closed at its layer with explicit justification or escalated up to system requirements with a baseline update at this layer. Peterson's NASA study of ARP&nbsp;4754A practice (NASA CR-2015-218982) documents this as the most common broken loop in industry practice: derived requirements are recorded at the lower layer but never propagated upward, leaving the system requirements baseline incomplete in ways that only surface at certification or in field incidents.</p>
+    <p><strong>Completeness findings flow up.</strong> When completeness analysis &mdash; running in parallel on the same baseline &mdash; produces new derived requirements, they enter this layer. The analysis stream is a generator of system requirements, not a critic of them; outputs are folded into the baseline rather than recorded as review findings against it.</p>
+  </section>
+
+  <!-- ===================== SECTION 3: PRODUCING QUALITY ===================== -->
+  <section id="sr-quality">
+    <h2>Producing Quality System Requirements</h2>
+    <p class="lead">This section covers the craft of writing and managing the requirements set: how individual requirements are written (3.1), how the set as a whole is made complete (3.2), how requirements are allocated to disciplines and budgets are decomposed (3.3), how operational scenarios are covered (3.4), how non-functional requirements are made testable (3.5), how the set is managed once it exists (3.6), and how traceability is made useful rather than ceremonial (3.7). A worked example &mdash; a connected insulin-pen dose calculator &mdash; runs throughout for continuity.</p>
+
+    <div class="card">
+      <h3>The Worked Example: Connected Insulin-Pen Dose Calculator</h3>
+      <p>The example runs through the section. The system is a smartphone application paired over Bluetooth Low Energy (BLE) with a connected insulin-injection pen. The application accepts user inputs (current blood glucose, planned carbohydrate intake, recent activity), computes a recommended bolus dose using a clinician-configured therapy profile, and dispatches the dose instruction to the pen for the user to confirm and inject. The pen records actual delivery and reports back. The combined system is medical-device software at the highest applicable rigor (IEC&nbsp;62304 Class&nbsp;C; analogous to ISO&nbsp;26262 ASIL&nbsp;C/D in scope-of-harm terms).</p>
+      <p>The example is software-heavy: most of the system is the phone application and the pen firmware; there are few HW elements to allocate to (the pen mechanism, the BLE radio, the phone). It exhibits realistic versions of every craft topic in this section &mdash; performance requirements with measurable thresholds, allocation across SW and HW, FTTI-style timing decomposition, mode coverage, safety-relevant requirements that carry integrity attributes, and bidirectional traceability obligations.</p>
+    </div>
+  </section>
+
+  <!-- ===================== 3.1 REQUIREMENT-WRITING CRAFT ===================== -->
+  <section id="sr-craft">
+    <h3>3.1 Requirement-Writing Craft</h3>
+    <p>The craft of writing a single system requirement has been studied empirically and codified extensively. INCOSE's Guide to Writing Requirements (GtWR) defines 42 rules organised into 14 categories; ASPICE, DO-178C, ISO&nbsp;26262, and IEC&nbsp;62304 each define quality criteria that overlap substantially with INCOSE's. EARS (Easy Approach to Requirements Syntax) provides five sentence patterns that, used consistently, produce requirements compliant with most of the rules by construction. Performance requirements add a five-element discipline that the natural-language patterns alone do not enforce. This subsection covers the rules, the patterns, the performance-requirement structure, and the automated checks that catch the most common defects.</p>
+
+    <h4>The Quality Characteristics</h4>
+    <p>INCOSE's nine individual-requirement characteristics, expanded to fifteen when set-level characteristics are added, are the agreed cross-standard quality bar. The characteristics are not aspirational &mdash; each one corresponds to a specific failure mode that has been observed in practice and that audits look for explicitly.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Characteristic</th><th>Definition</th><th>Failure mode it prevents</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Necessary</td><td>Removal would create a deficiency.</td><td>Bloated baseline with requirements added &ldquo;just in case&rdquo;; verification effort spent on requirements that no stakeholder needs.</td></tr>
+        <tr><td>Appropriate</td><td>Stated at the correct level of abstraction for this layer.</td><td>System requirements that descend into design detail (premature commitment) or hover at need-statement vagueness (untestable).</td></tr>
+        <tr><td>Unambiguous</td><td>Single interpretation by qualified readers.</td><td>Implementer and tester arrive at incompatible interpretations; defect surfaces at integration or in the field.</td></tr>
+        <tr><td>Complete</td><td>Fully stated; no TBDs, no implicit information.</td><td>Implementer fills in the gap with an arbitrary choice; tester cannot derive a pass/fail criterion.</td></tr>
+        <tr><td>Singular</td><td>States one thing.</td><td>Compound requirement passes one half of a test and fails the other; partial-credit verification is recorded as full satisfaction.</td></tr>
+        <tr><td>Feasible</td><td>Achievable within constraints (cost, schedule, technology, physics).</td><td>Wishful-thinking requirement (&ldquo;process in zero time&rdquo;) survives review and discovers infeasibility late.</td></tr>
+        <tr><td>Verifiable</td><td>Confirmable by test, analysis, inspection, or demonstration.</td><td>&ldquo;The system shall be user-friendly&rdquo; &mdash; passes review, blocks closure of the verification phase.</td></tr>
+        <tr><td>Correct</td><td>Accurately states what is needed.</td><td>Implementation satisfies the requirement but misses the underlying need; rework loops back to specification.</td></tr>
+        <tr><td>Conforming</td><td>Follows the project's approved template and style.</td><td>Inconsistent baseline that automated tooling cannot process; reviewer effort spent re-reading rather than evaluating.</td></tr>
+      </tbody>
+    </table>
+
+    <p>The same characteristics apply at set level &mdash; complete, consistent, feasible, comprehensible, validatable, and correct &mdash; with different failure modes. A requirements set is consistent when no two requirements contradict each other; complete at set level when every category of required content (function, performance, interface, constraint, quality) is addressed; comprehensible when a qualified reader can read the set straight through and understand what is being specified; validatable when the set as a whole can be confirmed against the upstream needs; correct when the set as a whole accurately specifies what is needed.</p>
+
+    <h4>The INCOSE 42-Rule Framework</h4>
+    <p>The GtWR's 42 rules are the operational decomposition of the characteristics into patterns and prohibitions. The full list is available from INCOSE; the high-leverage subset for this layer is summarised below by category. A project that reliably enforces the high-leverage subset catches the great majority of defects that audits and downstream rework discover.</p>
+    <table class="field-table">
+      <thead>
+        <tr><th>Category</th><th>Representative rules</th><th>Why this category matters at the system layer</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Accuracy (R1&ndash;R9)</td><td>Active voice with named subject; defined terms; no vague terms; no escape clauses; no open-ended clauses.</td><td>System requirements are read by SW, HW, and test teams who do not share context with the author; ambiguity defects propagate broadly.</td></tr>
+        <tr><td>Singularity (R18&ndash;R23)</td><td>One thought per sentence; no compound &ldquo;and&rdquo; / &ldquo;or&rdquo; combinators; no parenthetical subordination.</td><td>Compound system requirements decompose downstream into ill-defined parts; allocation matrices need atomic statements to assign.</td></tr>
+        <tr><td>Completeness (R24&ndash;R25)</td><td>No pronouns; statements self-contained independently of headings.</td><td>System requirements are extracted into trace matrices and review packages; they must stand alone when removed from their containing document.</td></tr>
+        <tr><td>Realism (R26)</td><td>No absolutes (&ldquo;100%&rdquo;, &ldquo;always&rdquo;, &ldquo;never&rdquo;).</td><td>Absolute claims fail verification by construction; the underlying intent is always a quantified threshold.</td></tr>
+        <tr><td>Conditions (R27&ndash;R28)</td><td>Conditions stated explicitly; AND vs. OR stated, not implied.</td><td>Implicit conditional logic is the single largest source of system-test defects: the requirement &ldquo;works&rdquo; in the case the author imagined and silently fails in the cases the author did not.</td></tr>
+        <tr><td>Abstraction (R31)</td><td>Solution-free &mdash; specifies what, not how.</td><td>The most-violated rule. Pinning a system requirement to an implementation removes the choice from the layer that should make it.</td></tr>
+        <tr><td>Quantification (R34&ndash;R35)</td><td>Measurable performance; explicit temporal dependencies.</td><td>Performance requirements written without measurable thresholds become test-blockers; see &sect;3.5 for the full discipline.</td></tr>
+        <tr><td>Tolerance (R33)</td><td>Define acceptable ranges, not single values.</td><td>Single-value requirements (&ldquo;exactly 150&nbsp;ms&rdquo;) are infeasible to verify and inappropriate to specify; tolerances allow legitimate engineering judgement at lower layers.</td></tr>
+      </tbody>
+    </table>
+
+    <h4>EARS: Five Patterns That Build the Discipline In</h4>
+    <p>The Easy Approach to Requirements Syntax (Mavin et&nbsp;al., 2009) defines five sentence patterns. Used consistently, they enforce most of the singularity, accuracy, and conditions rules by construction. EARS does not replace the full INCOSE rule set &mdash; it does not address abstraction, tolerance, quantification, or set-level properties &mdash; but it is the cheapest available discipline for raising the floor on individual-requirement quality.</p>
+    <table class="field-table">
+      <thead>
+        <tr><th>Pattern</th><th>Form</th><th>Use for</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Ubiquitous</td><td>The &lt;system&gt; shall &lt;response&gt;.</td><td>Invariants and properties that always hold.</td></tr>
+        <tr><td>Event-driven</td><td>When &lt;trigger&gt;, the &lt;system&gt; shall &lt;response&gt;.</td><td>Behaviour in response to a discrete external event.</td></tr>
+        <tr><td>State-driven</td><td>While &lt;state&gt;, the &lt;system&gt; shall &lt;response&gt;.</td><td>Behaviour that depends on the system being in a particular mode.</td></tr>
+        <tr><td>Optional</td><td>Where &lt;feature&gt;, the &lt;system&gt; shall &lt;response&gt;.</td><td>Behaviour conditional on a configurable feature or variant.</td></tr>
+        <tr><td>Unwanted-behaviour</td><td>If &lt;unwanted condition&gt;, then the &lt;system&gt; shall &lt;response&gt;.</td><td>Defensive behaviour, error handling, fault containment.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="example example-good">
+      <div class="example-label">Worked example &mdash; the same intent in three forms</div>
+<pre><code>Original (free-form, audit-unfriendly):
+  SR-DOSE-1: The application calculates and recommends an appropriate
+             insulin dose, normally within a few seconds, and prevents
+             unsafe doses.
+
+Decomposed into INCOSE-conforming, EARS-patterned requirements:
+
+  SR-DOSE-1 (event-driven):
+    When the user requests a meal-time bolus calculation, the application
+    shall display a recommended dose to the user within 2.0 s of the
+    request, measured at the point of user-input completion to the point
+    of dose-recommendation render-completion on the application UI.
+
+  SR-DOSE-2 (unwanted-behaviour):
+    If a calculated bolus dose exceeds the user's configured
+    maximum-single-dose parameter, the application shall reject the
+    calculation, display a non-dismissible warning, and require user
+    re-entry of inputs before any further dose calculation is permitted.
+
+  SR-DOSE-3 (ubiquitous, invariant):
+    The application shall not dispatch any dose instruction to the pen
+    without an explicit per-dose user confirmation captured within the
+    last 30 s preceding dispatch.
+
+Why the decomposition matters:
+  - SR-DOSE-1 is testable: a single timing measurement passes or fails.
+  - SR-DOSE-2 is testable independently; failure of -2 does not invalidate
+    -1 or -3.
+  - SR-DOSE-3 is an invariant; phrasing it ubiquitously rather than as a
+    case in -1 makes its scope unmistakable: it always holds, not just
+    "during meal-time bolus."</code></pre>
+    </div>
+
+    <h4>Performance Requirements: The Five-Element Rule</h4>
+    <p>A measurable performance requirement requires five elements: <em>stimulus</em> (what triggers the measurement), <em>response</em> (what the system does), <em>metric</em> (the quantity being constrained), <em>value</em> (the numerical threshold), and <em>condition</em> (the operating context under which the threshold applies). Omitting any of the five produces a requirement that either cannot be tested (no measurement is defined) or whose test result depends on assumptions the requirement does not state.</p>
+    <div class="example example-good">
+      <div class="example-label">The five-element decomposition on SR-DOSE-1</div>
+<pre><code>SR-DOSE-1: When the user requests a meal-time bolus calculation, the
+           application shall display a recommended dose to the user
+           within 2.0 s of the request, measured at the point of
+           user-input completion to the point of dose-recommendation
+           render-completion on the application UI, under the conditions
+           of paired pen, application in foreground, and device CPU not
+           in throttled state.
+
+  Stimulus:  user requests a meal-time bolus calculation
+             (specifically: tap of the "Calculate" control, with all
+             required inputs validated)
+  Response:  application displays a recommended dose to the user
+  Metric:    elapsed wall-clock time
+  Value:     <= 2.0 s
+  Condition: paired pen present (BLE link confirmed within last 60 s),
+             application in foreground, device CPU not in OS-imposed
+             throttled state
+
+Without each element:
+  - No stimulus    -> "the application shall display ... within 2.0 s"
+                      (within 2.0 s of what?)
+  - No response    -> "the application shall do something, but what?" (untestable)
+  - No metric      -> "responsive within 2.0 s" (2.0 s of what dimension?) <!-- TODO: this reference to a metric is not clear-->
+  - No value       -> "within an acceptable time" (banned vague term;
+                      INCOSE R7)
+  - No condition   -> ambiguity over whether the test applies in
+                      throttled state, in background, with no pen, etc.;
+                      passing or failing depends on the test environment</code></pre>
+    </div>
+    <p>The condition element is the one most commonly omitted. Authors specify the stimulus, response, metric, and value carefully and then leave the condition implicit (&ldquo;under nominal conditions&rdquo; or unstated). The downstream consequence is that test cases either invent conditions and over-specify the requirement (failing valid implementations) or accept any condition and under-specify it (passing implementations that fail in production). Making the condition explicit is the difference between a requirement that is actually verifiable and one that is only nominally so.</p>
+
+    <h4>The Nine Killer Anti-Patterns</h4>
+    <p>The same nine anti-patterns recur across every requirements audit. They are the operational form of the INCOSE rule violations and are the first thing to look for in any review.</p>
+    <table class="field-table">
+      <thead>
+        <tr><th>Anti-pattern</th><th>Example</th><th>Why it fails</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vague adjective</td><td>&ldquo;sufficiently accurate dose calculation&rdquo;</td><td>Untestable; &ldquo;sufficient&rdquo; has no defined threshold.</td></tr>
+        <tr><td>Compound requirement</td><td>&ldquo;shall validate inputs <em>and</em> compute the dose <em>and</em> log the result&rdquo;</td><td>Three requirements; partial-credit failure modes.</td></tr>
+        <tr><td>Passive without actor</td><td>&ldquo;the dose calculation shall be validated&rdquo;</td><td>By whom or by what? Allocation is impossible.</td></tr>
+        <tr><td>Unbounded list</td><td>&ldquo;such as carbohydrate count, recent activity, etc.&rdquo;</td><td>&ldquo;Etc.&rdquo; is untestable; the list must terminate.</td></tr>
+        <tr><td>Negative requirement</td><td>&ldquo;shall not produce incorrect doses&rdquo;</td><td>Cannot be proven by test; restate as a positive bound (&ldquo;shall produce doses within &plusmn;X% of the algorithm-computed value&rdquo;).</td></tr>
+        <tr><td>Implementation prescription</td><td>&ldquo;shall use a Kalman filter for glucose-trend estimation&rdquo;</td><td>Removes the algorithmic choice from the design layer that should make it.</td></tr>
+        <tr><td>Wishful thinking</td><td>&ldquo;shall calculate doses with no error&rdquo;</td><td>Infeasible; underlying intent is a bounded error envelope.</td></tr>
+        <tr><td>Escape clause</td><td>&ldquo;shall comply with all applicable regulations&rdquo;</td><td>&ldquo;Applicable&rdquo; is undefined; cite the specific regulation by reference.</td></tr>
+        <tr><td>TBD / TBR</td><td>&ldquo;within TBD seconds&rdquo;</td><td>Incomplete; cannot be baselined; cannot be tested.</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Automatable Quality Checks</h4> <!--TODO: reformulate. "A small set of regex-based checks runs in CI on every requirements commit and catches the most common defects before review". This seems to assume that something is happening. That is not teaching a craft. phrase it e.g. like something that can be done -->
+    <p>A small set of regex-based checks runs in CI on every requirements commit and catches the most common defects before review. These are not a substitute for review &mdash; they catch lexical defects, not semantic ones &mdash; but they remove the noise that human reviewers should not be spending attention on.</p>
+    <ul>
+      <li><strong>no_vague_terms</strong> &mdash; banned word list (adequate, appropriate, sufficient, timely, fast, slow, user-friendly, robust, easy, efficient).</li>
+      <li><strong>atomic_check</strong> &mdash; flags <code>shall&hellip;and&hellip;shall</code> patterns and other compound constructions.</li>
+      <li><strong>passive_voice</strong> &mdash; flags <code>shall be &lt;past participle&gt;</code>; allows passive only when the agent is explicitly named (&ldquo;shall be validated by the diagnostics module&rdquo;).</li>
+      <li><strong>no_tbd</strong> &mdash; rejects TBD / TBR / TBS / TODO / FIXME tokens.</li>
+      <li><strong>has_measurable_criterion</strong> &mdash; warns when a performance-classified requirement contains no numeric value.</li>
+      <li><strong>no_escape_clause</strong> &mdash; rejects &ldquo;as appropriate,&rdquo; &ldquo;if applicable,&rdquo; &ldquo;when possible,&rdquo; &ldquo;such as.&rdquo;</li>
+    </ul>
+    <p>The checks are a floor, not a ceiling. They run cheaply; they catch the patterns that are unambiguously defective; they leave the substantive judgement to human review. Their value is freeing the human review for the questions only humans can answer (correctness, completeness, appropriateness of abstraction).</p>
+
+    <p style="color: var(--fg-muted); font-size: 0.9em; font-style: italic;">Source depth: <code>research/system-level/03a-requirements-writing-craft.md</code>; engineering-codex <code>concept-requirement-quality</code>, <code>concept-ears</code>, <code>concept-ubiquitous-language</code>; INCOSE Guide to Writing Requirements (GtWR); Mavin et&nbsp;al. EARS (2009).</p>
+  </section>
+
+  <!-- ===================== 3.2 COMPLETENESS ===================== -->
+  <section id="sr-completeness">
+    <h3>3.2 Completeness Techniques</h3>
+    <p>Set-level completeness is the harder of the two completeness obligations. Individual-requirement completeness (no TBDs, statements self-contained) is checkable mechanically. Set-level completeness &mdash; the claim that the requirements collectively cover everything the system needs to do &mdash; is not provable in any formal sense, because it would require already having a complete model of the system. The best the discipline can do is structured coverage: a set of <em>lenses</em> through which the requirement set is examined, with the claim being &ldquo;no known gaps under any of these lenses,&rdquo; not &ldquo;no gaps exist.&rdquo;</p>
+
+    <h4>The Five-Lens Model</h4>
+    <p>A requirements set is examined for completeness through five complementary lenses, each one of which asks a different question about coverage. The lenses overlap intentionally; a requirement may be implicated under several lenses, and a gap surfaced under one lens is sometimes addressed by a requirement that satisfies a different lens.</p>
+    <table class="field-table">
+      <thead>
+        <tr><th>Lens</th><th>Coverage question</th><th>What it surfaces</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Functional</td><td>Is every operationally-required behaviour specified?</td><td>Missing capabilities, missing variants of a capability, missing inverse operations (create with no delete; enable with no disable).</td></tr>
+        <tr><td>Structural</td><td>Is every required quality attribute (the &ldquo;-ilities&rdquo;) specified?</td><td>Missing reliability, availability, security, maintainability, portability, regulatory-compliance requirements.</td></tr>
+        <tr><td>Behavioural</td><td>Is behaviour specified across all modes, transitions, and timing conditions?</td><td>Modes whose entry, exit, or in-mode behaviour is unspecified; transitions with no specified trigger or response; timing constraints without bounds.</td></tr>
+        <tr><td>Constraint</td><td>Are all environmental, regulatory, and physical constraints captured?</td><td>Unstated environmental envelopes; unstated regulatory or standards-compliance obligations; unstated physical or resource constraints (battery, storage, bandwidth).</td></tr>
+        <tr><td>Interface</td><td>Is every external interface (user, system, environment) specified for both directions of every interaction?</td><td>Half-specified interfaces (request defined, response not), missing error responses, undefined behaviour at protocol violations, undocumented external dependencies.</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Coverage Matrices</h4> <!--TODO: "Each lens has a matrix form". I liked this example, can we do the same for the other 4 lenses-->
+    <p>Each lens has a matrix form. Functional coverage maps requirements against the ConOps scenario list; structural coverage maps requirements against ISO&nbsp;25010 quality categories; behavioural coverage maps requirements against the mode state machine; constraint coverage maps requirements against the environmental envelope and constraints register; interface coverage maps requirements against the external interface inventory. An empty cell is a coverage gap; the matrix is the artifact that makes the gap visible.</p>
+    <div class="example example-good">
+      <div class="example-label">Behavioural-coverage fragment &mdash; insulin-pen modes</div>
+<pre><code>Mode -> Required requirement classes:
+  +----------------+-------+--------+--------+----------+--------+
+  | Mode           | Entry | Exit   | Behav. | Failure  | UI     |
+  +----------------+-------+--------+--------+----------+--------+
+  | INIT           | SR-3  | SR-4   | SR-5   | SR-6     | SR-7   |
+  | UNPAIRED       | SR-4  | SR-12  | SR-13  | SR-14    | SR-15  |
+  | PAIRED-IDLE    | SR-12 | SR-22  | SR-23  | SR-24    | SR-25  |
+  | DOSE-CALC      | SR-22 | SR-32  | SR-33  | SR-34    | SR-35  |
+  | DOSE-CONFIRM   | SR-32 | SR-42  | SR-43  | SR-44    | SR-45  |
+  | DOSE-DISPATCH  | SR-42 | SR-52  | SR-53  | SR-54    | SR-55  |
+  | DOSE-RECORD    | SR-52 | SR-22  | SR-63  | SR-64    | SR-65  |
+  | LINK-DEGRADED  | SR-12 | SR-12  |  GAP   | SR-74    |  GAP   |
+  | EMERGENCY-STOP |  GAP  |  GAP   | SR-83  | n/a      | SR-85  |
+  +----------------+-------+--------+--------+----------+--------+
+
+Three GAPs visible without further analysis:
+  - LINK-DEGRADED has no behavioural specification (what does the
+    application do while paired but with degraded link quality?)
+  - LINK-DEGRADED has no UI specification (what does the user see?)
+  - EMERGENCY-STOP has no entry or exit specification (how is it
+    entered? what permits leaving?)
+
+These gaps are not "found" by inspection of the requirements text;
+they are made visible by the matrix. A requirement set that does not
+have such a matrix is one whose gaps are invisible by construction.</code></pre>
+    </div>
+
+    <div class="card">
+      <h4>Lightweight Version (What to Drop)</h4>
+      <ul>
+        <li><strong>Two lenses, not five.</strong> Functional + behavioural alone catches a large share of gaps and is cheap to maintain. Add structural and interface as the project matures; constraint when the regulatory envelope demands.</li>
+        <li><strong>Inspection-mode coverage check.</strong> A working session walks the matrix, surfaces gaps as a punch list, decisions logged in the requirements tracker.</li>
+        <li><strong>Spreadsheet, not a tool.</strong> The matrix is a spreadsheet maintained by hand; updates are part of the requirement-authoring workflow, not a separate tool process.</li>
+      </ul>
+      <h4>Full Rigor (What to Add Back)</h4>
+      <ul>
+        <li><strong>All five lenses</strong> with maintained matrices that update as part of the configuration-managed baseline.</li>
+        <li><strong>Tool-managed coverage</strong> with automated gap detection and traceability into the change-impact analysis (a change to the mode state machine triggers a re-check of behavioural coverage).</li>
+        <li><strong>Independent coverage review</strong> at major baselines (system requirements review, preliminary design review) by a reviewer not on the requirements-authoring team.</li>
+        <li><strong>Quantitative coverage metrics</strong> (Template Completeness Factor, Definition Completeness Factor, Missing Semantic Element Count) tracked across baselines as a leading indicator of requirements-quality decay.</li>
+        <li><strong>Cross-check against completeness analysis output</strong> &mdash; every derived requirement from FTA / FMEA / STPA / PBR is reflected in the matrices, and gaps in the matrices feed back into the next analysis cycle.</li>
+      </ul>
+    </div>
+
+    <p style="color: var(--fg-muted); font-size: 0.9em; font-style: italic;">Source depth: <code>research/system-level/03b-requirements-completeness-allocation.md</code>; SEBoK System Requirements Definition (category coverage); IEEE 1233 (completeness definition); ISO 25010 (quality categories).</p>
+  </section>
+
+  <!-- ===================== 3.3 ALLOCATION ===================== -->
+  <section id="sr-allocation">
+    <h3>3.3 Allocation as Budgeting</h3>
+    <p>Every system-level requirement that is not satisfied by a single discipline must be allocated. Allocation answers two distinct questions. The first is qualitative: which discipline (SW, HW, mechanical, operational procedure) is responsible for satisfying this requirement? The second is quantitative: how is any decomposable budget (timing, reliability, resource consumption, accuracy) divided across the responsible disciplines? Allocation done well is an engineering activity that prevents downstream over-runs; allocation done poorly is a paperwork activity that records nothing useful and is ignored at every layer below.</p>
+
+    <h4>The Allocation Matrix as Sub-Artifact</h4>
+    <p>The artifact that records allocation decisions is the <em>allocation matrix</em>: a table whose rows are system requirements, whose columns are receiving disciplines, whose cells indicate which discipline owns which requirement, and whose budget columns record any quantitative decomposition. The allocation matrix is a sub-artifact of the system requirements baseline &mdash; it is not a separate baseline, it travels with the requirements, and it changes when the requirements change.</p>
+    <p>In this guide the allocation matrix is treated as a sub-artifact of system requirements. (A future revision may extract it into its own artifact page once the framework templates exist; for now its content lives here, and the schema obligation is captured in the templates and schemas backlog.)</p>
+
+    <h4>Two Allocation Modes</h4>
+    <p>Allocation has two distinct forms. <em>Single-discipline allocation</em> is straightforward: a requirement that says &ldquo;the application shall display the dose recommendation within 2.0&nbsp;s&rdquo; allocates entirely to SW (the application is software). The matrix records SW as the owning discipline and the requirement passes through to the SW requirements layer essentially unchanged.</p>
+    <p><em>Multi-discipline allocation with budget decomposition</em> is the harder case. A requirement that says &ldquo;the system shall complete dose dispatch within 3.0&nbsp;s of user confirmation, end-to-end&rdquo; cannot be satisfied by SW alone &mdash; it traverses the application (SW), the BLE radio (HW + SW stack), the pen firmware (SW), and the pen actuator (HW + mechanical). The 3.0&nbsp;s budget must be decomposed across these elements, with each receiving an allocated sub-budget that sums (with appropriate margin) to the parent.</p>
+
+    <h4>Worked Example &mdash; Dose-Dispatch Latency Decomposition</h4>
+    <div class="example example-good">
+      <div class="example-label">Allocating SR-DISP-1 across the dispatch chain</div>
+<pre><code>System requirement (parent):
+  SR-DISP-1: The system shall complete dose dispatch within 3.0 s of
+             user confirmation, end-to-end, measured from the point of
+             user confirmation tap on the application UI to the point of
+             dose-delivery-complete acknowledgement received by the
+             application.
+
+Decomposition:
+
+  Element                              Owning      Budget   Justification
+                                       discipline
+  ------------------------------------------------------------------------
+  App: confirmation -> dispatch ready   SW          200 ms   UI response
+  App: dispatch -> BLE write            SW + BLE    150 ms   Stack overhead
+  BLE: write propagation                HW          100 ms   BLE Conn Int
+  Pen FW: receive -> validate           SW          100 ms   Validation
+  Pen FW: validate -> motor-start       SW          100 ms   Motor command
+  Pen HW: motor-start -> dose-complete  HW + Mech  1500 ms   Mech delivery
+  Pen FW: dose-complete -> ack tx       SW          150 ms   Ack assembly
+  BLE: ack write propagation            HW          100 ms   BLE Conn Int
+  App: ack rx -> recorded               SW          200 ms   Local store
+                                                   --------
+                                       Allocated:  2600 ms
+                                       Margin:      400 ms   13% headroom
+                                                   --------
+                                       Parent:     3000 ms
+
+Allocation rules applied:
+  - Sums + margin reconciles to parent.
+  - Margin (T_margin) is a named, tracked element; not absorbed silently
+    into any sub-element.
+  - Each sub-budget has a named justification; "feels right" is not
+    acceptable.
+  - Each sub-budget has an owning discipline; cells with two disciplines
+    (e.g., "SW + BLE") have their own internal split documented separately.
+  - On any change to a sub-budget, parent and margin are revisited; the
+    SR-DISP-1 baseline cannot drift silently.</code></pre>
+    </div>
+
+    <h4>Allocation Rules That Make the Matrix Useful</h4>
+    <p>A useful allocation matrix obeys five rules. Each one prevents a specific failure mode that has been observed when the rule is not enforced.</p>
+    <ol>
+      <li><strong>Sum-with-margin reconciliation.</strong> Decomposed sub-budgets, plus a named margin, sum to the parent. The margin is not absorbed silently into any sub-budget; it is a tracked element of the matrix. Without an explicit margin, the first overrun at any layer either consumes invisible budget or breaks the parent without notice.</li>
+      <li><strong>Named justification per sub-budget.</strong> Each allocated value carries a justification (engineering analysis, vendor data, prior measurement, equivalent-system reference). &ldquo;Engineering judgement&rdquo; without record is not a justification; it is a placeholder for one.</li>
+      <li><strong>Single owning discipline per sub-element.</strong> Each row of the decomposition is owned by exactly one discipline. Rows that span disciplines (BLE link, for example) are decomposed further into discipline-internal sub-elements until single ownership holds. Shared ownership defeats accountability and budget enforcement.</li>
+      <li><strong>Bidirectional change propagation.</strong> A change to any sub-budget triggers reconciliation against the parent; a change to the parent triggers redistribution across sub-budgets. The matrix is not static; it is a piece of the configuration-managed baseline.</li>
+      <li><strong>Visible derived-requirement origin.</strong> Sub-budgets that are themselves derived requirements at the receiving layer (the SW requirements layer treats the 200&nbsp;ms application sub-budget as a system-allocated input, not a free choice) are tagged as derived from the parent. The receiving layer cannot silently revise them.</li>
+    </ol>
+
+    <h4>Beyond Timing &mdash; Other Decomposable Budgets</h4>
+    <p>Timing is the most familiar example, but the same allocation discipline applies to other dimensions. Reliability budgets allocate a target failure rate across redundant elements, accounting for independence (see common-mode analysis in completeness-analysis &sect;sr-vmodel-considerations). Resource budgets allocate memory, CPU, storage, bandwidth, and battery across SW elements; the system-level requirement (&ldquo;application shall consume no more than 2% of phone battery per 24&nbsp;h of nominal use&rdquo;) decomposes into per-component budgets that the SW architecture must respect. Accuracy budgets allocate measurement error across sensor, calibration, computation, and presentation. The pattern is the same: parent budget, named decomposition, named margin, per-sub-element justification, bidirectional propagation.</p>
+
+    <div class="card">
+      <h4>Lightweight Version (What to Drop)</h4>
+      <ul>
+        <li><strong>Allocation as a spreadsheet column</strong>, not a separate matrix tool. Each requirement carries an &ldquo;owning discipline&rdquo; field; budget decomposition is captured inline as a structured comment.</li>
+        <li><strong>Margin as a fixed percentage</strong> applied uniformly (10&ndash;20% is typical) rather than per-element analytical margin.</li>
+        <li><strong>Justifications captured in the requirement comment</strong> rather than a separate analysis record.</li>
+        <li><strong>Revisit on milestone</strong>, not on every change &mdash; budget reconciliation happens at major reviews rather than continuously.</li>
+      </ul>
+      <h4>Full Rigor (What to Add Back)</h4>
+      <ul>
+        <li><strong>Tool-managed allocation matrix</strong> (DOORS, Polarion, Jama, or equivalent) with automated sum-and-margin checks and change-impact alerts.</li>
+        <li><strong>Per-sub-element analytical margin</strong> based on measurement uncertainty, vendor variability, and worst-case engineering analysis.</li>
+        <li><strong>Bidirectional change-impact analysis</strong> that propagates to and from the SW / HW requirements baselines on every change to the matrix or any sub-budget.</li>
+        <li><strong>Independent allocation review</strong> at the system requirements review and at every subsequent baseline that touches the matrix.</li>
+        <li><strong>Allocation tied to integrity decomposition</strong> &mdash; ASIL / DAL allocation across redundant elements per ISO&nbsp;26262 Part&nbsp;9 or ARP&nbsp;4754A Table&nbsp;3, with documented independence claims.</li>
+        <li><strong>Signed allocation baseline</strong> at preliminary design review &mdash; the matrix is the contract that the receiving layers consume.</li>
+      </ul>
+    </div>
+
+    <p style="color: var(--fg-muted); font-size: 0.9em; font-style: italic;">Source depth: <code>research/system-level/03b-requirements-completeness-allocation.md</code>, <code>04b-safety-requirements-derivation.md</code>; engineering-codex <code>src-arch-readiness-promwad-latency-budget</code>, <code>src-ftti-iso26262-nvdungx-2026</code>, <code>src-arch-readiness-nasa-logical-decomposition</code>; ISO 26262 Part 9 (ASIL decomposition).</p>
+  </section>
+
+  <!-- ===================== 3.4 SCENARIO COVERAGE ===================== -->
+  <section id="sr-scenarios">
+    <h3>3.4 Operational Scenario Coverage</h3>
+    <p>The ConOps produces a set of operational scenarios &mdash; nominal flows, off-nominal flows, and degraded-mode flows &mdash; that the system shall support. The system requirements layer must provide, for each scenario, the set of requirements that collectively specify the system behaviour the scenario describes. Scenario coverage is the audit question: pick any ConOps scenario, and walk to the requirements that specify the behaviour. Missing walks indicate gaps.</p>
+
+    <h4>The Coverage Map</h4>
+    <p>The artifact is a map from each ConOps scenario (and each significant variant) to the system requirements that specify the behaviour at every step. The map is sparse &mdash; most requirements participate in only a few scenarios &mdash; but the union of all scenarios covers the operational space the system claims to support. A scenario whose row is empty is a scenario the requirements set does not yet cover; a requirement whose column is empty either is not exercised by any nominal operation (and may be a pure constraint or invariant, which is fine) or specifies behaviour the operational concept does not need (and may be over-specification, which is not).</p>
+
+    <div class="example example-good">
+      <div class="example-label">Scenario coverage fragment &mdash; insulin-pen meal-time bolus</div>
+<pre><code>ConOps scenario: SC-MEAL-001 "User delivers meal-time bolus, nominal"
+  Steps                                       Required requirements
+  ------------------------------------------------------------------
+  1. User opens app, app already paired       SR-INIT-12, SR-PAIR-3
+  2. User taps "Bolus", enters BG and carbs   SR-DOSE-1, SR-INPUT-3-7
+  3. User taps "Calculate"                    SR-DOSE-1, SR-DOSE-22
+  4. App displays recommended dose            SR-DOSE-22, SR-UI-15
+  5. User reviews and taps "Confirm"          SR-DOSE-3, SR-UI-22
+  6. App dispatches dose to pen               SR-DISP-1, SR-DISP-3
+  7. Pen acknowledges, app records            SR-DISP-1, SR-LOG-3-5
+  8. User injects (pen handles physically)    [pen FW, downstream]
+
+ConOps scenario: SC-MEAL-002 "Meal-time bolus, recommendation rejected"
+  Steps                                       Required requirements
+  ------------------------------------------------------------------
+  1-4 as SC-MEAL-001
+  5'. Recommended dose exceeds user maximum   SR-DOSE-2 (mandatory reject)
+  6'. App displays warning, blocks dispatch   SR-DOSE-2, SR-UI-44
+  7'. User adjusts inputs and re-calculates   SR-DOSE-2 (re-entry req)
+
+ConOps scenario: SC-LINK-LOST "BLE link lost mid-dispatch"
+  Steps                                       Required requirements
+  ------------------------------------------------------------------
+  1-6 as SC-MEAL-001
+  6.5. Link drops between dispatch and ack    SR-LINK-12 (timeout)
+  7''. App reverts dose record to "uncertain" SR-LINK-13 (state)
+  8''. User receives non-dismissible alert    SR-LINK-14 (UI)
+  9''. App attempts re-establish and confirm  SR-LINK-15 (recovery)
+
+Audit observations from this fragment:
+  - Three scenarios derived from the ConOps; each maps to a defined
+    set of requirements; no step in any scenario lacks a covering
+    requirement.
+  - The link-loss scenario surfaces SR-LINK-12 through SR-LINK-15 as
+    requirements specific to off-nominal flow. Without the scenario
+    map, these are easy to leave unspecified - "it works when the
+    link is up" is the default failure mode of insufficient scenario
+    coverage.
+  - Every requirement appearing here is also auditable in the
+    behavioural-coverage matrix (3.2): SR-LINK-12-15 are LINK-DEGRADED
+    mode requirements; their appearance here closes the matrix gap
+    that the behavioural lens surfaced.</code></pre>
+    </div>
+
+    <h4>What Scenario Coverage Catches That Other Lenses Miss</h4>
+    <p>Functional and structural completeness lenses ask &ldquo;is every capability or quality attribute covered?&rdquo; They miss the question scenario coverage answers: &ldquo;does the system, as specified, actually do what the operational concept says it does, end-to-end, including the off-nominal flows?&rdquo; A requirement set can be functionally complete in the sense that every named capability has a requirement, and still fail to specify the off-nominal recovery flows because no individual capability prompts them; only the scenario walk-through surfaces them.</p>
+    <p>Off-nominal coverage is the highest-value output of scenario mapping. Nominal flows tend to be specified; the requirements for what happens when the link drops, the input is invalid, the user changes their mind mid-dispatch, the pen reports an error, the phone backgrounds the app, the battery is critical &mdash; these are the requirements that go missing without a scenario map prompting them. The map's primary value is discipline, not coverage: it forces the team to ask &ldquo;what about when&hellip;&rdquo; questions in a structured way.</p>
+
+    <p style="color: var(--fg-muted); font-size: 0.9em; font-style: italic;">Source depth: <code>research/system-level/03b-requirements-completeness-allocation.md</code>; ConOps page (<code>conops.html</code>) &sect;3.3 (scenario anatomy and coverage matrix).</p>
+  </section>
+
+  <!-- ===================== 3.5 NFR ===================== -->
+  <section id="sr-nfr">
+    <h3>3.5 Non-Functional Requirements</h3>
+    <p>Non-functional requirements specify properties of the system as a whole rather than discrete behaviours. They are the &ldquo;-ilities&rdquo;: reliability, availability, maintainability, security, performance, usability, portability. Every project knows they are required; many projects produce them as a list of unverifiable adjectives (&ldquo;the system shall be reliable&rdquo;) and discover at qualification that nothing was actually specified. The discipline is making non-functional requirements as testable as functional ones, by attaching the same structure: stimulus, response, metric, value, condition.</p>
+
+    <h4>The Two Failure Modes</h4>
+    <p>Non-functional requirements fail in two characteristic ways. The first is the <em>untestable adjective</em>: &ldquo;the application shall be user-friendly,&rdquo; &ldquo;the system shall be highly available,&rdquo; &ldquo;the data shall be secure.&rdquo; These pass review by social agreement (no one disagrees that the system should be user-friendly) and fail at qualification when the test team asks what the pass criterion is. The second is the <em>missing category</em>: a baseline that has functional requirements covering every capability but no requirements at all on, say, security, performance under load, or graceful degradation. The category is missing not because anyone decided it did not apply, but because no one in the requirements process had ownership of asking whether it did.</p>
+
+    <h4>The Quality-Attribute Scenario Pattern</h4>
+    <p>The most-cited remedy for the untestable-adjective failure is the <em>quality-attribute scenario</em> pattern, developed in the SEI's ATAM work and adopted broadly. A quality-attribute scenario specifies six elements: source of the stimulus, stimulus, environment, artifact (the part of the system stimulated), response, and response measure. Filled in completely, it produces a non-functional requirement that is as testable as any functional requirement.</p>
+    <div class="example example-good">
+      <div class="example-label">Quality-attribute scenario for availability</div>
+<pre><code>Vague form (unacceptable):
+  SR-AVAIL-1: The application shall be highly available.
+
+Quality-attribute scenario form:
+  Source:           BLE link interruption (transient or sustained)
+  Stimulus:         loss of pen-application BLE connection
+  Environment:      application is in foreground, prior to dose dispatch
+  Artifact:         the dose-calculation and dispatch subsystem
+  Response:         system continues to allow dose calculation;
+                    blocks dispatch with explicit user notification;
+                    attempts re-connection per back-off schedule
+  Response measure: dose-calculation availability >= 99.9%
+                    of foreground-time intervals during 30-day rolling
+                    window;
+                    user notification within 2 s of link-loss detection
+
+Restated as an EARS requirement:
+  SR-AVAIL-1: When the BLE link to the paired pen is interrupted while
+              the application is in foreground prior to dose dispatch,
+              the application shall continue to permit dose calculation,
+              shall block any dose-dispatch attempt with a non-dismissible
+              user notification within 2 s of link-loss detection, and
+              shall attempt re-connection per the back-off schedule
+              defined in CONST-BLE-7.
+
+  Composite measure: SR-AVAIL-1 satisfied when dose-calculation
+                     availability >= 99.9% over any rolling 30-day
+                     foreground window in operational deployment.</code></pre>
+    </div>
+
+    <h4>The ISO 25010 Coverage Check</h4>
+    <p>ISO/IEC 25010 defines eight quality characteristics (functional suitability, performance efficiency, compatibility, usability, reliability, security, maintainability, portability) further decomposed into thirty-one sub-characteristics. The standard does not require that every quality characteristic appear in every project's requirements baseline &mdash; some are not relevant for some systems &mdash; but it provides the canonical checklist against which a project can argue that the absence of a category is intentional rather than oversight. Walking ISO 25010 once per major baseline catches the missing-category failure mode at low cost.</p>
+
+    <h4>The &ldquo;Operationally Visible&rdquo; Test</h4>
+    <p>Every non-functional requirement should pass an operationally-visible test: there exists a measurement, observable in operation or in qualification testing, that distinguishes a system satisfying the requirement from one that does not. Requirements that fail this test are either restated until they pass it, or moved out of the requirements baseline and into a design constraint or quality goal &mdash; categories that explicitly do not have verification obligations. The categorisation is itself useful: a quality attribute that the project considers important but cannot verify deserves explicit acknowledgement that it is a goal rather than a contract.</p>
+
+    <p style="color: var(--fg-muted); font-size: 0.9em; font-style: italic;">Source depth: <code>research/system-level/03a-requirements-writing-craft.md</code> (NFR section); engineering-codex <code>src-arch-evaluation-quality-attribute-scenarios</code>; ISO/IEC 25010; SEI quality-attribute scenarios (Bass et&nbsp;al., <em>Software Architecture in Practice</em>).</p>
+  </section>
+
+  <!-- ===================== 3.6 MANAGEMENT ===================== -->
+  <section id="sr-management">
+    <h3>3.6 Requirements Management</h3>
+    <p>Writing the requirements is half the work; managing the requirements once written is the other half. A requirements baseline is a living artifact: scenarios change, design discoveries propagate up, regulatory standards evolve, the operational concept matures with field experience. Requirements management is the discipline that lets the baseline change without losing the properties (consistency, traceability, integrity) that the baseline depends on. This subsection covers baselines and change control, impact analysis, and the role of decision rationale in surviving requirements churn.</p>
+
+    <h4>Baselines and the Approval Lifecycle</h4>
+    <p>A <em>baseline</em> is a formally approved, immutable snapshot of a set of artifacts at a point in time. ASPICE PAM v4.0 defines a baseline as &ldquo;a state of one or a set of work products and artifacts which are consistent and complete; basis for next process steps and/or delivery; is unique and may not be changed.&rdquo; The critical property is immutability combined with consistency: every item in the baseline is at a compatible version, and the baseline as a whole carries a claim that the contained artifacts are internally consistent and ready to serve as input to the next step.</p>
+    <p>Requirements baselines are established at major lifecycle milestones. The system-level baseline is established at the System Requirements Review (SRR), at which point the requirements set is approved as the contract for the next phase. The allocated baseline is established at the Preliminary Design Review (PDR), incorporating the allocation matrix and the SW / HW requirements derived from the system requirements. Subsequent baselines (CDR, qualification) are established as the lifecycle progresses; the system-level baseline is revisited at each one, with explicit change control.</p>
+
+    <h4>Change Control and the Change Control Board</h4>
+    <p>Once a baseline is approved, changes to the contained requirements are governed by a <em>change control</em> process. The mechanism is typically a Change Control Board (CCB) &mdash; a body with the authority to approve or reject proposed changes &mdash; which evaluates each proposed change against four questions: what is changing, why is it changing, what is impacted, and what is the cost-benefit of making the change. The CCB authorises the change; the change is then implemented (the baseline updated, the allocation matrix re-reconciled, downstream artifacts re-checked); the updated baseline is re-approved.</p>
+    <p>The discipline matters because requirements churn that is not managed produces a baseline whose claimed properties (consistency, traceability) silently degrade. A requirement updated without checking impact may contradict another requirement that the author was unaware of; a budget revision absorbed silently into one sub-element may break the parent allocation; a behavioural change may invalidate a system test case that no one re-examines. The CCB is not a bureaucratic gate &mdash; it is the mechanism that ensures the baseline's properties survive change.</p>
+
+    <h4>Impact Analysis</h4>
+    <p>Before the CCB approves a change, an <em>impact analysis</em> identifies what else in the baseline (and the surrounding artifacts) is affected. The trace structure (3.7) is what makes impact analysis tractable: a change to a system requirement traces forward to the SW / HW requirements derived from it, the allocation cells that mention it, the system test cases that verify it, and the design and code that implements it; backward to the stakeholder needs and ConOps scenarios it supports. An impact analysis that examines all of these is the input to the CCB's cost-benefit judgement.</p>
+    <div class="example example-good">
+      <div class="example-label">Impact analysis &mdash; revising the dose-dispatch latency budget</div>
+<pre><code>Proposed change:
+  SR-DISP-1 latency budget: 3.0 s -> 4.0 s (parent budget relaxation)
+  Reason:    Pen actuator vendor's revised data sheet shows worst-case
+             motor-start latency at 2.0 s rather than the assumed 1.5 s.
+             Allocated budget cannot be met without parent relaxation
+             OR redesign of motor-control firmware.
+
+Forward impact (downstream):
+  - Allocation matrix: parent budget -> 4.0 s; existing sub-budgets
+    retained; T_margin grows from 400 ms to 1400 ms.
+  - SW requirements: SWR-DISP-3 (app-side latency budget) unchanged.
+  - HW requirements: HWR-DISP-2 (motor-start budget) updated:
+    1500 ms -> 2000 ms; sub-budget justification updated to cite the
+    revised vendor data sheet (CONST-VENDOR-12-rev-B).
+  - System test cases: ST-DISP-1 (end-to-end latency) updated:
+    pass criterion 3.0 s -> 4.0 s; ST-DISP-2 sub-tests unchanged
+    structurally; one sub-test ST-DISP-2.4 (motor-start latency)
+    threshold updated.
+  - Design: pen FW design unchanged (no behavioural change required);
+    pen-FW-DD-15 has a comment update noting the vendor change but
+    no design rework.
+
+Backward impact (upstream):
+  - Stakeholder needs: NEED-USER-3 ("delivery should feel responsive
+    enough to be unobtrusive") - the 3.0 s -> 4.0 s change crosses
+    the empirically-validated user-perceptibility threshold (3.0 s
+    is the established perceptibility boundary for "device is doing
+    something" feedback). Stakeholder review required.
+  - ConOps: SC-MEAL-001 step 7 may need updated user-feedback
+    requirement (interim "in progress" indication) if the change is
+    approved.
+
+Disposition (CCB):
+  - Approve the technical relaxation conditionally on adding a new
+    requirement SR-DISP-4: "While dose dispatch is in progress and
+    the elapsed time exceeds 1.5 s, the application shall display an
+    in-progress indication to the user, updated at least every 500 ms."
+  - Stakeholder concurrence on the user-experience change documented
+    via NEED-USER-3 review.
+  - Vendor data sheet CONST-VENDOR-12-rev-B added to the constraints
+    register and cited from HWR-DISP-2.
+
+Without the impact analysis, the change would have updated SR-DISP-1
+in place, broken the user-perceptibility constraint silently, and
+discovered the user-experience defect during qualification or in
+field feedback - too late to design against.</code></pre>
+    </div>
+
+    <h4>Decision Rationale and the ADR Discipline</h4>
+    <p>Requirements changes without recorded rationale degrade fast. Six months after a change is approved, the team that approved it has moved on; a new team encounters the change and either reverts it (because the reason is no longer apparent) or builds further changes on it without understanding the constraint that produced it. The remedy is the same one used for architecture decisions: a brief Architecture Decision Record (ADR) attached to each non-trivial requirement change, capturing the context, the decision, the alternatives considered, and the consequences accepted.</p>
+    <p>For requirements, the ADR template is light: <em>context</em> (what changed in the world that prompted the proposal), <em>decision</em> (what the CCB approved), <em>alternatives</em> (what else was considered, briefly, and why rejected), <em>consequences</em> (what downstream cost or constraint the decision accepts). Five or six sentences is enough; the value is preservation of the reasoning, not literary depth. The IBIS structure (issue, position, argument) underneath the design-rationale tradition is the same shape, applied to a different artifact class.</p>
+
+    <h4>Volatility as a Leading Indicator</h4>
+    <p>Requirements volatility &mdash; the rate at which approved requirements change &mdash; is itself worth tracking. Empirical studies (Zowghi &amp; Nurmuliani; cited extensively in the requirements management literature) show requirements volatility correlates with project cost overrun and defect density. High volatility late in the lifecycle is a symptom that either the upstream needs were not yet stable when the requirements were baselined or that the analysis stream is producing derived requirements at a rate the change-control process cannot absorb. Tracking volatility per baseline gives early warning of either condition; reacting to high volatility means revisiting elicitation or completeness analysis upstream rather than continuing to absorb changes downstream.</p>
+
+    <div class="card">
+      <h4>Lightweight Version (What to Drop)</h4>
+      <ul>
+        <li><strong>Single CCB</strong> covering the project rather than tiered boards by impact class.</li>
+        <li><strong>Impact analysis as a checklist</strong> (forward links, backward links, allocation cells, test cases) rather than tool-automated impact propagation.</li>
+        <li><strong>ADR as a structured comment</strong> on the change request rather than a separate artifact.</li>
+        <li><strong>Volatility tracked at baseline review</strong>, not continuously.</li>
+      </ul>
+      <h4>Full Rigor (What to Add Back)</h4>
+      <ul>
+        <li><strong>Tiered CCBs</strong> by impact class (technical, schedule-affecting, customer-affecting, certification-affecting), each with appropriate authority and membership.</li>
+        <li><strong>Tool-managed impact analysis</strong> with traceability tooling that propagates change-impact alerts across the baseline and adjacent artifacts.</li>
+        <li><strong>ADRs as configuration-managed artifacts</strong> linked from every non-trivial requirement change, surveyed on every baseline review.</li>
+        <li><strong>Continuous volatility metrics</strong> with thresholds that escalate to the program (sustained high volatility triggers an upstream review).</li>
+        <li><strong>Independent change-control auditor</strong> at major baselines; the auditor confirms that the CCB process has been followed and that impact analyses are present and complete.</li>
+      </ul>
+    </div>
+
+    <p style="color: var(--fg-muted); font-size: 0.9em; font-style: italic;">Source depth: <code>research/system-level/03d-requirements-management-handoff.md</code>; engineering-codex <code>src-kunz-rittel-ibis-1970</code>, <code>src-potts-bruns-design-decisions-1988</code>, <code>src-tyree-akerman-adr-2005</code>, <code>src-nygard-adr-2011</code>; ASPICE PAM v4.0 (Annex B baseline definition); NASA SWE-082 (change authorisation).</p>
+  </section>
+
+  <!-- ===================== 3.7 TRACEABILITY ===================== -->
+  <section id="sr-traceability">
+    <h3>3.7 Traceability</h3>
+    <p>Traceability is the property that, for every requirement, you can walk from the upstream source that motivated it to the downstream artifacts that satisfy and verify it. It is the property auditors check first, the property that makes impact analysis tractable, and the property that distinguishes a requirements baseline from a list of statements. Traceability is also the property most commonly performed as ceremony &mdash; trace links populated to satisfy a checklist, with no expectation that anyone will follow them. Useful traceability is a different artifact from ceremonial traceability, even though both produce a matrix.</p>
+
+    <h4>Three Trace Directions</h4>
+    <p>Every system requirement participates in three trace directions.</p>
+    <ul>
+      <li><strong>Upward (satisfies):</strong> the system requirement traces to the stakeholder need(s), ConOps scenario(s), or completeness-analysis finding(s) that motivated it. An upward trace anchors the requirement in stakeholder value or analytically-derived obligation; a requirement with no upward trace is either over-specification or a requirement whose justification has been lost.</li>
+      <li><strong>Downward (allocated-to and refined-by):</strong> the system requirement traces to the SW and HW requirements that decompose it (refined-by) and to the allocation cell(s) that assign responsibility (allocated-to). A requirement with no downward trace at the appropriate point in the lifecycle is either unimplemented or unallocated.</li>
+      <li><strong>Lateral (verified-by):</strong> the system requirement traces to the system test case(s) that confirm it. A requirement with no verified-by trace at qualification is unverifiable in practice.</li>
+    </ul>
+
+    <h4>Satisfies vs Derived-From</h4>
+    <p>Two upward trace types must be distinguished. <em>Satisfies</em> means the requirement directly supports a stakeholder-articulated need or ConOps scenario; the upward link is to the elicited input. <em>Derived-from</em> means the requirement was generated by analysis (FTA, FMEA, STPA, PBR, completeness coverage) rather than elicited; the upward link is to the analysis finding. Both are valid trace types, but they carry different obligations: <em>satisfies</em> requirements have stakeholder review obligations; <em>derived-from</em> requirements have analysis-currency and integrity-allocation obligations. A baseline that conflates the two loses the ability to apply the right discipline to each.</p>
+
+    <h4>What Useful Traceability Looks Like</h4>
+    <p>The difference between useful and ceremonial traceability is that useful traceability survives the audit question &ldquo;walk me from this requirement to its tests&rdquo; with answers that the audit team can confirm. Specifically, useful traceability has four properties.</p>
+    <ol>
+      <li><strong>Bidirectional consistency.</strong> Forward and backward traces match: if SR-DOSE-1 traces forward to SWR-DISP-3, then SWR-DISP-3 traces backward to SR-DOSE-1. Asymmetric traces indicate one or the other side has drifted.</li>
+      <li><strong>Type-tagged links.</strong> Each link declares its type: satisfies, derived-from, refined-by, allocated-to, verified-by. Untyped links collapse the trace structure into a graph that cannot answer specific audit questions.</li>
+      <li><strong>Currency.</strong> Trace links are updated as part of the change-control process. A trace link to a deleted artifact, an obsoleted test, or a renamed requirement is worse than no trace, because it carries the apparent authority of a maintained record without the validity.</li>
+      <li><strong>Exception visibility.</strong> Requirements without expected links (a system requirement with no verified-by link at qualification; a derived requirement with no integrity-allocation tag) are surfaced as exceptions rather than absorbed into the matrix as gaps. The audit question &ldquo;what is missing&rdquo; should be answerable from the trace tooling.</li>
+    </ol>
+
+    <h4>The Cost of Bad Traceability</h4>
+    <p>Gotel and Finkelstein (1994) framed the problem that has remained the canonical reference for the field: the failures of traceability in practice are not failures of tooling but failures of the process around the tooling. Tools that record links produce no value if the links are populated mechanically by people who do not understand the upstream artifacts; tools that propagate changes produce no value if the changes are recorded after the fact rather than as part of the work. Useful traceability is what the project does, not what the tool does. The tool is the recording medium.</p>
+
+    <div class="card">
+      <h4>Lightweight Version (What to Drop)</h4>
+      <ul>
+        <li><strong>Three trace directions</strong> (upward, downward, lateral) maintained in the requirements tool's link fields; no separate matrix.</li>
+        <li><strong>Type-tagged links</strong> using the tool's link-type vocabulary; no formal trace ontology.</li>
+        <li><strong>Currency by review</strong> &mdash; trace links audited at each baseline review rather than continuously.</li>
+        <li><strong>Manual gap reports</strong> at major baselines.</li>
+      </ul>
+      <h4>Full Rigor (What to Add Back)</h4>
+      <ul>
+        <li><strong>Formal trace model</strong> (link types, allowed source/target combinations, mandatory cardinalities) enforced by tooling.</li>
+        <li><strong>Continuous trace validation</strong> in CI: every commit checks bidirectional consistency, type validity, and currency against the artifacts referenced.</li>
+        <li><strong>Independent trace audit</strong> at qualification &mdash; an auditor not on the requirements team walks a sample of requirements through the trace and confirms the linked artifacts say what the trace claims.</li>
+        <li><strong>Structural metrics</strong> on trace coverage (percentage of requirements with each link type populated; orphans; unreached test cases) reported as a leading indicator at every baseline.</li>
+        <li><strong>Tool-qualification</strong> per DO-330 / ISO 26262 Part&nbsp;8 Cl.&nbsp;11 if the trace tooling is used to discharge certification credit.</li>
+      </ul>
+    </div>
+
+    <p style="color: var(--fg-muted); font-size: 0.9em; font-style: italic;">Source depth: <code>research/system-level/03d-requirements-management-handoff.md</code>; engineering-codex <code>src-gotel-finkelstein-traceability-1994</code>, <code>pat-traceability-as-code</code>, <code>tool-doorstop</code>, <code>tool-trlc</code>.</p>
+  </section>
+
+  <!-- ===================== SECTION 4: V-MODEL CONSIDERATIONS ===================== -->
+  <section id="sr-vmodel-considerations">
+    <h2>V-Model Specific Considerations</h2>
+    <p class="lead">The craft of Section&nbsp;3 is general &mdash; INCOSE rules, EARS, allocation matrices, and traceability apply in any lifecycle. The V-model adds specific obligations that downstream layers, certification authorities, and operational deployments depend on. This section covers what the V-model demands beyond the general craft: bidirectional traceability as a structural obligation, the derived-requirements feedback loop, safety-relevant requirements as a first-class category, the independence-of-verification principle, and a worked FTTI decomposition example showing the cascade in action.</p>
+
+    <h3>Bidirectional Traceability as a Structural Obligation</h3>
+    <p><strong>What it establishes:</strong> in a V-model, every system requirement traces upward to a stakeholder need, ConOps scenario, or analysis finding, AND downward to its decomposition and verification. Both directions are mandatory; one direction is not adequate.</p>
+    <p><strong>What it prevents:</strong> two symmetric failure modes. Upward-only traceability (every requirement points back to a need) catches over-specification but misses unimplemented requirements &mdash; the project ships with the requirement &ldquo;in scope&rdquo; but no design or test against it. Downward-only traceability (every requirement points forward to design and test) catches incomplete implementation but misses unmotivated requirements &mdash; the project carries cost for a requirement that no stakeholder needs. Bidirectional traceability prevents both.</p>
+    <p><strong>Procedure:</strong> the requirements tool enforces both directions on every requirement of approved status. Reviews at each major baseline include trace audits that walk a sample in both directions and report exceptions; exceptions either gain a missing trace or a justified disposition (deactivated requirement, verification by similarity to a parent system, etc.). The default disposition is &ldquo;trace required&rdquo;; every exception is explicit.</p>
+
+    <h3>The Derived-Requirements Feedback Loop</h3>
+    <p><strong>What it establishes:</strong> when a downstream layer (SW requirements, architecture, detailed design, code) discovers a requirement that has no parent at the system level, that derived requirement is either closed at its own layer with explicit justification or escalated to the system requirements baseline with an update at this layer. The system requirements baseline is not closed at SRR forever; it is revisited whenever a downstream layer surfaces a derived requirement that the system layer should own.</p>
+    <p><strong>What it prevents:</strong> the most-documented broken loop in industry practice. Peterson's NASA study of ARP&nbsp;4754A practice (NASA CR-2015-218982) found that derived requirements at the SW or architecture layer are routinely recorded but not propagated upward. The consequence is a system-level baseline that is silently incomplete: the system claims to satisfy a set of requirements, but the actual implementation is constrained by additional requirements that no upstream artifact records. At certification time, the gap surfaces as an unjustified design decision; in field operation, it surfaces as behaviour the operational concept did not anticipate.</p>
+    <p><strong>Procedure:</strong> every derived requirement at every layer carries one of two dispositions: <em>closed-at-this-layer</em> with rationale (the derivation is purely internal to this layer's design and does not constrain the parent layer), or <em>escalate-to-parent</em> (the derivation introduces a constraint or behaviour the parent layer should specify). Escalated items go into a tracked queue whose closure requires a system-requirements baseline update, re-review, and re-approval. The queue is reviewed at every baseline; long-resident items are flagged for forced disposition.</p>
+
+    <h3>Safety-Relevant Requirements as a First-Class Category</h3>
+    <p><strong>What it establishes:</strong> at high assurance levels, a subset of system requirements carries integrity attributes (DAL under DO-178C, ASIL under ISO&nbsp;26262, SIL under IEC&nbsp;61508, Class A&ndash;C under IEC&nbsp;62304) that travel with the requirement through every downstream artifact. The integrity attribute is not a label on the requirement &mdash; it is a load-bearing piece of metadata that determines the verification rigor, the allocation rules, the tool-qualification obligations, and the review-independence requirements applied to every artifact derived from it.</p>
+    <p><strong>What it prevents:</strong> the under-allocation failure mode (a high-integrity requirement allocated to a low-integrity component, producing verification evidence that does not meet the actual assurance obligation) and the uniform-over-allocation failure mode (every requirement assigned the highest integrity to be safe, which inflates cost and reduces attention to the components that actually need the rigor). Both failures make the integrity assignment arbitrary and defeat its purpose: integrity is a finite resource, and allocating it precisely is the point.</p>
+    <p><strong>How the integrity attribute travels:</strong></p>
+    <ul>
+      <li><strong>At the system requirements layer</strong>, the integrity attribute is derived from completeness analysis (hazard severity, exposure, controllability per the applicable standard). Each system requirement that contributes to mitigating a high-severity hazard inherits the corresponding integrity level.</li>
+      <li><strong>Through allocation</strong>, the integrity attribute decomposes per the standard's decomposition rules (ISO&nbsp;26262 Part&nbsp;9 Cl.&nbsp;5; ARP&nbsp;4754A Table&nbsp;3; IEC&nbsp;62304 Cl.&nbsp;4.3). Two ASIL-B-allocated independent components can satisfy an ASIL-D parent under documented independence claims; a single component cannot. The decomposition is recorded in the allocation matrix.</li>
+      <li><strong>Through architecture and design</strong>, every component carries its allocated integrity level. Verification rigor (test coverage, independence of analysis, tool qualification) scales from the integrity level. A component without an allocated level is implicitly the lowest level, which is rarely what the project intends.</li>
+      <li><strong>Through verification</strong>, the integrity level determines the test methods accepted as evidence (analysis vs. test vs. inspection vs. demonstration), the coverage criteria applied (statement / branch / MC/DC), the review independence obligations (peer review vs. independent review vs. independent assessor), and the documentation rigor.</li>
+    </ul>
+
+    <h4>Worked Example &mdash; Safety-Relevant Requirement With Integrity Travel</h4>
+    <div class="example example-good">
+      <div class="example-label">SR-OD-1 with integrity attribute and downstream propagation</div>
+<pre><code>System requirement (safety-relevant):
+  SR-OD-1: If a calculated bolus dose exceeds the user's configured
+           maximum-single-dose parameter, the application shall reject
+           the calculation, display a non-dismissible warning, and
+           require user re-entry of inputs before any further dose
+           calculation is permitted.
+
+  Integrity:        IEC 62304 Class C (corresponds to "death or serious
+                    injury" hazard severity from over-dose).
+  Derived-from:     FTA cut-set OD-3 ("calculation produces dose
+                    exceeding safe envelope"); FMEA finding INPUT-7
+                    ("user enters unrealistic carbohydrate value").
+  Verification:     test (boundary cases) + analysis (envelope coverage);
+                    independent reviewer required (analyst not on the
+                    development team for the calculation function).
+
+Allocation (matrix entry):
+  Owning discipline:    SW (entirely - no HW path can over-dose without
+                        SW dispatching the dose).
+  Integrity decomp:     not decomposed (single-component allocation).
+  Sub-components:       calculation engine (Class C); UI warning
+                        subsystem (Class C, despite being
+                        "presentation"); input-validation subsystem
+                        (Class C). All three on the same integrity
+                        path; none of them can be relaxed.
+
+Downstream propagation:
+  - SW requirement SWR-DOSE-12 (calculation envelope check) carries
+    Class C; verification by static analysis + boundary test + MC/DC
+    coverage on the envelope-check function.
+  - SW requirement SWR-UI-44 (non-dismissible warning) carries Class C;
+    verification includes UI-fault injection (warning suppressed,
+    user-input race) and demonstrates that no path bypasses the
+    warning.
+  - Architecture: the calculation, validation, and UI-warning paths
+    are placed in a single safety-classified partition; no
+    non-safety-classified component shares state with this partition.
+  - Test: independent test team verifies the boundary conditions and
+    the warning-bypass faults; test artifacts qualified per IEC 62304
+    Class C.
+
+What would have happened without the integrity attribute:
+  - SWR-UI-44 might have been treated as a UI-class requirement
+    ("just a warning dialog"), implemented at lower verification
+    rigor, and bypassed under any number of UI race conditions
+    that boundary-tested calculation logic could not catch alone.
+  - The calculation envelope check might have been implemented as a
+    convenience guard rather than a safety guard, subject to relaxation
+    in a future "user feedback" iteration ("users find the warning
+    annoying when they're sure of their inputs"). The Class C
+    attribute makes such relaxation an explicit re-classification
+    rather than a quiet UX improvement.</code></pre>
+    </div>
+
+    <p><strong>Procedure for managing the integrity attribute:</strong> integrity is assigned at the system requirements layer based on the hazard the requirement mitigates (per the applicable standard's hazard classification table); decomposition follows the standard's decomposition rules and is recorded in the allocation matrix; downstream artifacts inherit the level from their parent; changes to the integrity attribute trigger re-verification at the new level for every downstream artifact. The integrity attribute is configuration-managed at the same level as the requirement itself; it is not a label that can be edited informally.</p>
+
+    <h3>Independence of Verification</h3>
+    <p><strong>What it establishes:</strong> at higher integrity levels, the engineer who verifies a requirement is separate from the engineer who authored or implemented it. Independence scales with integrity level: peer review at low integrity, independent reviewer at medium, organisationally-independent assessor at the highest. The principle is the same as completeness-analysis independence (see <a href="completeness-analysis.html">completeness-analysis</a> &sect;ca-vmodel-considerations) and rests on the same empirical basis: author-as-sole-verifier finds a fraction of the defects independent verification finds, and the missed defects are non-randomly distributed (they cluster where the author's mental model has already committed to a position).</p>
+    <table class="field-table">
+      <thead>
+        <tr><th>Integrity level</th><th>Independence required</th><th>Typical realisation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Low (e.g., DAL E, IEC 62304 Class A)</td><td>Peer review</td><td>A different engineer on the same team performs the verification; findings reviewed with the requirement author.</td></tr>
+        <tr><td>Medium (e.g., DAL B&ndash;C, ASIL B&ndash;C, IEC 62304 Class B)</td><td>Independent verifier</td><td>Verification performed by a separate verification function not reporting to the development lead; formal disposition of findings.</td></tr>
+        <tr><td>High (e.g., DAL A, ASIL D, IEC 62304 Class C)</td><td>Organisationally independent verifier</td><td>Verification by a separate organisation, certified independent assessor, or tool-qualified analysis pipeline; audit trail on disposition.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Worked FTTI Decomposition &mdash; The Cascade in Action</h3>
+    <p>The Fault-Tolerant Time Interval (FTTI) decomposition cascade demonstrates how a system-level safety requirement, expressed as a timing budget, decomposes through the V-model layers with integrity travel, named margins, and bidirectional propagation. The example here is the dose-dispatch over-dose containment chain on the insulin pen: detect that a dispatched dose is in error, withdraw the dispatch, and confirm safe state before the dose is actually delivered.</p>
+    <div class="example example-good">
+      <div class="example-label">FTTI cascade &mdash; over-dose detection and withdrawal</div>
+<pre><code>Hazard (from completeness analysis):
+  H-OD-1: Dispatched dose exceeds safe envelope and is delivered to
+          the user.
+
+System-level FTTI budget:
+  T_FTTI(H-OD-1) = 5.0 s   (worst-case time from dispatch to actual
+                            mechanical delivery beginning, derived from
+                            pen mechanical delay and pharmacokinetic
+                            response window).
+
+Layer: System Requirements
+  SR-OD-DET-1: The detection subsystem shall recognise an out-of-envelope
+               dose dispatch (by confirmation cross-check OR envelope
+               re-validation) within 1.5 s of dispatch transmission.
+               Integrity: Class C.
+  SR-OD-WD-1:  The application shall transmit a withdrawal command to
+               the pen and confirm pen acknowledgement within 1.0 s of
+               detection-subsystem fault output.
+               Integrity: Class C.
+  SR-OD-ACT-1: The pen firmware shall halt motor activation on receipt
+               of withdrawal command within 0.5 s of receipt and
+               confirm halted state to the application.
+               Integrity: Class C.
+
+  Sum: 1.5 + 1.0 + 0.5 = 3.0 s
+  T_margin: 5.0 - 3.0 = 2.0 s   (40% of FTTI; intentionally generous
+                                 because pharmacokinetic delay carries
+                                 measurement uncertainty).
+
+Layer: SW Requirements (allocated from SR-OD-DET-1, SR-OD-WD-1)
+  SWR-OD-DET-1a: Confirmation cross-check function shall complete within
+                 200 ms of dispatch transmission.
+  SWR-OD-DET-1b: Envelope re-validation function shall complete within
+                 1300 ms (allowing for re-fetch of therapy profile if
+                 cache stale).
+  SWR-OD-WD-1a:  Withdrawal-command construction shall complete within
+                 100 ms of fault output.
+  SWR-OD-WD-1b:  BLE write of withdrawal command shall complete within
+                 400 ms; ack receive within 500 ms.
+
+Layer: SW Architecture (allocated from SWR-OD-WD-1b)
+  SWA-OD-WD-1: BLE withdrawal-write path shall execute on a high-priority
+               thread without lock contention against any non-safety
+               BLE traffic; priority-inversion analysis required.
+
+Layer: Pen Firmware (separate development, system-allocated input)
+  Pen-FW-OD-ACT-1: Motor controller shall accept halt command on a
+                   dedicated interrupt path with 50 ms latency from
+                   receipt to motor de-energisation.
+
+Feedback example (from SW architecture review):
+  During SW architecture review, BLE stack analysis shows worst-case
+  withdrawal-write latency of 520 ms under loaded conditions (vs.
+  the SWR-OD-WD-1b budget of 400 ms write + 500 ms ack = 900 ms).
+  Two responses considered:
+    (a) Absorb the 120 ms overrun from T_margin (which has 2000 ms
+        available); update SWR-OD-WD-1b to 520 ms write + 500 ms ack;
+        re-baseline the SW requirements; T_margin reduces from 2000 ms
+        to 1880 ms; system-level baseline unchanged.
+    (b) Redesign the withdrawal-write path to use a reserved BLE
+        connection slot, reducing worst-case write latency to 350 ms;
+        no change to budgets; addresses root cause.
+  Disposition: option (b) selected because it removes the dependency
+  on shared BLE bandwidth that could re-introduce the latency in any
+  future feature that adds BLE traffic. Decision recorded in CCB record
+  CCB-OD-12 with ADR; SW architecture updated; budget unchanged;
+  re-verification required at the BLE-stack integration test level.
+
+What this cascade demonstrates:
+  - Every layer's timing requirement is traceable to the parent FTTI
+    and the hazard above it; no timing requirement appears unmotivated.
+  - Decomposition is explicit and sums correctly with named margin;
+    no silent overruns.
+  - Integrity (Class C) travels with every requirement in the chain;
+    the verification rigor at every layer is set by the integrity, not
+    by the layer's natural conventions.
+  - Feedback is visible: the SW-architecture finding triggers a CCB,
+    not a silent revision; the disposition is recorded with rationale;
+    the receiving layers re-verify against the updated baseline.</code></pre>
+    </div>
+
+    <h3>Summary &mdash; What the V-Model Adds to the Craft</h3>
+    <div class="card">
+      <p>The craft in Section&nbsp;3 produces a requirements baseline that is well-written, complete, allocated, scenario-covered, NFR-bearing, managed, and traceable. The V-model adds five obligations on top:</p>
+      <ul>
+        <li><strong>Bidirectional traceability as structural obligation</strong> &mdash; both directions are mandatory; one is not adequate; exceptions are explicit.</li>
+        <li><strong>Derived-requirements feedback loop</strong> &mdash; downstream-discovered requirements either close at their layer with rationale or escalate to the parent baseline with an update.</li>
+        <li><strong>Safety-relevant requirements as first-class</strong> &mdash; integrity attribute travels with the requirement through every artifact, governs verification rigor, decomposes per standard rules, is configuration-managed at the same level as the requirement.</li>
+        <li><strong>Independence of verification</strong> &mdash; verifier separation scales with integrity; the empirical basis is consistent across decades of inspection research.</li>
+        <li><strong>Decomposition discipline at every layer</strong> &mdash; FTTI is the worked example; the same structure (parent budget, named decomposition, named margin, bidirectional propagation) applies to every decomposable dimension.</li>
+      </ul>
+      <p>Each obligation exists because downstream layers, certification authorities, or operational deployments consume the requirements baseline expecting these properties to hold. A project can produce excellent requirements craft and still fail the V-model if these obligations are not met; the obligations are the difference between a baseline that reads well and a baseline that carries weight through the lifecycle.</p>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 5: FRAMEWORK (stub) ===================== -->
+  <section id="sr-framework">
+    <h2>Framework Integration <span class="status-badge stub">stub</span></h2>
+    <p><em>[To be written after templates exist. Will cover: system-requirements artifact schema (id, statement, EARS pattern, allocation, integrity, verification method, traceability links); allocation-matrix sub-artifact schema (rows of requirements, columns of disciplines, budget cells, margin tracking); trace-link schema (link types: satisfies, derived-from, refined-by, allocated-to, verified-by); the requirements baseline envelope; CI integration for the six automatable quality checks (no_vague_terms, atomic_check, passive_voice, no_tbd, has_measurable_criterion, no_escape_clause). Will also cover the change-control workflow: change request, impact analysis, CCB disposition, baseline update, downstream re-verification.]</em></p>
+  </section>
+
+  <!-- ===================== SECTION 6: AI SKILLS (stub) ===================== -->
+  <section id="sr-skills">
+    <h2>AI Skills Integration <span class="status-badge stub">stub</span></h2>
+    <p><em>[To be written after corresponding skills are built. Candidate skills from the backlog: vmodel-skill-write-system-requirements (transform stakeholder needs + ConOps scenarios into draft EARS-patterned system requirements with integrity attributes propagated from completeness-analysis findings), vmodel-skill-review-system-requirements (apply the INCOSE 42-rule subset, six automatable checks, and the five-element performance-requirement structure; flag anti-patterns; check trace coverage). The boundary between AI and human work is sharp here: language models are strong at applying the rule structure mechanically and producing first drafts that conform; they are weak at correctness (does this requirement actually capture what the stakeholder needs?) and at integrity assignment (does this requirement actually mitigate the hazard the analysis claims it does?). The skills will be advisory; final approval is human, and human-driven re-elicitation is the right response when the AI produces a requirement that conforms to the rules but fails to capture intent.]</em></p>
+  </section>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <section id="sr-references">
+    <h2>References</h2>
+    <p><em>[Full reference list to be compiled when page is complete. Principal sources expected: INCOSE Guide to Writing Requirements (GtWR); Mavin et&nbsp;al., &ldquo;Easy Approach to Requirements Syntax (EARS),&rdquo; RE 2009; ISO/IEC/IEEE 29148:2018 (Requirements Engineering); ISO/IEC 25010 (Quality Model); ASPICE PAM v4.0 (SYS.2 / SYS.3); DO-178C / DO-330 (aviation); ISO 26262 Parts 3, 4, 8, 9 (automotive); IEC 62304 (medical-device software); Peterson, NASA CR-2015-218982 (ARP 4754A industry study on derived-requirements feedback); Gotel &amp; Finkelstein, &ldquo;An Analysis of the Requirements Traceability Problem,&rdquo; ICRE 1994; Bass et&nbsp;al., Software Architecture in Practice (quality-attribute scenarios); Kruchten / Tyree &amp; Akerman / Nygard (decision rationale and ADRs); Kunz &amp; Rittel (IBIS); Zowghi &amp; Nurmuliani (requirements volatility). Engineering-codex pages: concept-requirement-quality, concept-ears, concept-ubiquitous-language, concept-bounded-context, src-incose-42-rule-guide-reqi-2026, src-arch-readiness-promwad-latency-budget, src-ftti-iso26262-nvdungx-2026, src-arch-readiness-nasa-logical-decomposition, src-arch-readiness-specinnovations-derivation-pt1, src-arch-readiness-wikipedia-asr, src-shull-pbr-requirements-2000, pat-traceability-as-code. Primary research documents: research/system-level/03a, 03b, 03c, 03d, 04b, 05f.]</em></p>
+  </section>
+
+</main>
+
+</body>
+</html>
