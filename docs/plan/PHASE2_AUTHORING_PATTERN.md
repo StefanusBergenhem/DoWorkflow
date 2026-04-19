@@ -62,9 +62,9 @@ Inspect for HTML template structure (CSS, header/sidebar/footer partials, sectio
 
 ## 4. Per-artifact flow (fresh session each)
 
-1. **Explore** — substrate in the three-tier order above. Assess what the existing pre-pivot page carries vs. needs rewriting. May parallelize via subagents if substrate is sprawling.
+1. **Explore** — substrate in the three-tier order above. Assess what the existing pre-pivot page carries vs. needs rewriting. Parallelize via subagents when substrate is sprawling (codex + `research/` + existing HTML scouts run well in parallel).
 2. **Propose** — summarize findings + a 5-section outline + gaps. Wait for user decisions.
-3. **Write HTML** — author the new page; replace existing file. Dispatch to subagent with a thorough prompt capturing voice rules and outline.
+3. **Write HTML** — author the new page **in the main context**; replace the existing file. **Do not dispatch HTML authoring to subagents.** Learned on Detailed Design (2026-04-19): subagent authoring produced a truncated, under-specified first pass that required a full main-context rewrite anyway. Subagents are the right tool for exploration and inventory (step 1); authoring stays in main because it needs the substrate reports, the user's approved outline, and the carry-over snippets all in one working context. Cost is controlled because steps 1–2 already reduced the substrate to a digest.
 4. **Review + iterate** — user reviews the rendered page; iterate until accepted. Update this pattern doc if new decisions surface.
 
 ---
@@ -105,8 +105,8 @@ Inspect for HTML template structure (CSS, header/sidebar/footer partials, sectio
 ## 8. Remaining artifact order
 
 1. ~~ADR~~ — complete (2026-04-19).
-2. **Detailed Design** — compression exercise; existing page has substantial carry-over; remove old Section 8 Test Strategy; reference TestSpec.
-3. **Product Brief** — new; consolidates former `stakeholder-needs` + `conops` + `completeness-analysis` pages.
+2. ~~Detailed Design~~ — complete (2026-04-19). Compression carried ~45% of the pre-pivot page's substance (DbC example, behavioural-spec example, error matrix, config-loader example, References core) under the new 5-section + 7-artifact-section shape; the rest was rewritten.
+3. **Product Brief** — next. Consolidates former `stakeholder-needs` + `conops` + `completeness-analysis` pages.
 4. **Requirements** — new; EARS craft, rationale discipline, measurable QAs.
 5. **Architecture** — new; decomposition, interfaces, mandatory Composition section.
 6. **TestSpec** — new; derivation strategies, per-layer emphasis, coverage targets.
