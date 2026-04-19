@@ -4,7 +4,7 @@
 
 Four independent components designed to work together for AI-augmented spec-driven development with V-model rigor:
 
-1. **Documentation** — Single source of truth for all domain knowledge. Per artifact type: 7 sections (V-model context, best practices, anti-patterns, examples, framework integration, AI skills integration, Quality Bar). AI skills are derived from this. Non-negotiable foundation.
+1. **Documentation** — Single source of truth for all domain knowledge. Per artifact type: 5 sections (V-model context, best practices, anti-patterns, examples, Quality Bar). AI skills are derived from this. Non-negotiable foundation.
 2. **Templates & Schemas** — Artifact definitions, structural-rigor schemas, canonical Quality Bar checklists. Usable by humans, agents, or both.
 3. **Traceability** — Link model + validation rules. Forward links embedded in artifacts; reverse relationships derived by tooling.
 4. **AI Skills** — Craft skills (standalone best practices, derived from documentation) and framework skills (orchestration, template integration, traceability use, retrofit mode).
@@ -35,6 +35,7 @@ The project pivoted on 2026-04-18 from a safety-specific V-model framework (HW/S
 - **Structured back-and-forth.** Present ideas, ask for input or approval, then implement. Applies to schemas, skills, prompts, and any new files.
 - **Small increments.** One concept at a time. Get alignment, then move on.
 - **Dispatch concrete execution to subagents.** Keep the main conversation focused on design, alignment, and sign-offs; file operations, multi-step lookups, and content rewrites go to subagents.
+- **Phase 2: fresh session per artifact.** Research substrate discipline: engineering-codex first (primary, software-first), `research/` second (secondary, with explicit safety-bias caveat — extract craft, discard framing), existing `docs/guide/artifacts/*.html` as pre-pivot output reference only (not substrate). Per-artifact loop: explore → propose structure+gaps → author → review.
 
 ---
 
@@ -72,17 +73,17 @@ Ten load-bearing principles. Canonical wording in `TARGET_ARCHITECTURE.md §3`. 
 
 - **Phase 0** — Archival — **DONE** (commit `69330f3`, 2026-04-18).
 - **Phase 1** — Foundation rewrite (BACKLOG, TARGET_ARCHITECTURE, this CLAUDE.md) — **IN PROGRESS**.
-- **Phase 2** — Per-artifact documentation (6 types, ~1/4 current size, best practices only first pass).
+- **Phase 2** — Per-artifact documentation (6 types, whole document per artifact under the 5-section structure; information density over length).
 - **Phase 3** — Schemas derived from docs.
 - **Phase 4** — Product Briefs for purpose-built tools (context only; can run parallel with Phase 5).
-- **Phase 5** — Skills (craft authoring + review per artifact; framework skills; Quality Bar YAML prereq).
+- **Phase 5** — Skills (craft authoring + review per artifact; framework skills). Quality Bar YAML is extracted in Phase 3, not a Phase 5 prerequisite.
 - **Phase 6** — Tools (each a separate product repo, built via framework — dogfooding). Gates on Build workflow design (deferred).
 - **Phase 7** — Retrofit-specific additions.
 
 Full details in `docs/plan/BACKLOG.md`.
 
 **Pre-pivot work preserved and operational:**
-- Lower V docs (`source-code.html`, `unit-test.html`, `detailed-design.html`) — to be condensed ~75% in Phase 2.
+- Lower V docs (`source-code.html`, `unit-test.html`, `detailed-design.html`) — treated as pre-pivot outputs; content mined as reference, pages replaced in Phase 2.
 - Skills `develop-code`, `derive-test-cases`, `vmodel-skill-review-code` — operational.
 - C2–C4 DD skills paused; superseded by Phase 5 structure.
 
@@ -94,21 +95,21 @@ Full details in `docs/plan/BACKLOG.md`.
 
 **Keep documentation in sync with every change.** Whenever components are updated (schemas, trace model, skills), the corresponding section in `docs/guide/` must also be updated.
 
-The documentation uses a **domain translation plugin system** (SOLID: content uses generic terms; domain-specific vocabulary applied at runtime from JSON plugins). Never hard-couple domain-specific terms into HTML content.
+**Domain translation plugin — deferred.** Phase 2 content is authored in direct software-engineering English only; the runtime translation plugin system and domain JSON files (`docs/guide/domains/*.json`) are being parked. Maintaining the plugin machinery while simultaneously establishing voice and rigor in new content created unacceptable drift risk. The JSON files will be archived to `archive/pre-pivot-2026-04-18/domains/` as a separate Phase 2 task; the mechanism (or a simpler successor) may be reintroduced once content is stable (see `TARGET_ARCHITECTURE §15`).
 
 **Proactively raise this:** when working on component changes, always remind that `docs/guide/` needs a corresponding update before the work is considered complete.
 
-### Per-Artifact Documentation Structure (7 sections)
+### Per-Artifact Documentation Structure (5 sections)
 
-1. **V-model context** — what, where, why.
+1. **V-model context** — what, where, why (how the artifact fits in the development flow).
 2. **Best practices** — how to produce quality output (the bulk).
 3. **Anti-patterns** — common mistakes.
 4. **Examples** — good and bad.
-5. **Framework integration** — template, traceability links, AI skills.
-6. **AI skills integration** — how craft and framework skills relate.
-7. **Quality Bar** — concrete Yes/No checklist grouped by concern; also extracted as canonical YAML consumed by templates + authoring/review skills.
+5. **Quality Bar** — concrete Yes/No checklist grouped by concern. Canonical YAML form is extracted in Phase 3 alongside other schemas and consumed by templates + authoring/review skills.
 
-This documentation is the source of truth. AI craft skills are distilled from it. Write docs first, then derive skills.
+Framework-integration and AI-skills-integration coverage — which appeared as separate sections in an earlier draft — are craft-orthogonal and belong in tool docs and skill docs respectively, not in per-artifact craft pages.
+
+This documentation is the source of truth for craft. AI craft skills are distilled from it. Write docs first, then derive skills.
 
 ---
 
@@ -121,7 +122,7 @@ Every specification artifact — at every layer — must be unambiguous enough t
 ## Domain
 
 - V-model as **engineering infrastructure** — safety-specific framing removed. The techniques (layered decomposition, traceability, design-test coupling) apply at any rigor level.
-- **Generic terminology** internally; standards vocabulary (DO-178C, ASPICE, ISO 26262) applied via translation plugins.
+- **Direct software-engineering English** in authored content; the pre-pivot translation plugin for standards vocabulary (DO-178C, ASPICE, ISO 26262) is deferred (see Documentation section above).
 - EARS syntax is a craft skill preference, not a framework requirement.
 
 ---
@@ -153,9 +154,9 @@ research/               — Research documents on standards, patterns, strategie
 docs/plan/              — Architecture (TARGET_ARCHITECTURE.md) and backlog (BACKLOG.md)
 docs/guide/             — Interactive HTML documentation (V-model guide + framework docs)
   css/                  — Styling
-  js/                   — domain.js (translation plugin), app.js (nav), v-diagram.js (SVG)
-  domains/              — Domain translation plugins (generic.json, do178c.json, aspice.json)
-  artifacts/            — Per-artifact HTML pages (to be condensed + reworked in Phase 2)
+  js/                   — app.js (nav), v-diagram.js (SVG); domain.js wiring to be removed in Phase 2
+  domains/              — Domain translation plugins (generic.json, do178c.json, aspice.json) — to be archived in Phase 2
+  artifacts/            — Per-artifact HTML pages (to be rewritten under 5-section structure in Phase 2)
 schemas/
   core/                 — Meta-schemas (skill contracts, pipeline contracts)
   artifacts/            — Artifact type schemas (Phase 3 rewrite against 6-artifact model)
@@ -181,7 +182,7 @@ schemas/
 ## Conventions
 
 - Artifact files: single-file Markdown, YAML front-matter + embedded YAML blocks + Mermaid.
-- Terminology: Generic V-model internally; standards vocabulary via translation layer.
+- Terminology: direct software-engineering English; standards-vocabulary translation layer deferred (see Documentation section).
 - **Uniform high rigor.** No per-artifact rigor tiers.
 - All framework outputs include verification via Quality Bar checklists.
 - IDs are stable across file renames; traceability links reference IDs, not paths.

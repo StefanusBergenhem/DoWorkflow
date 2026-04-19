@@ -14,7 +14,7 @@
 <aside class="sidebar">
   <div class="sidebar-header">
     <h1>VModelWorkflow</h1>
-    <div class="subtitle">V-Model Development Guide</div>
+    <div class="subtitle">Spec-Driven Development Guide</div>
   </div>
 
   <nav class="sidebar-nav">
@@ -25,35 +25,20 @@
 
     <div class="nav-group">
       <span class="nav-group-label">ADR</span>
-      <a class="nav-link" href="#adr-intro">What Is an ADR?</a>
-      <a class="nav-link" href="#adr-vmodel">V-Model Context</a>
-      <a class="nav-link" href="#adr-quality">Producing a Quality ADR</a>
-      <a class="nav-link" href="#adr-considerations">V-Model Considerations</a>
-    </div>
-
-    <div class="nav-group">
-      <span class="nav-group-label">V-Model &amp; Framework</span>
-      <a class="nav-link" href="#adr-framework">Framework Integration <span class="status-badge stub">stub</span></a>
-      <a class="nav-link" href="#adr-skills">AI Skills <span class="status-badge stub">stub</span></a>
+      <a class="nav-link" href="#adr-context">1. V-Model Context</a>
+      <a class="nav-link" href="#adr-best-practices">2. Best Practices</a>
+      <a class="nav-link" href="#adr-anti-patterns">3. Anti-Patterns</a>
+      <a class="nav-link" href="#adr-examples">4. Examples</a>
+      <a class="nav-link" href="#adr-quality-bar">5. Quality Bar</a>
+      <a class="nav-link" href="#adr-references">References</a>
     </div>
 
     <div class="nav-group">
       <span class="nav-group-label">Related Artifacts</span>
-      <a class="nav-link" href="system-requirements.html">System Requirements</a>
+      <a class="nav-link" href="system-requirements.html">Requirements</a>
       <a class="nav-link" href="detailed-design.html">Detailed Design</a>
-      <a class="nav-link" href="../skills-architecture.html">Skills Architecture</a>
-      <a class="nav-link" href="#adr-references">References</a>
     </div>
   </nav>
-
-  <div class="domain-switcher">
-    <label for="domain-select">Domain Vocabulary</label>
-    <select id="domain-select">
-      <option value="generic">Generic V-Model</option>
-      <option value="do178c">DO-178C (Aviation)</option>
-      <option value="aspice">ASPICE / ISO 26262 (Automotive)</option>
-    </select>
-  </div>
 </aside>
 
 <!-- ============================================================
@@ -61,234 +46,440 @@
      ============================================================ -->
 <main class="main-content" style="margin-left: var(--sidebar-width); padding: var(--space-3xl) var(--space-2xl); max-width: calc(var(--content-max) + var(--space-2xl) * 2 + var(--sidebar-width));">
 
-  <!-- ===================== SECTION 1: INTRO ===================== -->
-  <section id="adr-intro">
-    <div class="level-indicator left">Cross-Cutting &mdash; Decision Capture</div>
-    <h2>What Is an Architecture Decision Record?</h2>
-    <p class="lead">An Architecture Decision Record (ADR) is a short, version-controlled document that captures one load-bearing decision &mdash; the context that forced it, the options considered, the option chosen, and the consequences accepted. ADRs are the only artifact in the development stack that distinguishes <em>essential</em> constraints from <em>accidental</em> ones. Without them, code, tests, and design documents all flatten into &ldquo;this is how it is&rdquo; and a future maintainer (human or AI) cannot tell which parts of the system are load-bearing and which are incidental.</p>
+  <!-- ===================== SECTION 1: V-MODEL CONTEXT ===================== -->
+  <section id="adr-context">
+    <div class="level-indicator left">Cross-Cutting Artifact</div>
+    <h2>1. V-Model Context</h2>
+    <p class="lead">An Architecture Decision Record (ADR) is a short, version-controlled document that captures one load-bearing decision: the situation that forced it, the options considered, the option chosen, the reasoning, and the consequences accepted. One decision per file.</p>
+
+    <h3>Cross-cutting by design</h3>
+    <p>ADRs are not bound to a single layer of the scope tree. A load-bearing decision can surface at any depth &mdash; the root product, an intermediate subsystem, or a leaf module. The <code>scope_tags</code> field names the scope(s) the decision primarily applies to; ADRs themselves live flat in <code>/specs/adrs/</code> so that a decision that spans multiple children is not buried inside one of them.</p>
+
+    <h3>Why the framework treats ADRs as first-class</h3>
+    <p>Code, tests, and state documentation together describe what the system <em>is</em>. They do not distinguish <em>essential</em> constraints &mdash; the ones a change must respect &mdash; from <em>accidental</em> ones, which just happened to be how someone typed it. Every line of code looks equally load-bearing without a record of which constraints carry weight and why.</p>
+    <p>Rationale is the artifact that draws that line. When it is captured at decision time, a future reader (human or agent) can tell a hard requirement from an incidental choice, safely refactor the accidental parts, and negotiate the essential parts with eyes open. When rationale is missing, every refactor looks risky and every review is reduced to checking that code matches tests. Tests without rationale cannot explain themselves: a passing assertion may encode a specification, a customer accommodation from 2019, or a hardware quirk, and all three look identical in the test file.</p>
+    <p>This argument is <em>essential-vs-accidental constraint distinguishability</em>. It is the reason ADRs sit in the artifact set.</p>
 
     <div class="card">
-      <h3>The Threshold</h3>
-      <p>An ADR is created when <strong>all</strong> of the following hold:</p>
+      <h3>The threshold for authoring an ADR</h3>
+      <p>All three conditions must hold. If any one is missing, it is not ADR-worthy &mdash; note it inline in the Architecture or Detailed Design and move on.</p>
       <ul>
         <li><strong>Load-bearing.</strong> Changing the decision later could break the system or invalidate downstream design.</li>
-        <li><strong>Multiple real options existed.</strong> Two or more alternatives were on the table and one was picked.</li>
-        <li><strong>Rests on assumptions or drivers that may change.</strong> The decision is contingent on something specific to the present context.</li>
+        <li><strong>Multiple real options existed.</strong> Two or more alternatives were genuinely on the table.</li>
+        <li><strong>Contingent on assumptions or drivers that may change.</strong> The decision rests on something specific to the present context; if those inputs shift, the decision may need to be revisited.</li>
       </ul>
-      <p>An ADR is <em>not</em> created for routine choices, taste calls, or the mechanical application of an established pattern. The threshold is deliberately high: ADRs that are written for everything stop being written at all (the capture-cost master constraint &mdash; see References).</p>
-      <p><strong>Self-test:</strong> &ldquo;Could a future maintainer who changes this break the system?&rdquo; &mdash; if yes, ADR; if no, no ADR.</p>
+      <p>Deliberately high bar. ADRs written for every naming convention and import choice stop being written for the decisions that matter.</p>
     </div>
 
-    <h3>The ADR Is the Artifact of the Decision Conversation</h3>
-    <p>An ADR is not a justification written after a design is drafted. It is the record of the conversation in which the decision was made. The order is:</p>
-    <ol>
-      <li>A conversation (human-AI, or human-human) surfaces options and weighs them against drivers.</li>
-      <li>A decision is reached.</li>
-      <li>The ADR is drafted capturing that decision.</li>
-      <li>The design derives from the ADR.</li>
-    </ol>
-    <p>If the design is drafted first and the ADR is written afterwards to justify it, the option space has already collapsed and the ADR is reconstruction rather than recording. The same failure mode &mdash; confident invention rather than faithful capture &mdash; that makes legacy rationale recovery prone to fabrication also corrupts post-hoc ADRs in greenfield work.</p>
-
-    <h3>What an ADR Is Not</h3>
+    <h3>What an ADR is not</h3>
     <ul>
-      <li><strong>Not a design document.</strong> An ADR captures a decision; the design captures the structure that implements it. The two are linked but distinct.</li>
-      <li><strong>Not a meeting record.</strong> Discussion is summarised &mdash; the decision and the reasons are what survive, not the conversation transcript.</li>
-      <li><strong>Not a justification for a chosen technology.</strong> If only one option was ever considered, there is no decision and no ADR &mdash; just a note in the design.</li>
-      <li><strong>Not a retrofitted record.</strong> Reconstructing rationale for legacy code is forbidden. See &sect;3 Forward-Only Policy.</li>
+      <li><strong>Not a design document.</strong> The ADR captures a decision; the Architecture or Detailed Design captures the structure that implements it.</li>
+      <li><strong>Not a meeting record.</strong> Discussion is summarised to the decision and the reasons that survive it. Transcripts do not belong.</li>
+      <li><strong>Not a justification for a foregone conclusion.</strong> If only one option was ever considered, there was no decision &mdash; there is a note for the design, not an ADR.</li>
+      <li><strong>Not a retrofit invention.</strong> When rationale for a pre-existing decision is lost, the framework records that it is lost, not a plausible-sounding story.</li>
     </ul>
+
+    <h3>Where ADRs originate</h3>
+    <p>Default origin: <strong>during Architecture authoring</strong>, as the decomposition exposes a decision that meets the threshold. The Architecture references the ADR through <code>governing_adrs</code>.</p>
+    <p>Alternative origin: <strong>before Architecture</strong>, when an external or organisational decision already binds &mdash; e.g., "we run on Postgres" is policy before this scope exists. The ADR is written first, and the Architecture consumes it through the same <code>governing_adrs</code> link.</p>
   </section>
 
-  <!-- ===================== SECTION 2: V-MODEL CONTEXT ===================== -->
-  <section id="adr-vmodel">
-    <h2>ADRs in the V-Model</h2>
-    <p class="lead">ADRs are <strong>cross-cutting</strong>. They are not owned by a single V-model layer. A load-bearing decision can occur at any layer at which design happens &mdash; system architecture, software architecture, detailed design, or component-level when a load-bearing pattern is selected. The threshold filters which decisions become ADRs; the layer just labels them.</p>
+  <!-- ===================== SECTION 2: BEST PRACTICES ===================== -->
+  <section id="adr-best-practices">
+    <h2>2. Best Practices</h2>
 
-    <h3>Where ADRs Originate</h3>
-    <p>Two sources, both legitimate:</p>
-    <ul>
-      <li><strong>Research / plan phase.</strong> The interactive conversation in which a human and an AI agent shape the approach to a piece of work. Decisions reached during this phase that meet the threshold become ADRs as part of the plan output.</li>
-      <li><strong>Build phase, via HALT.</strong> A developer agent executing a task contract may encounter a load-bearing decision it cannot make alone. It writes a HALT artifact with category <code>design-issue</code>; the resolving human-AI conversation produces the ADR; the agent resumes with the ADR + updated design as input. See <a href="../skills-architecture.html#sa-halt">HALT Pattern</a> in the Skills Architecture.</li>
-    </ul>
+    <h3>Canonical fields</h3>
+    <p>An ADR is a single Markdown file under <code>/specs/adrs/adr-NNN-{slug}.md</code> with YAML front-matter and a short body. The canonical field list:</p>
 
-    <h3>Trigger: Either Side</h3>
-    <p>Both human and AI may propose an ADR. Each shares the discipline:</p>
-    <ul>
-      <li>The AI is instructed (in skill prompts) to recognise when a load-bearing decision is being made and <strong>suggest</strong> capturing an ADR.</li>
-      <li>The human exercises the same recognition independently and may call for an ADR even when the AI did not suggest one.</li>
-    </ul>
-    <p>The decision to <em>accept</em> an ADR is always the human's. AI may draft the body; only a named human appears in <code>deciders</code>.</p>
-
-    <h3>Cross-Reference into Other Artifact Pages</h3>
-    <p>System Requirements <a href="system-requirements.html#sr-management">&sect;3.6 Decision Rationale and the ADR Discipline</a> covers the use of ADRs for non-trivial requirement changes. Detailed Design <a href="detailed-design.html">Layer 3 &sect;Design Rationale</a> covers per-unit rationale that may either be inline or, when load-bearing, escalated to a stand-alone ADR. This page is the canonical treatment; the artifact-specific pages reference it for the cross-cutting discipline.</p>
-  </section>
-
-  <!-- ===================== SECTION 3: PRODUCING A QUALITY ADR ===================== -->
-  <section id="adr-quality">
-    <h2>Producing a Quality ADR</h2>
-    <p class="lead">Quality, for an ADR, is not literary. The ADR is good when a different engineer can read only the ADR and derive the same design from it. If they cannot, the ADR has under-specified the decision and the design contains commitments that were not actually captured.</p>
-
-    <h3>Template</h3>
-    <p>Markdown with YAML frontmatter. One file per decision under <code>docs/artifacts/adr/ADR-nnn.md</code>. The full schema is in <code>schemas/artifacts/adr.schema.yaml</code>; the template content is reproduced here for reference.</p>
-
-    <div class="card">
-      <h4>Frontmatter</h4>
-      <pre><code>---
-artifact_id: ADR-001
-artifact_type: adr
-title: "Token bucket for fuel-rate limiting"
-status: accepted              # proposed | accepted | superseded
-deciders: ["Stefanus Bergenhem"]
-date: 2026-04-17
-provenance: recorded          # only legal value — see Forward-Only below
-layer: detailed-design        # optional; system-arch | sw-arch | detailed-design | component | cross-cutting
-related:
-  requirements: [SWREQ-042, SWREQ-044]
-  produces: [DD-017]
-  # supersedes: ADR-012       # when this replaces an earlier decision
----</code></pre>
-
-      <h4>Body (required headings, in order)</h4>
-      <pre><code># ADR-001: Token bucket for fuel-rate limiting
-
-## Context and Problem Statement
-2-5 sentences on what changed, why a decision is needed now,
-and the forces at play. Neutral language, no solutions yet.
-
-## Key Assumptions
-- Bullet list. Grounds on which this decision rests.
-- If any of these change, the ADR may need to be revisited or superseded.
-
-## Decision Drivers
-- Bullet list. Criteria, quality attributes, or constraints
-  that weigh on the choice.
-
-## Considered Options
-- Option A — short description
-- Option B — short description
-- (At least two. A single-option ADR is a description, not a decision.)
-
-## Decision Outcome
-Chosen option: B, because [justification tied explicitly to named drivers].
-One short paragraph.
-
-## Positive Consequences
-- Bullet list of expected benefits.
-
-## Negative Consequences (Trade-offs)
-- Bullet list of accepted costs, risks, or constraints.
-- An ADR with no negatives listed is almost certainly missing them.</code></pre>
-    </div>
-
-    <h3>The Conversation Pattern</h3>
-    <p>A typical run from problem to ADR:</p>
-    <ol>
-      <li><strong>Surface options.</strong> Either side names two or more candidate approaches. The AI is good at brainstorming; the human is good at filtering for context-fit.</li>
-      <li><strong>Name the drivers.</strong> Quality attributes, constraints, deadlines, dependencies. Make them explicit before evaluating options &mdash; otherwise post-hoc weighting creeps in.</li>
-      <li><strong>State assumptions.</strong> What does each option assume about the world? These are the future revisit triggers; surfacing them early makes them inspectable.</li>
-      <li><strong>Pick.</strong> The decision emerges from how options score against drivers. The justification line in the ADR cites the drivers by name.</li>
-      <li><strong>Capture, then design.</strong> Write the ADR. Then derive the design from it &mdash; not the other way around.</li>
-    </ol>
-
-    <h3>Forward-Only: Never Reconstruct Rationale</h3>
-    <div class="card">
-      <p>An ADR records a decision <em>at decision time</em>. Reconstructing rationale for legacy code is forbidden by this framework. The <code>provenance</code> field has exactly one legal value, <code>recorded</code>, precisely so that there is nowhere to put &ldquo;reconstructed.&rdquo; The schema itself enforces the policy.</p>
-      <p>Why: an LLM (or a human guessing from code) asked to recover the original rationale produces confident invention &mdash; plausible-sounding justifications, fabricated constraint sources, false-precision trade-offs. The failure mode is not silence (which would be detectable) but confident invention (which looks like rationale and isn't). Once invented rationale enters the trace graph, every downstream artifact that cites it inherits the contamination.</p>
-      <p><strong>Honest alternative for legacy:</strong> mark the decisions &ldquo;rationale unknown&rdquo; in whatever index the project uses. Begin the ADR stream from baseline-day forward. Pretending to recover rationale is worse than admitting it is gone.</p>
-    </div>
-
-    <h3>Fitness Test</h3>
-    <p>One question, applied after the ADR is drafted:</p>
-    <p style="padding-left: var(--space-lg); border-left: 4px solid var(--accent-trace); margin-left: var(--space-md);"><em>&ldquo;Could a different engineer, reading only this ADR, derive the same design from it?&rdquo;</em></p>
-    <ul>
-      <li>If <strong>yes</strong> &mdash; the ADR is sufficient.</li>
-      <li>If <strong>no</strong> &mdash; the ADR under-specifies the decision; the design contains commitments that were not actually captured. Revise the ADR before accepting it.</li>
-    </ul>
-
-    <h3>Common Anti-Patterns</h3>
-    <ul>
-      <li><strong>Single-option ADR.</strong> Lists one option and a justification. This is a description, not a decision &mdash; either rewrite with the alternatives that were actually considered, or skip the ADR entirely.</li>
-      <li><strong>Generic justification.</strong> &ldquo;Chosen because it is more flexible / more modern / industry standard.&rdquo; The justification must reference the named drivers from this ADR &mdash; not generic praise of the option.</li>
-      <li><strong>Missing negatives.</strong> Positive consequences listed; negatives empty or hand-waved. Every load-bearing decision has trade-offs; if you cannot name them, you have not understood the decision.</li>
-      <li><strong>Buried assumptions.</strong> Assumptions implicit in Context prose rather than listed in Key Assumptions. Future maintainers will miss them.</li>
-      <li><strong>Post-hoc rationalisation.</strong> Design drafted first, ADR written to match. Detectable by the absence of any options that would have produced a different design &mdash; the option space has already been pruned to one.</li>
-      <li><strong>ADRs for routine choices.</strong> Capturing every variable name and method signature as an ADR. Ratio of signal to noise collapses; nothing gets read.</li>
-    </ul>
-  </section>
-
-  <!-- ===================== SECTION 4: V-MODEL CONSIDERATIONS ===================== -->
-  <section id="adr-considerations">
-    <h2>V-Model Considerations</h2>
-
-    <h3>Traceability</h3>
-    <p>ADRs are first-class trace nodes. Other artifacts cite an ADR by its <code>artifact_id</code>. Trace links are managed by the Traceability pillar (Pillar 2), not embedded in the ADR body. The <code>related</code> frontmatter is a lightweight in-document mirror of the formal trace links.</p>
     <table class="field-table">
       <thead>
-        <tr><th>From</th><th>To</th><th>Meaning</th></tr>
+        <tr><th>Field</th><th>Purpose</th></tr>
       </thead>
       <tbody>
-        <tr><td>Requirement</td><td>ADR</td><td>The decision constrains or interprets the requirement</td></tr>
-        <tr><td>Design artifact</td><td>ADR</td><td>The design implements the decision</td></tr>
-        <tr><td>ADR</td><td>ADR</td><td>Supersedes / refines</td></tr>
+        <tr><td><code>id</code></td><td>Stable identifier: <code>ADR-{seq}-{slug}</code>.</td></tr>
+        <tr><td><code>title</code></td><td>Short active-voice noun phrase naming the decision.</td></tr>
+        <tr><td><code>status</code></td><td><code>proposed</code> &rarr; <code>accepted</code> &rarr; <code>superseded</code>.</td></tr>
+        <tr><td><code>date</code></td><td>Date of acceptance (or first draft if still <code>proposed</code>).</td></tr>
+        <tr><td><code>scope_tags</code></td><td>Scope(s) the decision primarily applies to. Non-empty.</td></tr>
+        <tr><td><code>supersedes</code> / <code>superseded_by</code></td><td>ADR lineage when this replaces or is replaced by another.</td></tr>
+        <tr><td><code>affected_scopes</code></td><td>Optional: scopes the decision affects beyond its primary scope.</td></tr>
+        <tr><td><code>context</code></td><td>The situation addressed. What forces are at play, and why now.</td></tr>
+        <tr><td><code>decision</code></td><td>What was chosen. Active voice ("We will ...").</td></tr>
+        <tr><td><code>alternatives_considered</code></td><td>At least two. Each with a concrete reason for rejection.</td></tr>
+        <tr><td><code>rationale</code></td><td>Why the chosen option wins against the named drivers.</td></tr>
+        <tr><td><code>consequences</code></td><td>Positive and negative outcomes. Ends with the Reversibility sub-prompt (below).</td></tr>
       </tbody>
     </table>
-    <p>The interesting open question &mdash; whether ADRs sit in the standard trace chain (requirement &rarr; ADR &rarr; design &rarr; code &rarr; test) or as a parallel rationale graph anchored to design elements &mdash; is being worked separately. See backlog item under Component 2.</p>
 
-    <h3>Immutability and Supersession</h3>
-    <p>An accepted ADR is append-only. Decisions change; the historical record does not. To change a decision:</p>
-    <ol>
-      <li>Write a new ADR. Set its <code>status</code> to <code>accepted</code> and its <code>related.supersedes</code> to the old ADR's id.</li>
-      <li>Update the old ADR: change <code>status</code> to <code>superseded</code>; set <code>related.superseded_by</code> to the new ADR.</li>
-    </ol>
-    <p>Never edit the body of an accepted ADR. Preserving the decision graph is what makes informed change possible later &mdash; including the ability to revisit a decision when one of its key assumptions turns out to have changed.</p>
+    <h3>The Reversibility sub-prompt &mdash; mandatory inside Consequences</h3>
+    <div class="card">
+      <p>Every ADR's Consequences section ends with a direct answer to this prompt, verbatim:</p>
+      <p style="padding-left: var(--space-lg); border-left: 4px solid var(--accent-trace); margin-left: var(--space-md);"><em>Is this decision reversible? If yes: state the rollback path. If no: state the recovery plan and name who must sign off before implementation.</em></p>
+      <p>Reversibility sets the risk profile. A reversible decision can be walked back with a migration or a feature flag &mdash; review it like any other technical choice. An irreversible decision persists in data shape, public contracts, or regulatory posture. It deserves a named human on the hook and a recovery plan written before implementation, because the cost of being wrong is not a sprint; it is a rewrite.</p>
+      <p>The prompt is answered, not acknowledged. "Partially reversible" is not an answer &mdash; name which parts are which, and treat each on its own terms.</p>
+    </div>
 
-    <h3>Build-Phase Integration via HALT</h3>
-    <p>The <a href="../skills-architecture.html#sa-halt">HALT pattern</a> in the Skills Architecture defines a <code>design-issue</code> category for when an agent encounters a load-bearing decision it cannot make alone. The flow:</p>
+    <h3>Conversation pattern &mdash; capture then design</h3>
+    <p>The sequence that produces a faithful ADR:</p>
     <ol>
-      <li>Agent hits the design issue &mdash; writes <code>halt.yaml</code> with <code>category: design-issue</code> and the candidate options listed.</li>
-      <li>Human is notified, opens a conversation with the agent (or a fresh one) to resolve.</li>
-      <li>Resolution produces an ADR. The HALT and the ADR are separate artifacts &mdash; the HALT records the pause; the ADR records the decision.</li>
-      <li>Agent resumes with the ADR and the updated design as input.</li>
+      <li><strong>Surface options.</strong> Two or more real candidates, named.</li>
+      <li><strong>Name the drivers.</strong> Quality attributes, constraints, deadlines, dependencies &mdash; made explicit before any option is evaluated, so weighting does not creep in post-hoc.</li>
+      <li><strong>State assumptions.</strong> What each option assumes about the world. These are the revisit triggers; surface them so they can be inspected.</li>
+      <li><strong>Pick.</strong> The chosen option scores best against the drivers. The rationale cites drivers by name.</li>
+      <li><strong>Capture.</strong> Write the ADR.</li>
+      <li><strong>Design.</strong> Derive the Architecture or Detailed Design from the ADR, not the other way around.</li>
     </ol>
-    <p>This is the only sanctioned way for build-phase decisions to enter the trace graph. An agent that makes a load-bearing decision unilaterally and continues is in violation of the framework discipline; build agents are instructed to HALT.</p>
+    <p>If the design is drafted first and the ADR is written afterwards, the option space has already collapsed. What remains is reconstruction, and reconstruction looks like rationale without being rationale.</p>
+
+    <h3>Capture at decision time</h3>
+    <p>Rationale is lossy the moment a decision is made. The options that were on the table, the trade-offs that were weighed, the assumptions that pointed one way rather than another &mdash; all of it becomes invisible in the resulting artifact. A week later, the author can reproduce an approximation; a month later, a plausible-sounding version; a year later, a story that reads well but does not match what happened.</p>
+    <p>Write the ADR while the conversation is still in working memory. This is cheap at decision time and expensive at any later point.</p>
+
+    <h3>Immutability and supersession</h3>
+    <p>An ADR's lifecycle is <code>proposed</code> &rarr; <code>accepted</code> &rarr; <code>superseded</code>. Once accepted, the body is immutable. Changing a decision does not mean editing the old ADR; it means writing a new one that supersedes it:</p>
+    <ol>
+      <li>Author a new ADR. Set its status to <code>accepted</code> and its <code>supersedes</code> to the old ADR's id.</li>
+      <li>Edit the old ADR's front matter only: set <code>status</code> to <code>superseded</code> and <code>superseded_by</code> to the new ADR's id. Do not touch the body.</li>
+    </ol>
+    <p>The point is the historical graph. A maintainer revisiting a decision three years later needs to see the chain &mdash; what was decided, what it was replaced with, and why &mdash; not a single document that has been silently rewritten.</p>
+
+    <h3>Propagation &mdash; hybrid rule</h3>
+    <p>An ADR's consequences create downstream obligations. The framework propagates these in two ways, and one ADR can use both:</p>
+    <ul>
+      <li><strong>New requirement at the ADR's own layer</strong> &mdash; when the consequence is testable at that layer. Example: "latency &lt; 50 ms at the queue ingress" becomes a Quality Attribute requirement on the scope that owns the queue.</li>
+      <li><strong><code>governing_adrs</code> reference from child artifacts</strong> &mdash; when the consequence only bounds choices made lower down. Example: "job payloads are JSON" propagates as a constraint the child Detailed Design honours, not a testable target at the ADR's layer.</li>
+    </ul>
+
+    <h3>Completeness rule</h3>
+    <p>Every consequence must be either (a) satisfied by a requirement at the ADR's scope, or (b) referenced as a constraint by a child artifact. Tooling enforces this. A consequence that sits in the ADR and does not surface anywhere downstream is a dropped obligation &mdash; the decision said the system would behave a certain way and nothing in the spec tree commits to it.</p>
+
+    <h3>The Y-statement compact form</h3>
+    <p>When the decision fits it, a Y-statement lets a skilled reader absorb the ADR in one sentence:</p>
+    <p style="padding-left: var(--space-lg); border-left: 4px solid var(--accent-trace); margin-left: var(--space-md);"><em>In the context of {situation}, facing {concern}, we decided for {option}, to achieve {quality}, accepting {downside}.</em></p>
+    <p>Use it as an abstract line at the top of the ADR, not as a replacement for the fields. The five anchors map to context, drivers, decision, rationale, and the chief negative consequence; the fields still need to stand up to the Quality Bar.</p>
+
+    <h3>Retrofit posture &mdash; no fabrication</h3>
+    <p>When an ADR captures a pre-existing decision whose rationale is lost, the human-only fields carry <code>recovery_status: unknown</code>:</p>
+    <ul>
+      <li><code>context</code>, <code>alternatives_considered</code>, <code>rationale</code>, and anticipated <code>consequences</code> are human-only. Code does not contain them.</li>
+      <li>The only legal states for these fields in retrofit are <code>verified</code> (a human supplied the content from memory or archive) and <code>unknown</code> (no honest record exists).</li>
+      <li><strong>There is no <code>reconstructed</code> state for these fields.</strong> AI inference into human-only fields is refused at the skill level, not left to agent discretion.</li>
+    </ul>
+    <p>An ADR with <code>unknown</code> human-only fields is the correct retrofit outcome when rationale is gone. It is honest, it says what is known (the decision, visible in the code), and it does not launder the current state as inevitable.</p>
   </section>
 
-  <!-- ===================== SECTION 5: FRAMEWORK INTEGRATION (STUB) ===================== -->
-  <section id="adr-framework">
-    <h2>Framework Integration <span class="status-badge stub">stub</span></h2>
-    <p>To be expanded as templates and traceability link-rules are finalised.</p>
-    <ul>
-      <li><strong>Schema:</strong> <code>schemas/artifacts/adr.schema.yaml</code> &mdash; defines frontmatter fields, required body sections, immutability rules, and file conventions.</li>
-      <li><strong>Template skill (planned):</strong> <code>vmodel-skill-adr-template</code> under Phase D &mdash; thin schema adapter producing well-formed ADR drafts.</li>
-      <li><strong>Traceability link types (planned):</strong> see Component 2 backlog &mdash; ADR added as trace node type with <code>requirement &rarr; ADR</code>, <code>design &rarr; ADR</code>, <code>ADR &rarr; ADR</code> link rules.</li>
-    </ul>
+  <!-- ===================== SECTION 3: ANTI-PATTERNS ===================== -->
+  <section id="adr-anti-patterns">
+    <h2>3. Anti-Patterns</h2>
+
+    <ol>
+      <li><strong>Single-option ADR.</strong> One option listed, followed by a justification. This is a description of what was done, not a decision. Tell: the "alternatives" section is empty, absent, or filled with straw men like "do nothing."</li>
+
+      <li><strong>Generic justification.</strong> The rationale reads "more flexible," "more modern," "industry standard," or "best practice." Tell: the same sentence could be pasted into twenty unrelated ADRs without editing. The rationale must cite the drivers named in this ADR, by name.</li>
+
+      <li><strong>Missing negatives.</strong> Consequences list only upsides. Every load-bearing decision trades something away. Tell: the Consequences section reads as marketing copy; the cost side is empty or hand-waved ("some additional complexity").</li>
+
+      <li><strong>Buried assumptions.</strong> Assumptions are implicit in the Context prose rather than enumerated. Future maintainers will miss them. Tell: the ADR has no place a reader can point to and say "if this changes, revisit."</li>
+
+      <li><strong>Post-hoc rationalisation.</strong> The design was drafted first; the ADR was written afterwards to match. The option space is pruned to one before the ADR starts. Tell: the rejected alternatives would all have produced approximately the same design, which is another way of saying they were never real.</li>
+
+      <li><strong>ADRs for routine choices.</strong> Variable names, method signatures, directory layouts. The signal-to-noise ratio of the ADR stream collapses and the decisions that matter stop being read. Tell: more than one or two ADRs per scope per sprint in steady state.</li>
+
+      <li><strong>Test-as-requirement inversion (retrofit).</strong> A characterization test's assertion is read as the original intent, and the ADR is written to explain why the intent is the intent. Tell: the "rationale" reads as a paraphrase of the test expectation; the Context does not describe the forces that would have produced the decision.</li>
+
+      <li><strong>LLM confident invention (retrofit).</strong> An agent asked to reconstruct rationale for a pre-existing decision emits crisp, committee-grade prose with named alternatives and neat rejection reasons &mdash; all fabricated. Particularly insidious because the output looks like a good ADR. Tell: the retrofit had no preserved conversation, no archive, no deciders alive to interview, yet the ADR reads as if minutes were taken.</li>
+
+      <li><strong>Laundering the current state (retrofit).</strong> The ADR reads as a post-hoc defence of the present design, explaining why the current approach is the right one &mdash; rather than recording what was actually decided and why. Tell: every alternative is rejected for a reason that happens to be a property the current design has.</li>
+
+      <li><strong>Missing Reversibility answer.</strong> The Consequences section is present but the Reversibility sub-prompt is left unanswered, acknowledged with a stock phrase, or hedged into uselessness ("somewhat reversible"). Tell: no rollback path for a reversible decision, or no named sign-off for an irreversible one.</li>
+
+      <li><strong>Orphan ADR.</strong> No <code>scope_tags</code> set, and no artifact references it via <code>governing_adrs</code>. The decision exists in the ADR directory and nowhere else. Either the decision is not actually load-bearing (delete it) or the propagation rule has been skipped (wire it up).</li>
+    </ol>
   </section>
 
-  <!-- ===================== SECTION 6: AI SKILLS INTEGRATION (STUB) ===================== -->
-  <section id="adr-skills">
-    <h2>AI Skills Integration <span class="status-badge stub">stub</span></h2>
-    <p>To be expanded as design-producing skills are built (Phase 4 in the backlog).</p>
-    <ul>
-      <li><strong>Cross-cutting discipline.</strong> Every craft skill that produces design output (system architecture, software architecture, detailed design) and every skill that runs a research/plan conversation must recognise load-bearing decisions and propose ADRs. Captured as Guiding Principle 15 in the backlog.</li>
-      <li><strong>Conversation pattern.</strong> Skills implement the option &rarr; driver &rarr; assumption &rarr; pick &rarr; capture &rarr; design ordering. The conversation is the rationale-capture mechanism; the ADR is its persistent artifact.</li>
-      <li><strong>Open empirical question</strong> from the engineering codex (<code>q-ai-rationale-capture-workflow</code>): does forcing rationale-first generation in agents produce more faithful records than post-hoc emission? This framework's answer is the conversation pattern; whether it measurably reduces invention is a future evaluation target.</li>
-    </ul>
+  <!-- ===================== SECTION 4: EXAMPLES ===================== -->
+  <section id="adr-examples">
+    <h2>4. Examples</h2>
+
+    <h3>Good example &mdash; fully populated</h3>
+    <p>A web-service scope facing a choice of mechanism for its asynchronous job queue. The team considered three real options, picked one, and recorded the decision before sketching the queue's design.</p>
+
+    <pre><code>---
+id: ADR-017-use-postgres-for-job-queue
+title: "Use Postgres for the asynchronous job queue"
+status: accepted
+date: 2026-03-12
+scope_tags: [app/jobs]
+affected_scopes: [app/jobs, app/ops]
+---
+
+# ADR-017: Use Postgres for the asynchronous job queue
+
+**Y-statement.** In the context of the app's background job processing, facing
+the need for at-least-once delivery with operationally cheap retries, we
+decided to use Postgres (via `SKIP LOCKED`) as the queue backing store, to
+achieve transactional job enqueue with the same durability guarantees as the
+rest of our data, accepting lower peak throughput than a dedicated broker.
+
+## Context
+The app already writes its primary domain state to Postgres. Several features
+require side effects that must happen after a request commits (e.g., sending
+receipts, provisioning downstream accounts). We need a way to schedule and
+retry these jobs durably. The ops team manages one Postgres cluster today and
+has no experience operating Redis or RabbitMQ in production.
+
+## Decision
+We will store queued jobs in a Postgres table and dequeue with
+`FOR UPDATE SKIP LOCKED` from a small fleet of worker processes.
+
+## Alternatives considered
+- **Redis with a Lua-scripted reliable queue.** Rejected: introduces a second
+  stateful system to operate; ops familiarity is zero; durability story is
+  weaker without AOF tuning the team does not currently do.
+- **RabbitMQ.** Rejected: delivers the feature set but adds broker operations
+  (clustering, disk sizing, upgrade dance) that the ops team cannot take on
+  this quarter; the throughput headroom is not needed at current load.
+- **Cloud-managed queue (SQS / Pub-Sub).** Rejected: couples the app to a
+  specific cloud vendor; we have a portability requirement from ADR-003.
+
+## Rationale
+Two drivers decided it: (1) **operational familiarity on the ops team** &mdash;
+adding Postgres tables is free, adding a new stateful system is not, and (2)
+**ACID enqueue for idempotency-critical retries** &mdash; jobs enqueued in the
+same transaction as the domain write cannot diverge from it, which Redis and
+RabbitMQ can only approximate with outbox patterns.
+
+## Consequences
+**Positive**
+- Single source of durability for domain state and job state; no dual-write
+  inconsistency; no outbox pattern needed.
+- Ops surface does not grow.
+- Jobs are visible via SQL for debugging and reporting.
+
+**Negative**
+- Peak throughput ceiling (~2k jobs/sec on our current hardware) is lower
+  than a dedicated broker would provide. Above that, we revisit.
+- Long-running worker transactions can interact badly with autovacuum; we
+  accept this and constrain job handlers to short transactions.
+
+**Reversibility.** Reversible. Rollback path: workers read via a queue-client
+adapter (see DD-app-jobs-worker); swapping to Redis or a broker means
+implementing a second adapter behind the same interface and running both in
+parallel for one release while draining the Postgres queue. Migration cost
+estimated at ~1 engineer-week; no data-loss risk because queued jobs are
+derivable from domain events.
+
+## Propagation
+- New requirement at this scope: **REQ-app-jobs-018** &mdash; *"Job enqueue
+  MUST occur in the same database transaction as the domain write that
+  produces the job."* Testable at `app/jobs` integration level.
+- Constraint on child designs: worker implementations reference this ADR
+  via `governing_adrs: [ADR-017]` and use the `SKIP LOCKED` dequeue pattern.
+</code></pre>
+
+    <p>What this example gets right: two drivers cited by name in rationale (not generic praise); three alternatives with concrete, context-specific rejection reasons; explicit negatives with a threshold at which the decision is revisited; Reversibility answered with a real rollback path and a rough migration cost; a new testable requirement materialised at the ADR's layer; a clear propagation path to child designs.</p>
+
+    <h3>Bad example &mdash; same topic, several failures at once</h3>
+
+    <pre><code>---
+id: ADR-042-async-job-mechanism
+title: "Use Redis for async jobs"
+status: accepted
+date: 2026-03-12
+scope_tags: [app/jobs]
+---
+
+# ADR-042: Use Redis for async jobs
+
+## Context
+We need an async job queue for the app.                         &larr; No forces, no drivers, no "why now."
+
+## Decision
+We will use Redis because it is more modern and flexible.       &larr; Generic justification; drivers not named.
+
+## Alternatives considered
+- Don't use a queue.                                            &larr; Straw man. Single real option.
+
+## Rationale
+Redis is the industry standard for this kind of workload.       &larr; Could be pasted into any ADR, unchanged.
+
+## Consequences
+- Fast.                                                         &larr; Only upside; negatives missing.
+- Developers are happy with it.                                 &larr; Not a consequence of the system.
+
+                                                                &larr; Reversibility sub-prompt missing entirely.
+</code></pre>
+
+    <p>Four anti-patterns in one page: single-option (the alternatives list is a straw man), generic justification, missing negatives, missing Reversibility answer. A reader has no idea which constraints are load-bearing, what breaks if the ops team can't run Redis, or whether switching back is an afternoon or a rewrite.</p>
+
+    <h3>AI-era bad example &mdash; fabricated retrofit rationale</h3>
+    <p>A team runs a retrofit skill over a legacy service. The code shows Postgres with <code>SKIP LOCKED</code>. No design docs, no preserved email, no commit messages beyond "add queue," and the original engineers are no longer at the company. The agent produces:</p>
+
+    <pre><code>---
+id: ADR-099-legacy-job-queue
+title: "Use Postgres for the job queue"
+status: accepted
+date: 2021-06-14   &larr; Back-dated; no evidence this was the decision date.
+scope_tags: [legacy/jobs]
+recovery_status:
+  context: reconstructed          &larr; Illegal state for human-only field.
+  alternatives_considered: reconstructed
+  rationale: reconstructed
+---
+
+## Context
+The team was evaluating asynchronous job processing for the 2021 relaunch.
+After reviewing operational experience with Redis and RabbitMQ in the                &larr; Crisp committee-style prose;
+previous quarter's spike, the architecture group concluded that a                     no preserved conversation backs
+Postgres-based queue was the most pragmatic fit for the team's skill                  any of this.
+profile and the system's durability goals.
+
+## Alternatives considered
+- Redis. Rejected due to operational complexity and the team's preference              &larr; Suspiciously neat rejection
+  for a single stateful system.                                                         reasons; no contextual grit.
+- RabbitMQ. Rejected due to the overhead of broker management.                         &larr; Plausible-sounding, entirely
+- Kafka. Rejected as over-engineered for the expected throughput.                       fabricated.
+
+## Rationale
+Postgres with SKIP LOCKED offered ACID guarantees for enqueue and a minimal            &larr; Reads like rationale but is
+operational footprint, aligning with the team's existing expertise.                     back-derived from what the
+                                                                                        code does.
+</code></pre>
+
+    <p>Tells of fabrication: (a) committee-quality prose despite no preserved conversation, no accessible deciders, no archive; (b) rejection reasons that are too tidy &mdash; real decisions leave contextual grit (a specific incident, a named constraint, an ops on-call rotation) that an LLM inferring from code cannot supply; (c) the rationale paraphrases what the code already does, which is the "laundering the current state" anti-pattern wearing a retrofit badge; (d) <code>recovery_status: reconstructed</code> on human-only fields &mdash; an illegal state the retrofit skill must refuse to emit.</p>
+
+    <p>What the retrofit should have written instead:</p>
+
+    <pre><code>---
+id: ADR-099-legacy-job-queue
+title: "Use Postgres for the job queue (retrofit)"
+status: accepted
+date: 2026-04-19   &larr; Date of the retrofit record, not a guessed decision date.
+scope_tags: [legacy/jobs]
+recovery_status:
+  context: unknown
+  alternatives_considered: unknown
+  rationale: unknown
+---
+
+## Context
+unknown &mdash; no preserved design notes, no accessible deciders as of the
+retrofit date.
+
+## Decision (observed from code)
+The service uses Postgres with `FOR UPDATE SKIP LOCKED` as its async job
+queue. See `src/queue/postgres_worker.py`.
+
+## Alternatives considered
+unknown.
+
+## Rationale
+unknown.
+
+## Consequences (observable)
+- Durability of queued jobs matches the primary database's durability.
+- Throughput observed in production ~800 jobs/sec; no stress test on record.
+
+**Reversibility.** Unknown at retrofit time; a forward ADR is required before
+any migration is attempted. Owner: @ops-lead.
+</code></pre>
+
+    <p>Honest, useful, and forward-compatible. It records what the code reveals, admits what has been lost, and does not pretend to reconstruct a conversation that no longer exists.</p>
+  </section>
+
+  <!-- ===================== SECTION 5: QUALITY BAR ===================== -->
+  <section id="adr-quality-bar">
+    <h2>5. Quality Bar</h2>
+    <p class="lead">Yes/No checklist, grouped by concern. An ADR passes when every applicable item is answered Yes. The meta-gate at the bottom &mdash; the Spec Ambiguity Test &mdash; overrides all of them: an ADR that ticks every box but cannot guide a junior engineer to the same design fails.</p>
+
+    <div class="card">
+      <h3>Context completeness</h3>
+      <ul>
+        <li>Does the Context describe the specific situation that forced the decision (not a generic statement of the problem domain)?</li>
+        <li>Are the forces at play &mdash; constraints, deadlines, dependencies &mdash; named?</li>
+        <li>Are the decision drivers explicit, so the rationale can cite them by name?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Option space integrity</h3>
+      <ul>
+        <li>Are at least two real alternatives listed? ("Do nothing" and straw men do not count.)</li>
+        <li>Does each alternative have a concrete, context-specific reason for rejection?</li>
+        <li>No single-option smell &mdash; would any of the rejected options have produced a materially different design?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Decision clarity</h3>
+      <ul>
+        <li>Is the Decision stated in active voice, with the chosen option named?</li>
+        <li>Does the Rationale cite the drivers from this ADR, by name &mdash; not generic praise of the option?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Consequences discipline</h3>
+      <ul>
+        <li>Are positive consequences listed?</li>
+        <li>Are negative consequences listed, non-empty, and concrete?</li>
+        <li>Is the Reversibility sub-prompt answered &mdash; either with a rollback path (reversible) or with a recovery plan and a named sign-off (irreversible)?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Linkage</h3>
+      <ul>
+        <li>Is <code>scope_tags</code> non-empty?</li>
+        <li>If this ADR supersedes or is superseded, is the chain intact in both directions?</li>
+        <li>If the decision affects scopes beyond <code>scope_tags</code>, is <code>affected_scopes</code> set?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Completeness rule</h3>
+      <ul>
+        <li>Is every consequence either satisfied by a requirement at the ADR's scope or referenced as a constraint by a child artifact? (No orphan consequences.)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Propagation rule</h3>
+      <ul>
+        <li>For consequences testable at this ADR's layer: has a new requirement been materialised at that layer?</li>
+        <li>For consequences that only bound child choices: are the relevant child artifacts linked via <code>governing_adrs</code>?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Retrofit honesty</h3>
+      <ul>
+        <li>If this is a retrofit of a pre-existing decision and the rationale is lost: is <code>recovery_status: unknown</code> set on Context, Alternatives, and Rationale?</li>
+        <li>Are all fields free of AI-fabricated content &mdash; no committee-style prose for conversations that did not happen, no tidy rejection reasons invented from the current code?</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--accent-trace);">
+      <h3>Spec Ambiguity Test &mdash; meta-gate</h3>
+      <ul>
+        <li>Could a junior engineer or low-mid-tier AI, reading only this ADR, derive the same design from it without guessing?</li>
+      </ul>
+      <p>If the answer is No, the ADR under-specifies the decision. Revise before accepting. This test overrides every box above: an ADR that passes all of them but fails this one is not done.</p>
+    </div>
   </section>
 
   <!-- ===================== REFERENCES ===================== -->
   <section id="adr-references">
     <h2>References</h2>
-    <p style="color: var(--fg-muted); font-size: 0.9em;">Primary backing for this page from the engineering-codex (read-only knowledge bank at <code>/home/stefanus/repos/engineering-codex/</code>):</p>
+    <p style="color: var(--fg-muted); font-size: 0.9em;">Primary backing from the engineering-codex (<code>/home/stefanus/repos/engineering-codex/</code>). Claims load-bearing on this page are anchored in the cited pages.</p>
     <ul>
-      <li><code>concept-design-rationale</code> &mdash; the codex's mature treatment; load-bearing argument that rationale is the only artifact that distinguishes essential from accidental constraints.</li>
-      <li><code>src-nygard-adr-2011</code> &mdash; original ADR template (5 fields, immutability principle, capture-at-decision-time).</li>
-      <li><code>src-tyree-akerman-adr-2005</code> &mdash; richer 14-field practitioner template (IEEE Software). Source of the &ldquo;decisions are the most important concept&rdquo; framing.</li>
-      <li><code>src-potts-bruns-design-decisions-1988</code> &mdash; ICSE'88 origin of the capture-cost master constraint (&ldquo;non-intrusive tool support is vital&rdquo;).</li>
-      <li><code>src-kruchten-decision-ontology-2004</code> &mdash; richer ontology (existence/property/executive decisions, 7-state lifecycle, 11 relationship types). Not adopted in this framework's lightweight template; cited for completeness.</li>
-      <li><code>q-ai-rationale-capture-workflow</code> &mdash; open question on faithful rationale capture by AI agents; the framework's conversation pattern is one candidate answer.</li>
-      <li><code>q-v-model-design-rationale-gap</code> &mdash; open question on whether V-model standards treat rationale as a first-class traceable artifact; this framework treats it as such regardless of standards coverage.</li>
-      <li><code>concept-brownfield-baseline</code> &mdash; the &ldquo;forward-only&rdquo; rationale policy in the legacy retrofit context; basis for the &sect;3 Forward-Only Policy.</li>
+      <li><code>wiki/concepts/concept-design-rationale.md</code> &mdash; essential-vs-accidental constraint distinguishability; capture-at-decision-time; retrofit as degraded mode; AI-era failure modes (test-as-requirement inversion, LLM confident invention, laundering the current state).</li>
+      <li><code>wiki/sources/src-nygard-adr-2011.md</code> &mdash; canonical lightweight ADR template; immutability and append-only supersession.</li>
+      <li><code>wiki/sources/src-tyree-akerman-adr-2005.md</code> &mdash; practitioner-template lineage and worked-example format (D01 financial-services decision adapted to the job-queue example above).</li>
+      <li><code>wiki/sources/src-potts-bruns-design-decisions-1988.md</code> &mdash; capture-cost master constraint: heavyweight rationale capture is abandoned in practice, which fixes the threshold at "load-bearing decisions only."</li>
+      <li><code>wiki/sources/src-kruchten-decision-ontology-2004.md</code> &mdash; richer decision ontology (existence / property / executive kinds, 11 relationship types). Cited for completeness; this framework uses a lightweight template, not the full ontology.</li>
+      <li><code>wiki/sources/src-adr-github-io.md</code> &mdash; Y-statement compact form (Zdun et al.) and industry-adoption context.</li>
     </ul>
-    <p style="color: var(--fg-muted); font-size: 0.9em;">Codex query log: <code>engineering-codex/log.md</code> entry <code>2026-04-17 query | ADR as central building block for VModelWorkflow</code>.</p>
   </section>
 
 </main>

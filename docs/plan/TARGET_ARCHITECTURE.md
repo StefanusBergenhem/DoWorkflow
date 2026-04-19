@@ -73,15 +73,16 @@ DOCUMENTATION              TEMPLATES & SCHEMAS         TRACEABILITY             
 (source of truth)          (structural rigor)          (link + validate)         (interpretive work)
 
 ┌─────────────────┐       ┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
-│ 7-section HTML  │       │ Per-artifact     │       │ Forward links    │       │ Craft skills     │
+│ 5-section HTML  │       │ Per-artifact     │       │ Forward links    │       │ Craft skills     │
 │ per artifact    │       │ YAML schemas     │       │ embedded in      │       │ (standalone best │
-│ (incl. Quality  │       │                  │       │ artifacts        │       │ practices)       │
-│  Bar as §7)     │       │ Quality Bar YAML │       │                  │       │                  │
-│                 │       │ (canonical)      │       │ Reverse derived  │       │ Framework skills │
-│ Generic craft + │       │                  │       │ by tooling       │       │ (orchestration,  │
-│ translation     │       │ Scaffolder       │       │                  │       │ template, trace, │
-│ layer for       │       │ templates        │       │ Validation rules │       │ retrofit)        │
-│ standards       │       │                  │       │                  │       │                  │
+│ (V-model ctx,   │       │                  │       │ artifacts        │       │ practices)       │
+│  best practices,│       │ Quality Bar YAML │       │                  │       │                  │
+│  anti-patterns, │       │ (canonical,      │       │ Reverse derived  │       │ Framework skills │
+│  examples,      │       │  Phase 3)        │       │ by tooling       │       │ (orchestration,  │
+│  Quality Bar)   │       │ Scaffolder       │       │                  │       │ template, trace, │
+│                 │       │ templates        │       │ Validation rules │       │ retrofit)        │
+│ Direct SW-eng   │       │                  │       │                  │       │                  │
+│ English (§14)   │       │                  │       │                  │       │                  │
 └─────────────────┘       └──────────────────┘       └──────────────────┘       └──────────────────┘
 
 Any component usable standalone. Full value comes from combining all four.
@@ -304,7 +305,7 @@ Traceability links reference IDs, not paths.
 Lives in the artifact schema. Mandatory sections, required fields, required traceability links. Mechanically validatable: `vmodel validate <artifact>` returns pass/fail.
 
 ### Semantic rigor (Quality Bar checklist)
-A concrete Yes/No checklist grouped by concern, subject to the **Spec Ambiguity Test** as a meta-test. Lives as the **7th section** in each `docs/guide/artifacts/<type>.html` page (alongside the existing six: V-model context, best practices, anti-patterns, examples, framework integration, AI skills integration). Also extracted as canonical YAML consumed by templates, authoring skills, and review skills — single source of truth.
+A concrete Yes/No checklist grouped by concern, subject to the **Spec Ambiguity Test** as a meta-test. Lives as the **5th section** in each `docs/guide/artifacts/<type>.html` page (alongside the other four: V-model context, best practices, anti-patterns, examples). Extracted as canonical YAML in Phase 3 alongside other schemas, consumed by templates, authoring skills, and review skills — single source of truth.
 
 **Quality Bar is additive per layer.** Upstream failure blocks downstream approval. A leaf DD cannot pass review if its parent Architecture Quality Bar has unresolved items. Tooling surfaces the chain rather than allowing a reviewer to rubber-stamp a leaf on top of a broken parent.
 
@@ -312,7 +313,7 @@ A concrete Yes/No checklist grouped by concern, subject to the **Spec Ambiguity 
 
 **Reversibility** is captured as a mandatory sub-prompt inside ADR Consequences (see §5.3 ADR), not as a separate flag or field. Model tier (junior engineer / low-mid AI) is a **complexity heuristic** used when judging artifact quality — never a property stored on an artifact.
 
-**Per-artifact rigor dimensions** (full checklists authored in Phase 5 prereq — see BACKLOG):
+**Per-artifact rigor dimensions** (HTML checklists authored in Phase 2, YAML extraction in Phase 3 — see BACKLOG):
 
 | Artifact | Key dimensions |
 |---|---|
@@ -637,11 +638,16 @@ The primary value: an honest floor of documentation for forward development, plu
 
 ---
 
-## 14. Domain Translation
+## 14. Domain Translation — deferred
 
-The framework uses **generic V-model terminology** internally. Standards-specific vocabulary (DO-178C, ASPICE, ISO 26262, IEC 62304, and others) is applied via a **translation plugin system** (`docs/guide/domains/*.json`) — JSON files map generic terms to domain-specific ones at runtime.
+The pre-pivot design positioned generic V-model terminology internally with a **translation plugin system** (`docs/guide/domains/*.json`) mapping to standards-specific vocabulary (DO-178C, ASPICE, ISO 26262, IEC 62304, …) at runtime.
 
-**Generic-first is primary; standards are translations** — reinforced by the pivot. Pre-pivot docs that foregrounded safety vocabulary will be rewritten with generic terms first and standards vocabulary folded into the translation layer (Phase 2).
+**Current status:** the plugin mechanism is parked for the duration of Phase 2.
+
+1. **Phase 2 content is authored in direct software-engineering English.** No generic/standards translation layer is applied to the text.
+2. **Rationale for deferral.** Running the plugin machinery while simultaneously establishing voice, depth, and rigor in new content creates drift risk: the generic surface and the standards-specific rendering can diverge in both directions. Separating the concerns — get the content right first, translation later — protects Phase 2 quality.
+3. **Reintroduction horizon.** The mechanism (or a simpler successor — e.g., manual domain-specific page variants) may be reintroduced post-Phase 2 when content is stable. See §15.
+4. **Archival.** The existing `docs/guide/domains/*.json` files are to be moved to `archive/pre-pivot-2026-04-18/domains/` as a Phase 2 task, together with removal of the plugin runtime wiring in `docs/guide/`. This is not done by Phase 1.
 
 ---
 
@@ -655,3 +661,4 @@ Genuine architectural uncertainties to revisit as we learn more. (Execution open
 4. **Build workflow contract.** Explicitly deferred. When designed: how Build chunks a scope bundle, how `realizes` links are emitted, whether Build publishes a readable structure for coverage queries.
 5. **Retrofit completeness threshold.** How many `unknown` fields make a retrofit "not useful" vs "partial but usable"? No principled answer today; real retrofit runs will inform.
 6. **Product Brief for micro-projects.** The 7-section shape fits real products. For internal tools or one-week prototypes a "Product Brief Lite" may be useful — out of scope until we see the need.
+7. **Domain translation reintroduction.** Whether, when, and how to reinstate a domain-vocabulary translation mechanism once Phase 2 content is stable. Options include the pre-pivot JSON-plugin runtime, manual per-domain page variants, or abandoning translation in favor of a single-voice corpus. Deferred until we have stable content to evaluate against.

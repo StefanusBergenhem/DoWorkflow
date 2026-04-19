@@ -12,11 +12,11 @@ Execution plan for the VModelWorkflow framework following the 2026-04-18 pivot. 
 - Phases 2–7 — pending.
 
 **Preserved and operational:**
-- Lower V documentation (`docs/guide/artifacts/source-code.html`, `unit-test.html`, `detailed-design.html`) — slated for ~75% compression in Phase 2.
+- Lower V documentation (`docs/guide/artifacts/source-code.html`, `unit-test.html`, `detailed-design.html`) — pre-pivot outputs; content mined as reference, pages replaced in Phase 2.
 - Craft skills `develop-code` (Haiku eval 91%, +13% over baseline), `derive-test-cases` (100%, +3%), `vmodel-skill-review-code` (95.8%, +25%).
 - C2–C4 detailed-design skills (develop-dd, retrofit-dd, review-dd) — paused; superseded by Phase 5 structure.
-- 20 research documents in `research/` (system-level, implementation, detailed-design, pillar3) — mostly reusable.
-- Domain translation layer (`docs/guide/domains/`) — still valid; generic-first reinforced by pivot.
+- 20 research documents in `research/` (system-level, implementation, detailed-design, pillar3) — reusable **as secondary substrate with an explicit safety-bias caveat** (authored pre-pivot with ASPICE/DO-178C framing; extract craft, discard framing).
+- Domain translation layer (`docs/guide/domains/`) — **deferred.** JSON files to be archived to `archive/pre-pivot-2026-04-18/domains/` as a Phase 2 task (see §3.2); plugin mechanism parked for post-Phase 2 revisit (see `TARGET_ARCHITECTURE §14`, §15).
 
 ---
 
@@ -50,35 +50,55 @@ Architectural rationale — including the full Q8–Q15 and NQ-B/C/D/E decisions
 
 ### 3.2 Phase 2 — Per-artifact Documentation
 
-**Goal:** Rewrite `docs/guide/artifacts/*.html` pages for the six new artifact types, condensed to ~1/4 of current size. First-pass scope: **best practices section only.** Other sections (V-model context, anti-patterns, examples, framework integration, AI skills integration) come later. Quality Bar is a Phase 5 prerequisite, not Phase 2.
+**Goal:** Rewrite `docs/guide/artifacts/*.html` for the six artifact types under the new **5-section structure** (V-model context, best practices, anti-patterns, examples, Quality Bar). **Whole document per artifact** — no first-pass slicing; all five sections authored together. **No length target.** Governing principle: *information density over length — every paragraph earns its existence.*
 
-**Inputs:**
-- `TARGET_ARCHITECTURE.md` (artifact structure per type).
-- Existing docs for reuse: `stakeholder-needs.html` + `conops.html` + `completeness-analysis.html` fold into **Product Brief**; `system-requirements.html` content maps to **Requirements**; `sw-architecture.html` framing (if present) supersedes into **Architecture**; existing `detailed-design.html` condenses into new Detailed Design page; `unit-test.html` + `source-code.html` content feeds **TestSpec** and Build-workflow reference; `adr.html` stands largely as-is.
-- Research for salvage (inventory in §5).
+**Authoring mode — per-artifact fresh session:**
 
-**Tasks:**
-- [ ] **Product Brief** — new page, consolidates three bloated pages into ~1/4 total size, best practices only.
-- [ ] **Requirements** — new page; EARS craft, rationale discipline, QAs measurable.
-- [ ] **Architecture** — new page; decomposition, interfaces, **Composition section** (mandatory).
-- [ ] **ADR** — light refresh; pre-pivot page already close.
-- [ ] **Detailed Design** — compress existing to ~1/4; remove old Section 8 Test Strategy; reference TestSpec.
-- [ ] **TestSpec** — new page; derivation strategies, per-layer emphasis, coverage targets.
-- [ ] **Fix navigation** — not every artifact page is linked from `docs/guide/index.html`. Validate linkage.
-- [ ] **Strip pre-pivot framing** — remove "V-model for industry product" voice, safety-tier scaling, HW/SW split. Keep generic craft principles.
+1. **Explore substrate.** Engineering-codex first. Existing research and HTML with the caveats below.
+2. **Propose structure + gaps.** Back to the user in the main session: section outline, key claims, open questions.
+3. **Write HTML.** Fresh session with approved structure.
+4. **Review + iterate.** User reviews; refine until accepted.
 
-**Deliverables:** Six condensed `docs/guide/artifacts/*.html` pages, updated `docs/guide/index.html` navigation.
+**Inputs (substrate discipline):**
+- **Engineering codex (`/home/stefanus/repos/engineering-codex/`) — primary.** Software-first, already synthesized and cited. Check here before researching elsewhere.
+- **`research/` — secondary, with explicit safety-bias caveat.** Authored pre-pivot with ASPICE/DO-178C framing; extract craft insights, discard safety-specific framing.
+- **Existing `docs/guide/artifacts/*.html` — pre-pivot outputs, reference only.** Not substrate. Treated as sources of prior phrasing and examples we may reuse, never as inputs to the new structure.
+- `TARGET_ARCHITECTURE.md` — artifact shape per type (§5.3), Quality Bar dimensions (§6).
+
+**Artifact order** (pattern-setter first, then hardest compression, then upper V):
+
+- [ ] **ADR** — pattern-setter. Lightest refresh (pre-pivot page already closest). Authored first to establish voice, section ordering, abstraction level, example style for the rest.
+- [ ] *After ADR is accepted:* write `docs/plan/PHASE2_AUTHORING_PATTERN.md` capturing chosen voice, section ordering, abstraction level, example style — loaded as context by subsequent fresh sessions so they don't re-invent.
+- [ ] **Detailed Design** — compression exercise. Existing page is the largest; whole-document rewrite under the 5-section structure; remove old Section 8 Test Strategy; reference TestSpec via traceability.
+- [ ] **Product Brief** — consolidates pre-pivot `stakeholder-needs.html` + `conops.html` + `completeness-analysis.html` into one page under the 5-section structure.
+- [ ] **Requirements** — new page: EARS craft, rationale discipline, measurable QAs, interface contracts.
+- [ ] **Architecture** — new page: decomposition, interfaces, **Composition section** (mandatory per `TARGET_ARCHITECTURE §5.3`).
+- [ ] **TestSpec** — new page: derivation strategies, per-layer emphasis, coverage targets, mandatory-non-empty `verifies`.
+
+**Cross-cutting tasks:**
+
+- [ ] **Remove domain translation plugin machinery from `docs/guide/`** — unwind `js/domain.js` wiring, domain selector UI, any per-page translation hooks. Phase 2 content is authored in direct software-engineering English.
+- [ ] **Archive domain JSON files** — move `docs/guide/domains/*.json` to `archive/pre-pivot-2026-04-18/domains/`.
+- [ ] **Fix navigation** — `docs/guide/index.html` must link to all six artifact pages; validate linkage.
+- [ ] **Strip pre-pivot framing** — remove "V-model for industry product" voice, safety-tier scaling, HW/SW split, and standards-directive tone from any surviving surrounding pages encountered while working.
+
+**Deliverables:**
+- Six authored `docs/guide/artifacts/*.html` pages under the 5-section structure.
+- `docs/plan/PHASE2_AUTHORING_PATTERN.md` (written after artifact 1).
+- Updated `docs/guide/index.html` navigation.
+- Domain plugin runtime removed; domain JSON archived.
 
 **Success criteria:**
-- Each page ≤ ~1/4 of pre-pivot size (where applicable).
-- All six artifact types have an accurate best-practices section.
+- All six artifact pages authored under the 5-section structure, information-dense (no length target — density is the bar).
 - Navigation links all pages.
+- No residual domain-plugin wiring in `docs/guide/`.
+- `PHASE2_AUTHORING_PATTERN.md` exists and is actually followed by pages 2–6.
 
 **Dependencies:** Phase 1.
 
 ### 3.3 Phase 3 — Schemas
 
-**Goal:** Per-artifact YAML schemas derived from the Phase 2 docs; traceability schema; Quality Bar schema (machine format).
+**Goal:** Per-artifact YAML schemas derived from the Phase 2 docs; traceability schema; **Quality Bar YAML extraction (canonical machine format)** per artifact. All schemas in one phase.
 
 **Tasks:**
 - [ ] `schemas/artifacts/product-brief.schema.yaml` — new.
@@ -87,14 +107,15 @@ Architectural rationale — including the full Q8–Q15 and NQ-B/C/D/E decisions
 - [ ] `schemas/artifacts/adr.schema.yaml` — update (reversibility sub-prompt).
 - [ ] `schemas/artifacts/detailed-design.schema.yaml` — update (remove old Section 8 Test Strategy).
 - [ ] `schemas/artifacts/test-spec.schema.yaml` — new.
-- [ ] `schemas/traceability/` — update link type catalog; add validation rules per `TARGET_ARCHITECTURE §7`.
 - [ ] `schemas/artifacts/artifact-envelope.schema.yaml` — consolidate envelope for all six artifact types.
+- [ ] `schemas/traceability/` — update link type catalog; add validation rules per `TARGET_ARCHITECTURE §7`.
+- [ ] **Quality Bar YAML extraction per artifact** — derive canonical machine-readable checklists from the Phase 2 HTML Quality Bar sections. Consumed by templates and by future authoring/review skills. Design the container shape here (the HTML sections are authoritative for content).
 
-**Deliverables:** Updated `schemas/` matching `TARGET_ARCHITECTURE §5`.
+**Deliverables:** Updated `schemas/` matching `TARGET_ARCHITECTURE §5` and §6, including per-artifact Quality Bar YAML files.
 
-**Success criteria:** Schemas mechanically validate a minimal example of each artifact type.
+**Success criteria:** Schemas mechanically validate a minimal example of each artifact type; Quality Bar YAML parses and is consumable by a mechanical checker.
 
-**Dependencies:** Phase 2 (docs are source of truth).
+**Dependencies:** Phase 2 (docs are source of truth; Quality Bar HTML sections authored there).
 
 ### 3.4 Phase 4 — Product Briefs for Purpose-built Tools
 
@@ -111,10 +132,7 @@ Architectural rationale — including the full Q8–Q15 and NQ-B/C/D/E decisions
 
 ### 3.5 Phase 5 — Skills (craft + framework)
 
-**Goal:** Build per-artifact authoring + review skills, plus framework skills (orchestration, traceability, retrofit). Quality Bar content enters the framework here.
-
-**Phase 5 prerequisite — Quality Bar authoring:**
-- [ ] Author Quality Bar per artifact — add the 7th section to each `docs/guide/artifacts/*.html` page **and** extract canonical YAML consumed by templates + skills.
+**Goal:** Build per-artifact authoring + review skills, plus framework skills (orchestration, traceability, retrofit). Quality Bar content is already in place — HTML in Phase 2, canonical YAML in Phase 3 — and is consumed here.
 
 **Tasks (per-artifact skills):**
 - [ ] `vmodel-skill-author-product-brief` and `vmodel-skill-review-product-brief`.
@@ -132,7 +150,7 @@ Architectural rationale — including the full Q8–Q15 and NQ-B/C/D/E decisions
 **Tasks (skills architecture rewrite):**
 - [ ] Rewrite `docs/guide/skills-architecture.html` for the new 6-artifact model (pre-pivot version is stale).
 
-**Deliverables:** Skill directories under `.claude/skills/`; canonical Quality Bar YAML files; updated `skills-architecture.html`.
+**Deliverables:** Skill directories under `.claude/skills/`; updated `skills-architecture.html`. (Quality Bar YAML is a Phase 3 deliverable, consumed here.)
 
 **Success criteria:**
 - Each skill passes `/skill-creator` evaluation on Haiku at agreed thresholds.
@@ -199,15 +217,15 @@ Items explicitly out of current phasing:
 
 Content that survives the pivot verbatim or with minor adaptation:
 
-**Documentation (to be compressed / repurposed in Phase 2):**
-- `docs/guide/artifacts/source-code.html` — condense and repurpose as Build-workflow / implementation reference.
-- `docs/guide/artifacts/unit-test.html` — content feeds TestSpec (unit level).
-- `docs/guide/artifacts/detailed-design.html` — condense into new Detailed Design page; Layer 1/2/3 model preserved.
-- `docs/guide/artifacts/adr.html` — largely stands; minor tweaks for new artifact set.
-- `docs/guide/domains/` — generic, do178c, aspice plugins preserved.
+**Documentation (pre-pivot outputs — inspection-only reference for Phase 2, not substrate; see §3.2):**
+- `docs/guide/artifacts/source-code.html` — reference only; content feeds the future Build-workflow / implementation doc (not a Phase 2 artifact-page target).
+- `docs/guide/artifacts/unit-test.html` — reference only; craft insights feed the TestSpec (unit-level) page.
+- `docs/guide/artifacts/detailed-design.html` — reference only; Layer 1/2/3 model worth mining for the new Detailed Design page.
+- `docs/guide/artifacts/adr.html` — reference only; closest to pattern, still replaced under the 5-section structure.
+- `docs/guide/domains/` — **to be archived** to `archive/pre-pivot-2026-04-18/domains/` as a Phase 2 task. Plugin mechanism deferred; may be reintroduced post-Phase 2 (see `TARGET_ARCHITECTURE §14`, §15).
 
 **Research (under `research/`):**
-- `system-level/01-standards-system-level-processes.md` — standards overview for translation layer.
+- `system-level/01-standards-system-level-processes.md` — standards overview; reference material for any future translation layer work (§3.2 defers the plugin).
 - `system-level/02a–02d` (stakeholder craft) — feeds Product Brief authoring knowledge.
 - `system-level/03a–03d` (requirements craft) — feeds Requirements authoring.
 - `system-level/05a–05f` (architecture craft) — feeds Architecture authoring.
@@ -235,7 +253,7 @@ Content that survives the pivot verbatim or with minor adaptation:
 
 Questions tied to upcoming phases. Architectural open questions live in `TARGET_ARCHITECTURE §15`.
 
-1. **Quality Bar YAML schema format.** Structure for the canonical per-artifact checklist file. Phase 5 prereq. To be designed with Phase 5.
+1. **Quality Bar YAML schema format.** Structure for the canonical per-artifact checklist file. Addressed in Phase 3 as part of "all schemas in Phase 3"; HTML Quality Bar sections from Phase 2 are the authoritative source.
 2. **Topology discovery algorithm choice.** Dependency analysis vs package boundaries vs bounded-context detection. Phase 7 decision; pilot-driven.
 3. **Scaffolder CLI shape.** Exact commands and options for the scaffolder tool. Phase 6.
 4. **Project config format (e.g., `.vmodel/tools.yaml`).** How projects declare available tools. Draft needed before Phase 5's framework skills reference it.
