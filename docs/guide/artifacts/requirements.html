@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requirements &mdash; VModelWorkflow Guide</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>VModelWorkflow</h1>
+    <div class="subtitle">Spec-Driven Development Guide</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-group-label">Navigation</span>
+      <a class="nav-link" href="../index.html">Back to Main Guide</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Requirements</span>
+      <a class="nav-link" href="#req-context">1. V-Model Context</a>
+      <a class="nav-link" href="#req-best-practices">2. Best Practices</a>
+      <a class="nav-link" href="#req-anti-patterns">3. Anti-Patterns</a>
+      <a class="nav-link" href="#req-examples">4. Examples</a>
+      <a class="nav-link" href="#req-quality-bar">5. Quality Bar</a>
+      <a class="nav-link" href="#req-references">References</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Related Artifacts</span>
+      <a class="nav-link" href="product-brief.html">Product Brief</a>
+      <a class="nav-link" href="adr.html">ADR</a>
+      <a class="nav-link" href="detailed-design.html">Detailed Design</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content" style="margin-left: var(--sidebar-width); padding: var(--space-3xl) var(--space-2xl); max-width: calc(var(--content-max) + var(--space-2xl) * 2 + var(--sidebar-width));">
+
+  <!-- ===================== SECTION 1: V-MODEL CONTEXT ===================== -->
+  <section id="req-context">
+    <div class="level-indicator left">Non-Leaf Scope Artifact</div>
+    <h2>1. V-Model Context</h2>
+    <p class="lead">A Requirements artifact states what the system (or subsystem) at this scope must do, as a set of individually verifiable, traceable, solution-free statements. One Requirements document per non-leaf scope. It is the formalisation layer &mdash; the place where stakeholder intent, product outcomes, user stories, and upstream constraints become sentences that Architecture can allocate to children, tests can verify, and a junior engineer or a mid-tier AI can implement without guessing.</p>
+
+    <h3>Position on the V</h3>
+    <p>Requirements live on the left-hand descent of the V, one at every non-leaf scope. The root-scope Requirements document turns Product Brief outcomes, operational scenarios, NFRs, and constraints into testable behaviour specifications. Each branch-scope Requirements document refines the parent's allocated slice for a subsystem. Leaves have no Requirements artifact of their own &mdash; they hold a Detailed Design instead &mdash; but every leaf DD traces upward to requirements at the nearest non-leaf ancestor.</p>
+
+    <p>The right-hand ascent verifies the left. Integration tests at a branch verify that branch's requirements. System / end-to-end tests at the root verify root-scope requirements. Unit tests at a leaf verify the DD contracts that implement a subset of the branch requirements. Without requirements as the organising axis, there is nothing specific enough to derive tests from and nothing coarse enough to evaluate an architecture against.</p>
+
+    <h3>The traceability lineage</h3>
+    <p>Requirements sit in the middle of a five-link chain from stakeholder intent to verified behaviour.</p>
+
+    <div class="mermaid">
+flowchart LR
+    PB["Product Brief<br/>(outcomes, NFRs,<br/>constraints)"]
+    REQ["Requirements<br/>(this artifact)"]
+    ARCH["Architecture<br/>(allocates to children)"]
+    DD["Detailed Design<br/>(leaf contracts)"]
+    TS["TestSpec<br/>(verifies)"]
+    ADR["ADRs<br/>(cross-cutting)"]
+
+    PB -->|derived_from| REQ
+    REQ -->|derived_from / allocates| ARCH
+    ARCH -->|decomposes| DD
+    REQ -->|verified_by| TS
+    DD -.->|verified_by| TS
+    ADR -.->|governing_adrs| REQ
+    ADR -.->|governing_adrs| ARCH
+
+    classDef primary fill:#eef,stroke:#557,stroke-width:2px
+    classDef side fill:#f5f5f5,stroke:#aaa,stroke-width:1px
+    class REQ primary
+    class ADR,DD,TS side
+    </div>
+
+    <p>Every link in this chain is mandatory at some granularity. Requirements with no <code>derived_from</code> are orphans (what are they for?). Requirements with no downstream <code>allocates</code> relationship in Architecture are unbuilt. Requirements with no <code>verified_by</code> tests are unchecked. Governing ADRs flow in as constraints; allocated REQ-IDs flow out to Architecture children and ultimately to DD contracts.</p>
+
+    <h3>User stories and requirements are not the same thing</h3>
+    <div class="card">
+      <p>Most teams elicit with <strong>user stories</strong> (<em>"As a returning customer, I want a fast checkout so that I don't abandon the cart."</em>). User stories are excellent for stakeholder conversation and backlog prioritisation; they are a conversation token, deliberately under-specified so the conversation fills in the detail.</p>
+      <p>Requirements are different: they are the <em>formalisation</em> of what those conversations settled on. A single user story typically produces several requirements &mdash; a functional one about the happy path, one or more unwanted-behaviour requirements for error paths, an NFR about latency or throughput, an interface requirement if the story touches an external system. The user story is retained as input (INVEST, backlog item, conversation record); the requirement is what Architecture, Detailed Design, and tests hang off.</p>
+      <p>Example: <em>"As a returning customer, I want one-click checkout so that I don't retype my details"</em> becomes <strong>functional</strong> (<em>"When a returning customer with a saved payment method initiates checkout, the system shall pre-populate billing and shipping from the most recent completed order"</em>), <strong>NFR</strong> (<em>"The checkout initiation shall complete in &le; 400 ms at p95 for sessions with cached payment tokens, measured at the API boundary"</em>), and <strong>unwanted-behaviour</strong> (<em>"If the saved payment method is expired, then the system shall prompt for a new payment method and shall not silently fall back to manual entry"</em>). Three requirements, one user story. All three trace back to the user story as <code>derived_from</code>; the user story itself traces back to the Product Brief outcome it serves.</p>
+    </div>
+
+    <h3>What a Requirements artifact is not</h3>
+    <ul>
+      <li><strong>Not a backlog.</strong> A backlog is work to be done, ordered by value / effort / dependency. Requirements are behavioural specifications, independent of when anyone will build them.</li>
+      <li><strong>Not a design.</strong> Requirements say <em>what</em>, not <em>how</em>. Naming a database, a framework, a specific algorithm, or a data structure inside a requirement statement is a category error &mdash; that is ADR, Architecture, or DD territory.</li>
+      <li><strong>Not test cases.</strong> Requirements say <em>what the system must do</em>; test cases say <em>how you would prove it</em>. The two are cleanly separated: requirements live here; test cases live in TestSpec. A requirement does not list its test cases inline.</li>
+      <li><strong>Not a feature list.</strong> A feature is a user-visible capability; a requirement is a constraint on behaviour. A single feature typically produces multiple requirements across the five types (functional, QA, interface, data, inherited constraint).</li>
+      <li><strong>Not a wishlist.</strong> "It would be nice if&hellip;" does not belong in Requirements. Every statement is a commitment to verify; if the system doesn't have to satisfy it, it isn't a requirement.</li>
+    </ul>
+
+    <h3>Retrofit posture</h3>
+    <p>Requirements retrofitted from existing code sit in a <em>mixed-evidence</em> position. The <em>functional</em> behaviour is largely recoverable &mdash; code and tests show what the system does. The <em>rationale</em> is not: nobody left a record of why the system was built to do it that way, what alternatives were considered, or which constraint was binding. The framework's rule is explicit: <strong>rationale is human-only</strong>. A retrofit Requirements document records the behaviour (<code>recovery_status: reconstructed</code> where evidence is solid; <code>verified</code> where a human confirms it) and marks the rationale <code>recovery_status: unknown</code> until a human supplies it. Fabricating a plausible-sounding "why" from training priors is the single sharpest retrofit anti-pattern and the skill layer refuses to emit it.</p>
+
+    <h3>Why the framework treats this layer as non-negotiable</h3>
+    <p>The Spec Ambiguity Test applies universally: every specification artifact at every layer must let a junior engineer or mid-tier AI implement without guessing. Requirements are the layer where this test bites hardest. Above Requirements (Product Brief), the artifact is narrative and stakeholder-facing; ambiguity can be negotiated in conversation. Below Requirements (Detailed Design), the artifact is already specific to code-producing granularity. Requirements are the translation layer between them. If they are vague, everything below compensates by guessing, and the guesses drift out of alignment with stakeholder intent. No amount of careful downstream design or testing recovers from ambiguous requirements &mdash; it only hardens whichever interpretation got picked.</p>
+  </section>
+
+  <!-- ===================== SECTION 2: BEST PRACTICES ===================== -->
+  <section id="req-best-practices">
+    <h2>2. Best Practices</h2>
+    <p class="lead">Eight disciplines. Vocabulary first, because every subsequent discipline depends on terms that mean the same thing to every reader. Type taxonomy next, because the remaining craft differs by type. Then four type-specific disciplines (structured language, statement-level quality, NFRs, interfaces) and one for constraints. Finally the lifecycle discipline &mdash; rationale, derivation, traceability, inspection &mdash; that keeps the artifact honest over time.</p>
+
+    <h3>Frontmatter and shape</h3>
+    <p>A Requirements artifact is a single Markdown file per non-leaf scope at <code>/specs/{scope}/requirements.md</code> (root-scope lives at <code>/specs/requirements.md</code>). YAML front-matter identifies the artifact; the body holds prose sections and embedded YAML blocks per requirement. Canonical front-matter:</p>
+
+    <table class="field-table">
+      <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td><code>REQS-{scope}</code>; at root, <code>REQS</code>.</td></tr>
+        <tr><td><code>scope</code></td><td>Scope path this artifact covers.</td></tr>
+        <tr><td><code>parent_scope</code></td><td>Parent scope path; null at root.</td></tr>
+        <tr><td><code>derived_from</code></td><td>Upstream artifacts (Product Brief at root; parent Requirements at branches).</td></tr>
+        <tr><td><code>governing_adrs</code></td><td>Cross-cutting ADRs that constrain this scope.</td></tr>
+        <tr><td><code>status</code></td><td><code>draft</code> &rarr; <code>accepted</code>. Re-enters <code>draft</code> on material edit.</td></tr>
+        <tr><td><code>date</code></td><td>Date of last acceptance.</td></tr>
+        <tr><td><code>recovery_status</code></td><td>Per-section map, retrofit only. <code>verified</code> | <code>reconstructed</code> (behaviour fields) | <code>unknown</code> (rationale and other human-only fields).</td></tr>
+      </tbody>
+    </table>
+
+    <p>Per requirement, the embedded YAML block carries <code>id</code>, <code>statement</code>, <code>rationale</code> (required), <code>acceptance</code> (optional; required when the statement alone leaves test conditions ambiguous), <code>priority</code> (optional), and <code>derived_from</code> (the upstream user story, stakeholder need, or parent requirement).</p>
+
+    <h3>2.1 &nbsp; Vocabulary discipline &mdash; glossary and ubiquitous language</h3>
+    <p>Before any requirement statement has meaning, the terms it uses must mean the same thing to every reader. This is Evans' ubiquitous language adapted to the requirements layer: a single vocabulary, binding across conversation, requirements text, architecture diagrams, code, and tests, scoped to one bounded context. Within that scope there is one word per concept and one concept per word. Different scopes are free to use the same word with different meanings; that is the whole point of a bounded context.</p>
+
+    <p>The artifact discipline is short and non-negotiable: every non-trivial Requirements document opens with a <strong>Glossary</strong> section that names every domain term with a single definition. A term used in a requirement that is not in the glossary is either slang, a synonym of a glossary term (pick one and stick to it), or an undefined concept that needs to be added. Terms should be model-anchored &mdash; they name things in the domain the system reasons about, not things in the implementation.</p>
+
+    <pre><code>glossary:
+  - term: "Session"
+    definition: "A server-side record of an authenticated user's continuous interaction
+                 with the system, scoped to a single device and identified by an opaque
+                 session token. A session is created on successful authentication and
+                 destroyed on logout, idle timeout, or explicit invalidation."
+    model_refs: [Session entity in the Identity bounded context]
+
+  - term: "Idle timeout"
+    definition: "A session invariant: the maximum duration between the end of one
+                 authenticated request on the session and the start of the next
+                 before the session is destroyed. Distinct from absolute timeout."
+
+  - term: "Absolute timeout"
+    definition: "A session invariant: the maximum duration from session creation
+                 to forced destruction, independent of activity."
+
+  - term: "Elevated session"
+    definition: "A session that has completed step-up authentication (e.g., second factor
+                 or re-entry of password) within the last N minutes, making it eligible
+                 to perform security-sensitive operations. Distinct from Session."</code></pre>
+
+    <p>The payoff is directly requirements-level. <em>"While the user's session is idle, the system shall&hellip;"</em> is only meaningful if <em>session</em> and <em>idle</em> mean one thing. Two readers who each imagine a different definition produce two different tests, two different designs, and an incompatible integration.</p>
+
+    <p>Evans' observation that vocabulary fragments quickly &mdash; "as few as three or four people" working together can produce divergent dialects &mdash; applies doubly in an AI-augmented workflow. LLM-generated requirement text defaults to generic-programmer vocabulary (<em>Manager</em>, <em>Service</em>, <em>Handler</em>, <em>Record</em>) unless the project vocabulary is established and enforced. The glossary is the project's statement that this drift is not acceptable, and the reference that review tools (human or AI) can check against. <strong>Vocabulary is checked before any other quality discipline applies</strong>: statement-level craft cannot salvage a requirement built on undefined terms.</p>
+
+    <h4>EARS versus glossary &mdash; sentence vs. vocabulary</h4>
+    <p>Structured requirements languages like EARS discipline the <em>sentence</em>: one verb, named actor, specified trigger, specified response. The glossary disciplines the <em>vocabulary</em> the sentence is built from. A grammatically perfect EARS statement built on a sloppy vocabulary is still ambiguous; rigorous vocabulary embedded in prose without structure is still untestable. The two are complementary and both load-bearing.</p>
+
+    <h3>2.2 &nbsp; Requirement type taxonomy</h3>
+    <p>The framework's Requirements artifact has five fixed sections, one per requirement <strong>type</strong>. Authors and reviewers must know the distinction &mdash; a requirement filed in the wrong section silently weakens the artifact because each section has different rigor rules and different downstream consumers.</p>
+
+    <table class="field-table">
+      <thead><tr><th>Type</th><th>States</th><th>Verified at</th><th>Example (session scope)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Functional</strong></td>
+          <td>What the system does in response to stimuli or in a given state.</td>
+          <td>Unit + integration + system tests, depending on scope.</td>
+          <td><em>"When the user submits valid credentials, the system shall create a session and return its token."</em></td>
+        </tr>
+        <tr>
+          <td><strong>Quality attribute / NFR</strong></td>
+          <td>A measurable non-functional characteristic under specified load and environment.</td>
+          <td>Performance / load / chaos tests; static analysis for some.</td>
+          <td><em>"The session-validation endpoint shall respond in &le; 50 ms at p95 under 5,000 concurrent sessions, measured at the API gateway."</em></td>
+        </tr>
+        <tr>
+          <td><strong>Interface</strong></td>
+          <td>A contract with an external caller, dependency, or protocol peer.</td>
+          <td>Contract tests; integration tests at the interface.</td>
+          <td><em>"The authentication callback shall accept OIDC authorization-code responses per RFC 6749 §4.1.2, and shall reject responses whose <code>state</code> parameter does not match the one issued."</em></td>
+        </tr>
+        <tr>
+          <td><strong>Data</strong></td>
+          <td>Format, retention, privacy class, integrity invariants of data the system holds or exchanges.</td>
+          <td>Schema tests; data-layer tests; compliance audits.</td>
+          <td><em>"Session records shall retain the user's IP address for no more than 90 days from last activity, after which the IP field shall be deleted while the session history record is preserved."</em></td>
+        </tr>
+        <tr>
+          <td><strong>Inherited constraint</strong></td>
+          <td>Bounds imposed from above or outside &mdash; Product Brief, governing ADR, regulatory regime &mdash; that this scope must honour.</td>
+          <td>Reviewed; some are architecture-testable, some are process-verified.</td>
+          <td><em>"Per ADR-012, all session token generation shall use a CSPRNG; direct use of <code>java.util.Random</code> or equivalent is prohibited."</em></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Two level-confusion errors recur often enough to name. First, NFRs written as functional requirements: <em>"The system shall be fast"</em> reads as functional but is an untestable NFR. Second, design smuggled as a requirement: <em>"The system shall use a distributed cache to store session tokens"</em> reads as functional but is an architectural decision. Move the first to &sect; QA with a measurable target; move the second to ADR / Architecture and, if it implies a testable behaviour at this layer, add the requirement that tests that behaviour.</p>
+
+    <h3>2.3 &nbsp; Structured language &mdash; EARS as default, GWT where useful</h3>
+    <p>Free-form natural language makes roughly half the requirements it produces ambiguous. <strong>EARS (Easy Approach to Requirements Syntax)</strong> is five sentence templates that cut most of the ambiguity by forcing the author to classify the requirement before writing it. The templates are learnable in under an hour and are used across aerospace (Rolls-Royce, NASA, Airbus), automotive, medical, and increasingly general software.</p>
+
+    <table class="field-table">
+      <thead><tr><th>Pattern</th><th>Template</th><th>When to use</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Ubiquitous</strong></td>
+          <td><em>The &lt;system&gt; shall &lt;response&gt;.</em></td>
+          <td>Always-on invariants. Behaviour that is true without a trigger or a state condition.</td>
+        </tr>
+        <tr>
+          <td><strong>Event-driven</strong> (<em>When</em>)</td>
+          <td><em>When &lt;trigger&gt;, the &lt;system&gt; shall &lt;response&gt;.</em></td>
+          <td>Stimulus-response. The trigger is a discrete event; the response fires once per trigger.</td>
+        </tr>
+        <tr>
+          <td><strong>State-driven</strong> (<em>While</em>)</td>
+          <td><em>While &lt;state&gt;, the &lt;system&gt; shall &lt;response&gt;.</em></td>
+          <td>Behaviour that persists for the duration of a named mode or condition.</td>
+        </tr>
+        <tr>
+          <td><strong>Optional-feature</strong> (<em>Where</em>)</td>
+          <td><em>Where &lt;feature&gt;, the &lt;system&gt; shall &lt;response&gt;.</em></td>
+          <td>Behaviour conditional on a configuration or deployment variant.</td>
+        </tr>
+        <tr>
+          <td><strong>Unwanted-behaviour</strong> (<em>If/then</em>)</td>
+          <td><em>If &lt;condition&gt;, then the &lt;system&gt; shall &lt;response&gt;.</em></td>
+          <td>Error paths, fault responses, security violations. Every "shall not" candidate should be rephrased as a positive "shall" under an unwanted condition.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Compound templates</h4>
+    <p>Keywords combine in a canonical order: <code>Where</code> &rarr; <code>While</code> &rarr; <code>When</code> &rarr; <code>If/then</code> &rarr; <code>shall</code>. Use at most two keywords per statement; three or more signals that the statement is carrying multiple requirements that need to be split. <em>"Where the tenant plan is Enterprise, while the user's session is elevated, when the user requests a bulk export, the system shall queue the export and return a job token"</em> is a two-keyword compound (Where + When; <em>while the user's session is elevated</em> is a precondition, not a third template keyword &mdash; the author should still verify that two is the ceiling).</p>
+
+    <h4>When EARS is not enough</h4>
+    <p>EARS handles functional behaviour and unwanted behaviour well. It is less natural for:</p>
+    <ul>
+      <li><strong>Measurable NFRs with multi-level targets.</strong> Use the five-element performance rule (&sect; 2.5) or Planguage's <code>GOAL / STRETCH / WISH / FAIL</code> scale to express tiered quality attributes.</li>
+      <li><strong>Multi-step scenarios with pre- and post-conditions.</strong> <strong>Given-When-Then (GWT)</strong> is the natural shape. GWT maps cleanly to EARS when needed: <em>Given</em> &harr; <em>While</em> (state precondition), <em>When</em> &harr; <em>When</em> (trigger), <em>Then</em> &harr; <em>shall</em> (response). Teams familiar with BDD can write acceptance criteria in GWT and derive the EARS requirement from them, or vice versa.</li>
+      <li><strong>Temporal / duration expressions beyond simple triggers.</strong> "Within 5 seconds of&hellip;", "for no more than 10 minutes after&hellip;" &mdash; EARS does not forbid them but their detection and enforcement is author discipline, not template.</li>
+    </ul>
+
+    <p>The default is EARS for the requirement statement; GWT is available as a form for the optional <code>acceptance</code> block when the statement alone leaves conditions ambiguous; Planguage appears inside NFR target specifications. Do not mix two structured forms inside one statement.</p>
+
+    <h3>2.4 &nbsp; Statement-level quality &mdash; atomic, testable, solution-free</h3>
+    <p>Every individual requirement statement must clear three gates.</p>
+
+    <ol>
+      <li><strong>Atomic.</strong> One <code>shall</code> per statement, verifying one behaviour. Compound statements (<em>"&hellip;shall X <strong>and</strong> shall Y"</em>) break atomicity and are the single most common anti-pattern. If a test would need two independent check groups to pass the requirement, split it.</li>
+      <li><strong>Testable.</strong> A tester reading the statement alone can write a test that distinguishes conforming from non-conforming behaviour. The <em>box test</em> is the author's own check: can I, reading only this statement and the glossary, sketch the test? If the answer is "I would need to ask someone", the statement is not yet testable.</li>
+      <li><strong>Solution-free.</strong> The statement constrains what the system does, not how. Naming a database, framework, library, data structure, or algorithm inside the statement is a category error; move it to ADR or Architecture. The one exception is interface requirements, which legitimately specify externally visible protocols and message formats &mdash; an externally-imposed interface is what, not how.</li>
+    </ol>
+
+    <h4>Conditional completeness &mdash; state-driven pairs</h4>
+    <p>Every state-driven requirement (<em>While &lt;state&gt;&hellip;</em>) implicitly raises the question: what does the system do <em>outside</em> that state? A Requirements document that says <em>"While the session is elevated, the system shall allow changes to payment methods"</em> but never states what happens outside the elevated state has a latent gap; a reviewer has no way to tell whether the behaviour is "allow it with a prompt", "deny it", or "deny silently". Write the complementary pair whenever the state axis is load-bearing: <em>"While the session is elevated, the system shall allow&hellip;"</em> paired with <em>"While the session is not elevated, the system shall prompt for step-up authentication before allowing&hellip;"</em>. State-driven requirements without complements are among the most common findings in requirements review.</p>
+
+    <h4>Prioritisation &mdash; an attribute, not a section</h4>
+    <p>Teams with many requirements and bounded capacity inevitably need to express <em>which</em> requirements are must-have. The framework stores priority as a per-requirement attribute, not as a grouping section, because grouping by priority fragments the natural grouping by type. Common schemes: MoSCoW (<em>must / should / could / won't</em>) for straightforward prioritisation; WSJF (weighted shortest job first) for scaled agile with cost-of-delay estimates; RICE (reach / impact / confidence / effort) for product-driven prioritisation. Pick one consciously and apply it uniformly; a Requirements document whose priority field uses three schemes cannot be sorted reliably.</p>
+
+    <h3>2.5 &nbsp; Quality attributes at requirement granularity</h3>
+    <p>The Product Brief page covers quality-attribute <em>scoping</em>: the NFR-10 floor list (availability, latency, throughput, security, privacy / compliance, data, compatibility, extensibility, operability, cost) and the six-component quality-attribute scenario form (stimulus / source / environment / artifact / response / response measure). This page covers what changes when those scenarios harden into individual, testable requirement statements.</p>
+
+    <h4>The five-element performance rule</h4>
+    <p>An NFR statement that is load-bearing &mdash; one a reviewer could approve or reject, not a wish &mdash; contains five elements:</p>
+    <ol>
+      <li><strong>The system or subsystem</strong> the requirement applies to, named specifically.</li>
+      <li><strong>The response or behaviour</strong> being measured.</li>
+      <li><strong>The metric with unit</strong> the measurement produces (milliseconds, requests/second, bytes, nines of availability).</li>
+      <li><strong>The target value</strong>, expressed at the correct statistical level (mean is almost never right for latency; prefer a stated percentile).</li>
+      <li><strong>The condition</strong> under which the measurement is valid &mdash; load, environment, operating mode, measurement point.</li>
+    </ol>
+
+    <pre><code># All five elements, in order:
+"The session-validation endpoint [system]
+  shall respond [response]
+  in &le; 50 ms [metric + unit]
+  at p95 [statistical level on target]
+  under 5,000 concurrent sessions in the production deployment,
+  measured at the API gateway [condition]."</code></pre>
+
+    <p>The condition is the element most often omitted. Without it, the metric is not reproducible: <em>"the system shall respond in &le; 50 ms"</em> can be trivially satisfied under 1% load and trivially failed under 100% load, and no test configuration is defensible.</p>
+
+    <h4>Multi-level targets &mdash; Planguage</h4>
+    <p>Binary pass/fail NFRs force an all-or-nothing trade-off at implementation time. For attributes where the right target is a range &mdash; nearly all performance and availability targets &mdash; Planguage's multi-level form carries the trade-off into the requirement itself:</p>
+
+    <pre><code>availability (session-validation endpoint):
+  scale:     percentage of authenticated-user-facing requests completed within SLO
+  meter:     computed over 30-day rolling window, excluding planned maintenance windows
+  fail:      &lt; 99.5%     # below this the system is considered in violation
+  goal:      &ge; 99.9%    # target the team commits to
+  stretch:   &ge; 99.95%   # desirable but not committed
+  wish:      99.99%       # aspirational; not a commitment</code></pre>
+
+    <p>The key discipline Planguage imposes is the separate <code>scale</code> and <code>meter</code> fields. A target without a scale (what is being measured) and a meter (how and over what window) is a number, not a measurement.</p>
+
+    <h4>Compliance constraints translate to derived requirements</h4>
+    <p>Regulatory regimes (GDPR, HIPAA, PCI-DSS, WCAG, SOC 2, CCPA) rarely speak in testable statements. They state obligations at a legal or policy level that must be translated into requirements the system and its tests can verify. The translation is a derivation step, captured explicitly.</p>
+
+    <p>Example: GDPR Article 17 ("Right to erasure") &mdash; a data subject may request that their personal data be erased without undue delay. At the requirements layer:</p>
+    <pre><code>inherited_constraints:
+  - source: "GDPR Article 17 (Right to erasure)"
+    summary: "Data subjects have the right to have their personal data erased
+              without undue delay on request, subject to limited exceptions."
+
+derived_requirements:
+  - id: REQ-SESSION-042
+    statement: "When an authenticated data subject submits an erasure request for
+                their session data, the system shall destroy all active sessions for
+                that subject and shall remove personal identifiers from session history
+                records within 7 calendar days of receiving the request."
+    derived_from: [Inherited constraint &ndash; GDPR Article 17]
+    rationale: "GDPR Article 17(1) requires erasure without undue delay; our DPA
+                commits to 7 days for session data specifically. Full audit-log records
+                are retained under the legal-obligation exception (Article 17(3)(b))
+                but personal identifiers are severed per the pseudonymisation practice."
+
+  - id: REQ-SESSION-043
+    statement: "If the system retains any session record after an erasure request,
+                then the retained record shall contain no directly-identifying fields
+                (user ID, email, IP address, device fingerprint)."
+    derived_from: [Inherited constraint &ndash; GDPR Article 17; REQ-SESSION-042]
+    rationale: "Supports the pseudonymisation commitment in REQ-042's rationale;
+                legal-obligation exception permits retention of pseudonymised records
+                for audit, not of directly-identifying ones."</code></pre>
+
+    <p>The pattern: the regulation is captured once as an inherited constraint with its source; each testable behaviour it implies is a derived requirement with a <code>derived_from</code> link back to the constraint. The rationale on each derived requirement explains the choice that translates the general obligation into a specific commitment (here: "7 days" is not in the regulation; it is our DPA commitment derived from "without undue delay").</p>
+
+    <h3>2.6 &nbsp; Interface contracts</h3>
+    <p>Interface requirements specify the boundary between this system (or scope) and anything outside it: external APIs, event streams, databases the scope does not own, hardware, user agents. Interface requirements are <em>the single most common omission</em> in requirements audits, and the most common failure mode is <em>syntax without semantics</em> &mdash; a function signature or a JSON schema with no statement of what actually happens.</p>
+
+    <h4>Five dimensions every interface requirement covers</h4>
+    <ol>
+      <li><strong>Protocol.</strong> The communication standard and version (HTTP/1.1, gRPC, AMQP 0.9.1, OIDC 1.0, TLS 1.3, specific OAuth grant type). Protocols are <em>what</em>, not <em>how</em>: externally imposed and therefore legitimately named here.</li>
+      <li><strong>Message structure.</strong> Fields, types, units, ranges, resolutions, defaults, optionality. For APIs: request / response schemas. For queues: message payloads. For databases the scope does not own: read and write contracts.</li>
+      <li><strong>Timing.</strong> Latency budget for the response, rate limits, retry expectations, heartbeat intervals. Timing is part of the contract, not an NFR about the contract.</li>
+      <li><strong>Error handling.</strong> What the interface does when the call fails, times out, returns unexpected data, or hits a rate limit. <em>"The system shall retry up to 3 times with exponential back-off starting at 500 ms, then fail the upstream operation with status <code>DOWNSTREAM_UNAVAILABLE</code>."</em></li>
+      <li><strong>Startup / initial state.</strong> What the interface does before it has been established &mdash; cold start, connection lost, first request after a restart. Interfaces that are silent here have latent bugs that surface in production incidents.</li>
+    </ol>
+
+    <h4>Design by Contract at the requirements layer</h4>
+    <p>For each externally-callable operation, the interface requirement states <strong>preconditions</strong> (what the caller must guarantee), <strong>postconditions</strong> (what the system guarantees if the preconditions hold), and <strong>invariants</strong> (conditions true before and after, always). This is Meyer's Design by Contract applied one layer above code &mdash; at the requirements layer, the contract governs testability; at the code layer, DD lifts the same contract into executable assertions.</p>
+
+    <pre><code>interface: POST /sessions/{id}/invalidate
+
+precondition:
+  - Authenticated caller holds role 'session-admin' OR owns the target session.
+  - Session {id} exists and is in state ACTIVE or IDLE.
+
+postcondition (on 200):
+  - Session {id} is in state INVALIDATED.
+  - Subsequent calls to validate this session-id return 401 with reason 'invalidated'.
+  - An invalidation audit event has been appended to the session history record.
+
+postcondition (on 404):
+  - Session {id} does not exist OR is already INVALIDATED.
+  - No state changes are performed.
+
+invariants:
+  - The operation is idempotent; calling it on an already-INVALIDATED session is a 404
+    with no state mutation, never a 5xx.
+  - No response discloses whether the caller would have been authorised had the session
+    existed (prevents session enumeration).</code></pre>
+
+    <p>The pre/post form makes the requirement directly test-derivable: each precondition branch is a test-case class; each postcondition is an assertion; each invariant is a property to fuzz or cross-check.</p>
+
+    <h4>Versioning is a first-class requirement</h4>
+    <p>An interface that is not versioned has silently committed to never-changing, which is a commitment the system cannot keep. The interface requirement names the version (v1, 2026-04), the compatibility regime (semver, date-based, additive-only), and the deprecation policy (how long old versions remain available, how callers are notified). Teams that omit versioning from the requirement discover, at the first breaking change, that there was no written rule for how to change the interface, and every caller's migration story is improvised.</p>
+
+    <h3>2.7 &nbsp; Constraints craft</h3>
+    <p>Constraints are distinct from requirements. A requirement specifies behaviour the system must exhibit (testable by observing the system); a constraint bounds the space of acceptable solutions (verifiable often by inspection, process, or architecture review rather than by runtime test). The framework keeps them in the <strong>Inherited Constraints</strong> section, and the craft rules are different from the rules for requirements.</p>
+
+    <ul>
+      <li><strong>Every constraint cites its source.</strong> "Must use Java 17" is a constraint; who imposed it and why? ADR-034 (company-wide JVM baseline)? A customer contract? The upstream platform team? A constraint without a source is a preference pretending to be a rule.</li>
+      <li><strong>Every constraint has a rationale that names the cost of relaxing it.</strong> If the constraint could be relaxed without cost, it is not really a constraint. Name the cost (<em>"Relaxing this requires a customer-wide re-certification"</em>, <em>"Relaxing this creates a dependency on a service the org does not operate"</em>). This is what lets a future review reopen the constraint when circumstances change.</li>
+      <li><strong>Constraints with downstream behavioural consequences propagate as derived requirements.</strong> <em>"Must use Java 17"</em> alone changes nothing at the behavioural layer; <em>"Must use Postgres 15 as the primary datastore"</em> combined with the system's latency target may imply derived requirements about query patterns or connection-pool shape. The framework's hybrid propagation rule (ADRs with testable consequences become requirements; ADRs that only bound choices propagate via <code>governing_adrs</code>) applies identically to inherited constraints.</li>
+      <li><strong>Constraint categories.</strong> <em>Technical</em> (platforms, frameworks, protocols mandated), <em>regulatory / legal</em> (GDPR, HIPAA, contractual obligations), <em>organisational</em> (company-wide policies, coding standards, procurement), <em>financial</em> (infrastructure budget ceilings, vendor cost caps), <em>temporal</em> (hard launch dates, freeze windows). Categorising helps reviewers spot under-represented categories &mdash; most teams over-list technical and under-list regulatory.</li>
+    </ul>
+
+    <h3>2.8 &nbsp; Rationale, derivation, traceability, inspection</h3>
+    <p>The lifecycle discipline: how requirements start honest and stay honest.</p>
+
+    <h4>Rationale is mandatory and captured at decision time</h4>
+    <p>Every requirement has a <code>rationale</code> field. The rationale is <em>not</em> a restatement of the requirement; it is the <em>why</em> &mdash; the context, the options that were considered, the criterion that drove the choice. Good rationale distinguishes essential constraints from accidental ones, which is the distinction that makes future maintenance safe. Without rationale, every requirement in the system looks equally non-negotiable, and the team that inherits the artifact has to either over-conserve everything or guess at what was load-bearing.</p>
+
+    <p>Rationale is captured at <em>decision time</em>, not retroactively. Rationale produced years after the fact is lower-fidelity by an order of magnitude; the options the original author considered have been forgotten, and the human brain readily invents plausible justifications for whatever decision got made. Three failure modes are specific and worth naming:</p>
+    <ul>
+      <li><strong>LLM confident invention.</strong> An agent asked to generate rationale for an existing requirement produces a plausible-sounding justification that is not grounded in any decision ever made. The rationale <em>reads</em> right and is entirely fabricated.</li>
+      <li><strong>Test-as-requirement inversion.</strong> A characterisation test written against existing behaviour gets treated as the "requirement", and the rationale says "the system shall do X because that is what test T verifies". The test is verifying the current code, not the original intent; the rationale is circular.</li>
+      <li><strong>Laundering the current state.</strong> Rationale that explains why the current design is right rather than why the original choice was made. The current state is a fact; a rationale that only defends it is a ratification, not a reason.</li>
+    </ul>
+
+    <p>The honest retrofit posture: rationale is a <strong>human-only field</strong>, and its retrofit <code>recovery_status</code> is <code>verified</code> (a human confirmed it from preserved documents or conversation) or <code>unknown</code>. Never <code>reconstructed</code>. A retrofit Requirements document with many <code>rationale: unknown</code> entries is <em>correct</em> &mdash; it honestly reports what is lost &mdash; not partial.</p>
+
+    <h4>Derived requirements</h4>
+    <p>A derived requirement is one that does not come from an upstream stakeholder need or parent requirement directly, but from a design or architectural decision at this scope that introduces a new constraint. <em>"Per ADR-012 (token generation), the system shall use a CSPRNG"</em> is derived &mdash; no stakeholder requested it, but the ADR's consequences require it be testable here. Derived requirements are flagged explicitly (<code>derivation: derived</code>) and their rationale cites the decision that introduced them. The framework refuses the pattern where derived requirements accumulate silently &mdash; every one of them is surfaced for review, because the easiest way to drift out of stakeholder alignment is to quietly add requirements that no upstream party ever agreed to.</p>
+
+    <h4>Bidirectional traceability is the working artifact</h4>
+    <p>Traceability is not paperwork; it is the mechanism that makes every other discipline provable. Forward: every requirement has a <code>derived_from</code> (user story, parent requirement, Product Brief outcome, inherited constraint). Backward (computed by tooling, not authored): every stakeholder need resolves to at least one requirement, every requirement to at least one allocated Architecture child and to at least one verifying test case. Missing links in either direction are findings &mdash; an orphan requirement is unjustified; an unverified requirement is unenforced.</p>
+
+    <p>A completeness check worth running on every Requirements artifact before review:</p>
+    <ul>
+      <li>Every requirement has <code>derived_from</code> non-empty.</li>
+      <li>Every inherited constraint has a source.</li>
+      <li>Every governing ADR is referenced by at least one requirement or at least one derived requirement.</li>
+      <li>Every requirement has <code>rationale</code> non-empty (or <code>recovery_status: unknown</code> in a retrofit, never both empty).</li>
+      <li>Every NFR has the five elements present (system, response, metric + unit, target, condition).</li>
+      <li>Every interface requirement has the five dimensions present (protocol, message, timing, error, startup).</li>
+    </ul>
+
+    <h4>Inspection &mdash; Perspective-Based Reading</h4>
+    <p>Ad-hoc review misses the defects that the author is blind to. <strong>Perspective-Based Reading (PBR)</strong> is a scenario-based inspection technique with three reviewer roles, each reading the same artifact from a different stance. Each reviewer looks for defects that the stance makes salient and the other stances miss.</p>
+    <ul>
+      <li><strong>Designer perspective.</strong> "If I were allocating this to children, could I?" Surfaces requirements that are impossible to decompose, that conflict, or that hide design decisions.</li>
+      <li><strong>Tester perspective.</strong> "If I were deriving test cases from this, could I?" Surfaces ambiguity, untestable statements, missing conditions, and implicit acceptance criteria.</li>
+      <li><strong>User / stakeholder perspective.</strong> "Does this capture what the stakeholder actually wants?" Surfaces outcomes the requirements fail to express, or over-specification that constrains without justification.</li>
+    </ul>
+
+    <p>Empirical evidence (Shull et al., NASA GSFC, 1995&ndash;2000) shows PBR detects defect classes ad-hoc review consistently misses, with effort comparable to or modestly higher than informal walkthroughs. The discipline is cheap to adopt and the yield is specifically the kind of latent ambiguity that cascades into expensive downstream defects. PBR is the default review practice for Requirements artifacts in this framework; teams with an INCOSE-compliance bent can layer a checklist review (the 42-rule framework) on top of PBR, but not instead of it.</p>
+  </section>
+
+  <!-- ===================== SECTION 3: ANTI-PATTERNS ===================== -->
+  <section id="req-anti-patterns">
+    <h2>3. Anti-Patterns</h2>
+    <p class="lead">Nine universal failure modes in individual statements; seven specific to AI-augmented authoring and retrofit. The universal nine have been catalogued for decades across requirements research and audit findings. The AI-era seven are newer and the shape of future audit findings; they deserve explicit naming because their remedies differ from the classical ones.</p>
+
+    <h3>Universal (nine)</h3>
+    <ol>
+      <li><strong>Compound requirement.</strong> Two <code>shall</code>s in one statement, joined by <em>and</em>, <em>or</em>, or an enumerated list. <em>"The system shall authenticate the user and shall log the attempt."</em> Split.</li>
+      <li><strong>Vague adjective.</strong> <em>Fast, sufficient, appropriate, adequate, user-friendly, robust.</em> The statement reads approvable but no test distinguishes pass from fail. Replace with a measured quantity or remove.</li>
+      <li><strong>Passive voice without actor.</strong> <em>"Session data shall be validated."</em> By whom, at what point, against what? Rewrite with a named subject.</li>
+      <li><strong>Unbounded list / escape clause.</strong> <em>"Such as X, Y, Z, etc.", "including but not limited to", "as appropriate", "where applicable".</em> Closes no option space, commits to nothing.</li>
+      <li><strong>Unbounded negative requirement.</strong> <em>"The system shall not crash."</em> The negative cannot be exhaustively verified, the scope is infinite. This is the anti-pattern &mdash; not negative requirements in general. Bounded negatives are legitimate and often necessary: <em>"The system shall not log session tokens in plaintext to any destination"</em> is bounded (tokens, plaintext, all destinations), verifiable (log-pattern review + audit), and load-bearing for security. The discipline: rewrite <em>unbounded</em> negatives as positive unwanted-behaviour EARS statements (<em>If X, then the system shall Y</em>); keep <em>bounded</em> negatives and verify them where they make sense.</li>
+      <li><strong>Implementation prescription.</strong> <em>"The system shall use a distributed in-memory store for session tokens."</em> This is ADR content, not a requirement. Move it, and replace here with the behaviour the prescription was trying to ensure.</li>
+      <li><strong>Wishful thinking.</strong> <em>"The system shall process requests with zero latency"</em>, <em>"shall handle infinite concurrent users"</em>. Impossible targets are not requirements; they are aspirations. Honest targets are bounded.</li>
+      <li><strong>Ambiguous pronoun or reference.</strong> <em>"When the request arrives, the system shall validate <em>it</em> and return an appropriate response."</em> <em>It</em> could be the request payload, the headers, the authentication token; <em>appropriate</em> is vague. Rewrite with explicit referents.</li>
+      <li><strong>TBD / TBR / TODO in a baselined requirement.</strong> A requirement with an open placeholder cannot be tested, cannot be allocated, cannot be reviewed. Either resolve the TBD or remove the requirement from the baseline until it is ready.</li>
+    </ol>
+
+    <h3>AI-era and retrofit (seven)</h3>
+    <ol>
+      <li><strong>LLM-fabricated rationale.</strong> An agent asked to retrofit or generate requirements produces a plausible-sounding <code>rationale</code> for every statement, regardless of whether any decision record or human source supports it. The rationale <em>reads</em> competent and is entirely synthesised from training priors. Tell: perfect-grammar rationales on retrofit requirements for which no preserved conversation or document exists; rationales that never say "because the original team chose X over Y" &mdash; only "because X is better than Y", which is reasoning, not recall.</li>
+      <li><strong>EARS cargo-culting.</strong> Statements that obey EARS grammar with no underlying discipline &mdash; vague trigger, vague response, glossary-free terms. <em>"When the system experiences load, the system shall respond appropriately."</em> Structurally event-driven; semantically vacuous. The remedy is not "write better EARS" &mdash; it is to reject EARS as a shield against thinking and require the author to pass the box test.</li>
+      <li><strong>Requirements smuggling design.</strong> A generated requirement contains an implementation choice disguised as behaviour: <em>"The system shall store session state in Redis with 5-second TTL"</em>. The Redis and 5-second TTL are design, not requirement &mdash; but in LLM output they are sticky because training data blends the two. Review specifically for named technologies, named data structures, and named algorithms inside requirement text.</li>
+      <li><strong>Code-driven requirement fabrication.</strong> An agent asked "derive requirements from this code" reads existing behaviour and produces requirements that describe whatever the code happens to do, including bugs and accidental features. The requirements then justify the bugs as intentional. The honest retrofit posture is the opposite: behaviour observable from code is captured with <code>recovery_status: reconstructed</code>; intent behind the behaviour is marked <code>unknown</code> until a human supplies it.</li>
+      <li><strong>Level confusion.</strong> The agent mixes stakeholder need (<em>"the finance team wants fewer errors"</em>), system requirement (<em>"the system shall&hellip;"</em>), and subsystem / component requirement (<em>"the reconciliation job shall&hellip;"</em>) in the same document without distinction. The remedy is to enforce the scope axis explicitly: every requirement's scope matches this artifact's scope; parent-scope concerns are upstream <code>derived_from</code> references, not requirements here.</li>
+      <li><strong>Test-as-requirement inversion.</strong> A characterisation test written against existing behaviour is promoted to "the requirement", closing the loop with no stakeholder in it. The rationale becomes circular: the requirement exists because the test exists. Symptoms: rationale fields that cite tests but never cite a decision; requirements that exactly mirror current behaviour including its quirks.</li>
+      <li><strong>Laundering the current state.</strong> Requirements that exactly describe the deployed system, with rationale that defends the current design as if it were the only possible choice. Useful for auditing what currently exists; deceptive when presented as intended behaviour. Tell: no requirement ever deviates from what the code does; no rationale ever cites a rejected alternative.</li>
+    </ol>
+  </section>
+
+  <!-- ===================== SECTION 4: EXAMPLES ===================== -->
+  <section id="req-examples">
+    <h2>4. Examples</h2>
+    <p class="lead">All examples use a single worked domain: a <strong>session-management service</strong> within a larger e-commerce platform. The service authenticates users, issues and validates session tokens, enforces session policies (idle timeout, absolute timeout, step-up for elevated operations), and integrates with an OIDC identity provider and an audit-log consumer.</p>
+
+    <h3>4.1 &nbsp; EARS templates &mdash; one per pattern, plus a compound</h3>
+
+    <pre><code># Ubiquitous (invariant)
+REQ-001: The session service shall use a cryptographically secure pseudo-random
+         number generator for all session token generation.
+
+# Event-driven (When)
+REQ-002: When a user submits a valid credential pair, the session service shall
+         create a new session, persist it in the ACTIVE state, and return the
+         session token and its absolute-timeout expiry timestamp.
+
+# State-driven (While)
+REQ-003: While a session is in the IDLE state, the session service shall reject
+         validation requests for that session with status 401 and reason
+         'idle-timeout'.
+
+# Optional-feature (Where)
+REQ-004: Where the tenant has enabled multi-factor authentication, the session
+         service shall require step-up authentication before promoting a session
+         to the ELEVATED state.
+
+# Unwanted-behaviour (If/then)
+REQ-005: If three consecutive credential-validation attempts for the same user
+         account fail within 10 minutes, then the session service shall lock
+         the account for 15 minutes and shall emit a 'credential-lockout' audit
+         event.
+
+# Compound (Where + When)
+REQ-006: Where the tenant plan is Enterprise, when an elevated session requests
+         a bulk export larger than 10 MB, the session service shall enqueue the
+         export to the long-running-job queue and shall return a job token with
+         status 202.
+</code></pre>
+
+    <h3>4.2 &nbsp; User story &rarr; requirements translation</h3>
+
+    <pre><code># Input &mdash; user story (elicitation)
+"As a returning customer, I want my session to stay active while I'm shopping so
+ that I don't have to log in again mid-checkout."
+
+# Output &mdash; three requirements (formalisation)
+
+REQ-010 (functional &mdash; state-driven):
+  statement: "While a session has recorded authenticated activity within the last
+              {idle_timeout} minutes, the session service shall keep the session
+              in the ACTIVE state."
+  rationale: "Supports the returning-customer outcome from PB-Outcome-3 (keep
+              authenticated users from being logged out mid-task). Idle timeout
+              is parameterised per ADR-018 (session-policy configuration)."
+  derived_from: [user-story-US-42, PB-Outcome-3, ADR-018]
+
+REQ-011 (NFR &mdash; latency):
+  statement: "The session-validation endpoint shall respond in &le; 50 ms at p95
+              under 5,000 concurrent sessions in the production deployment,
+              measured at the API gateway."
+  rationale: "Validation runs on every authenticated request. PB-NFR-latency
+              commits to &le; 400 ms end-to-end per request at p95; the validation
+              budget of 50 ms leaves headroom for downstream operations."
+  derived_from: [user-story-US-42, PB-NFR-latency]
+
+REQ-012 (unwanted-behaviour &mdash; error path):
+  statement: "If a validation request arrives for a session that has exceeded
+              its absolute-timeout, then the session service shall return 401
+              with reason 'absolute-timeout' and shall not extend the session."
+  rationale: "Absolute timeout is a hard security boundary (ADR-018); even an
+              actively-used session must be re-authenticated once a day."
+  derived_from: [user-story-US-42, ADR-018]
+</code></pre>
+    <p>One user story, three requirements, each testable on its own, each traceable back to the story and forward to the architecture allocation and tests. The user story itself is preserved as elicitation input &mdash; it lives in the product backlog, not in this Requirements document.</p>
+
+    <h3>4.3 &nbsp; Five-element performance rule &mdash; before and after</h3>
+
+    <pre><code># Before &mdash; three elements missing
+"Session validation shall be fast."
+                 &larr; No metric, no target, no condition. "Fast" is an adjective.
+
+# After &mdash; all five elements present
+REQ-015: "The session-validation endpoint          &larr; 1. system named
+            shall respond                          &larr; 2. response named
+            in &le; 50 ms                          &larr; 3. metric + unit
+            at p95                                 &larr; 4. target at a stated percentile
+            under 5,000 concurrent sessions in     &larr; 5. condition
+            the production deployment,                 (load + environment +
+            measured at the API gateway."              measurement point)
+
+  rationale: "Validation is on the hot path of every authenticated request.
+              The 50 ms p95 budget derives from the PB-NFR-latency commitment
+              of 400 ms end-to-end at p95 and the eight downstream operations
+              sharing the budget (roughly 45 ms each plus overhead)."
+</code></pre>
+
+    <h3>4.4 &nbsp; Interface requirement &mdash; five dimensions</h3>
+
+    <pre><code>REQ-020: Session-validation interface
+
+PROTOCOL:
+  The session service shall expose session validation via HTTP/1.1 POST to
+  '/sessions/validate' with TLS 1.3, API version v1.
+
+MESSAGE STRUCTURE:
+  request body:
+    token        required, string, opaque session token, 64-128 chars
+    purpose      optional, enum { 'read', 'write', 'elevated' }, default 'read'
+  response body (200):
+    valid        required, boolean
+    subject      required on valid=true, string, stable user identifier
+    session_state required on valid=true, enum { ACTIVE, IDLE, ELEVATED }
+    reason       required on valid=false, enum { 'expired', 'invalidated',
+                                                 'not-found', 'idle-timeout',
+                                                 'absolute-timeout' }
+
+TIMING:
+  Response within 50 ms at p95 under normal load (see REQ-015).
+  Requests lasting &gt; 500 ms shall be timed out server-side with status 504.
+
+ERROR HANDLING:
+  On downstream store unavailability, the service shall retry the internal
+  read up to 2 times with 50 ms back-off, then fail with 503 and header
+  'Retry-After: 1'. The service shall never silently return valid=false on
+  infrastructure failure &mdash; that condition is 5xx, not 401.
+
+STARTUP / INITIAL STATE:
+  On cold start before the backing store is reachable, the service shall
+  respond 503 with body { 'ready': false, 'reason': 'warming' } and shall
+  fail the '/health/ready' probe until the store has been reachable for
+  10 consecutive seconds.
+
+PRE/POST (DbC):
+  precondition:    caller holds valid API credentials (handled by gateway).
+  postcondition:   on 200 with valid=true, the session's last-activity
+                   timestamp has been updated iff purpose != 'read'.
+  invariant:       the response never discloses the subject on valid=false
+                   (prevents session-existence enumeration).
+
+VERSIONING:
+  Additive-only changes within v1 (new enum values require client handling).
+  Breaking changes increment the major version; v1 remains available for
+  minimum 12 months after v2 is announced.
+</code></pre>
+
+    <h3>4.5 &nbsp; Compliance constraint &rarr; derived requirements (GDPR Article 17)</h3>
+
+    <pre><code>inherited_constraints:
+  - id: IC-GDPR-17
+    source: "GDPR Article 17 (Right to erasure)"
+    summary: "Data subjects may request erasure of their personal data without
+              undue delay, subject to Article 17(3) exceptions."
+    category: regulatory
+    rationale_for_binding: "The service processes personal data (email, IP, device
+                            fingerprint) within session records; GDPR applies to
+                            all EU data subjects using the platform. Cost of
+                            relaxing: DPA breach, supervisory-authority
+                            intervention, material fines (up to 4% global turnover)."
+
+# Derived requirements
+
+REQ-050 (data &mdash; retention + erasure action):
+  statement: "When an authenticated data subject submits an erasure request via
+              the account-settings interface, the session service shall destroy
+              all ACTIVE and IDLE sessions belonging to that subject and shall
+              remove directly-identifying fields (user_id, email, ip_address,
+              device_fingerprint) from all session history records for that
+              subject within 7 calendar days of receiving the request."
+  rationale: "Article 17(1) requires erasure without undue delay. Our DPA
+              (section 6.3) commits specifically to 7 days for session data.
+              History records are pseudonymised rather than deleted to preserve
+              the audit-log legal-obligation exception (Article 17(3)(b)).
+              Alternatives considered: full deletion of history (rejected on
+              audit-log grounds); 30-day window (rejected as outside DPA
+              commitment)."
+  derived_from: [IC-GDPR-17]
+  derivation: derived
+
+REQ-051 (unwanted-behaviour &mdash; no partial retention):
+  statement: "If the session service retains any session history record for a
+              subject after an erasure request has been processed, then the
+              record shall contain no directly-identifying fields."
+  rationale: "Supports REQ-050's pseudonymisation commitment; protects against
+              partial-erasure defects where some identifying fields are cleared
+              and others are missed. Every history record schema change must
+              re-verify this invariant."
+  derived_from: [IC-GDPR-17, REQ-050]
+  derivation: derived
+
+REQ-052 (interface &mdash; request acknowledgement):
+  statement: "When the account-settings interface receives an erasure request,
+              the session service shall return status 202 with a request
+              correlation-id within 2 seconds, and shall emit a
+              'erasure-requested' audit event with that correlation-id."
+  rationale: "Article 15(3) requires timely acknowledgement. The audit event
+              supports proof-of-compliance for supervisory-authority
+              inspections."
+  derived_from: [IC-GDPR-17]
+  derivation: derived
+</code></pre>
+    <p>The translation pattern: one regulatory constraint, three derived requirements across three types (data, unwanted-behaviour, interface). Each derived requirement names the specific commitment the system makes (7 days, pseudonymisation, 202 acknowledgement) and cites the place that commitment was made (our DPA, our architecture, our audit practice). A reviewer can trace GDPR Article 17 through to the test cases in TestSpec that will verify the system honours it.</p>
+
+    <h3>4.6 &nbsp; Anti-pattern before / after</h3>
+
+    <pre><code># 1. Compound
+BEFORE: "The system shall authenticate the user and shall log the attempt."
+AFTER:
+  REQ-A: "When a user submits a credential pair, the session service shall
+          validate it against the identity provider."
+  REQ-B: "When the session service validates a credential pair, it shall emit
+          a 'credential-validation' audit event with outcome (success|failure)
+          and user identifier."
+
+# 2. Vague adjective
+BEFORE: "The session service shall be highly available."
+AFTER:  "The session-validation endpoint shall achieve &ge; 99.95% availability
+         over any rolling 30-day window, excluding planned maintenance
+         windows declared at least 48 hours in advance via the status page."
+
+# 3. Passive voice without actor
+BEFORE: "Session tokens shall be invalidated on logout."
+AFTER:  "When a user logs out, the session service shall transition the
+         session to INVALIDATED and shall reject all subsequent validation
+         requests for that session with status 401 and reason 'invalidated'."
+
+# 4. Unbounded negative
+BEFORE: "The session service shall not fail."          &larr; infinite scope,
+                                                          untestable
+AFTER (bounded, rewritten positive):
+        "If the session service is unable to reach the backing store, then it
+         shall return 503 to validation requests with 'Retry-After: 1',
+         shall fail the readiness probe, and shall not return 200 with
+         valid=false (which would incorrectly signal 'session is invalid'
+         rather than 'service is unhealthy')."
+
+# 5. Implementation prescription
+BEFORE: "The session service shall use Redis with a 5-second TTL for active
+         session state."
+AFTER:  Move the storage choice to ADR-018 (session-store choice) and
+        ADR-024 (freshness policy). Replace here with the behaviour:
+        "While a session is in the ACTIVE state, the session service shall
+         reflect session-state changes to all nodes within 5 seconds of
+         commit, measured at p99 under normal load."
+</code></pre>
+
+    <h3>4.7 &nbsp; Retrofit / AI-era side-by-side &mdash; fabricated vs. honest</h3>
+    <p>A team runs a retrofit agent against a four-year-old internal session service. The code is intact; the original designers have left; no decision records are preserved.</p>
+
+    <pre><code># BAD &mdash; LLM-fabricated retrofit requirement
+
+REQ-R-001:
+  statement: "The session service shall use a 30-minute idle timeout for all
+              sessions."
+  rationale: "30 minutes balances security (limiting session hijack windows)    &larr; Plausible, generic,
+              with user experience (avoiding frequent re-authentication).          and entirely invented.
+              This is an industry-standard timeout value chosen after              No decision record
+              consultation with the security team."                                exists citing a 30-min
+                                                                                   choice. No security
+                                                                                   team was consulted for
+                                                                                   this retrofit. The
+                                                                                   agent generated
+                                                                                   boilerplate that
+                                                                                   "sounds right".
+  derived_from: [user-experience, security]     &larr; Vague, non-artifact references. Not real links.
+  recovery_status: reconstructed                &larr; ILLEGAL state for rationale.
+                                                   Rationale is human-only; the retrofit skill
+                                                   must refuse to emit 'reconstructed' here.
+
+# GOOD &mdash; honest retrofit of the same requirement
+
+REQ-R-001:
+  statement: "While a session has had no recorded authenticated activity for
+              30 minutes, the session service shall transition the session to
+              IDLE and shall reject subsequent validation requests for it
+              with status 401 and reason 'idle-timeout'."
+  statement_recovery_status: reconstructed    &larr; Behaviour is observable: the code enforces
+                                                  the 30-minute timeout. Reconstructed is the
+                                                  right state for the behaviour field.
+  rationale: unknown                          &larr; No preserved record of why 30 minutes was
+                                                  chosen. Honest unknown is a correct retrofit
+                                                  outcome.
+  rationale_recovery_status: unknown          &larr; Only 'verified' or 'unknown' allowed here.
+  follow_up:
+    - owner: "@security-team"                 &larr; Retrofit surfaces the gap and queues human
+    - action: "Confirm that 30-minute             follow-up; does not fabricate a justification
+               timeout is the intended policy;     to fill it.
+               if not, raise a change request."
+  derived_from: [observed_behaviour: session_service.py:L245-L268,
+                 observed_config: session.idle_timeout_seconds=1800]</code></pre>
+
+    <p>The honest retrofit tells a future reader exactly what is known and what is not: the behaviour is confirmed from code, the reasoning behind the behaviour is not preserved, and a specific human owner has been queued to close the gap. A team reading the honest version can tell at a glance that REQ-R-001 is operationally correct but its "why" needs a human. A team reading the fabricated version has no idea that the rationale was generated by an agent with no source &mdash; and a year later will cite the fabricated rationale in a review meeting as "what we decided".</p>
+  </section>
+
+  <!-- ===================== SECTION 5: QUALITY BAR ===================== -->
+  <section id="req-quality-bar">
+    <h2>5. Quality Bar</h2>
+    <p class="lead">Yes/No checklist, grouped by concern. A Requirements artifact passes when every applicable item is answered Yes. The meta-gate at the end &mdash; the Spec Ambiguity Test &mdash; overrides all of them: an artifact that ticks every box but cannot let a junior engineer or mid-tier AI derive defensible Architecture, DD, and TestSpec from it fails.</p>
+
+    <div class="card">
+      <h3>Vocabulary discipline</h3>
+      <ul>
+        <li>Is a Glossary section present and non-empty for every non-trivial artifact?</li>
+        <li>Is every domain term used in a requirement statement defined in the glossary?</li>
+        <li>Is there one word per concept and one concept per word within this scope?</li>
+        <li>Are generic-programmer placeholder terms (<em>Manager, Service, Handler, Record</em>) audited out of statements except where they name actual domain concepts?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Requirement type clarity</h3>
+      <ul>
+        <li>Is every requirement filed under the correct type section (functional / QA / interface / data / inherited constraint)?</li>
+        <li>Are NFRs written in NFR form (not as functional statements with an adjective) and functional requirements in functional form (not as NFRs with a behaviour smuggled in)?</li>
+        <li>Has level confusion been audited &mdash; does every requirement's scope match this artifact's scope?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Statement-level quality</h3>
+      <ul>
+        <li>Is every statement atomic (one <code>shall</code>, one behaviour)?</li>
+        <li>Does every statement pass the box test (a tester could write the test from the statement and the glossary alone)?</li>
+        <li>Is every statement solution-free (no named technologies, frameworks, libraries, data structures, or algorithms, except in interface requirements where the protocol is externally imposed)?</li>
+        <li>Is every state-driven requirement paired with its complementary out-of-state behaviour, or is the out-of-state case explicitly out of scope?</li>
+        <li>Is structured language (EARS primary; GWT where scenario-heavy) used consistently rather than mixed within a statement?</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--accent-trace);">
+      <h3>NFR measurability &mdash; the five-element rule</h3>
+      <ul>
+        <li>Does every NFR name the <strong>system or subsystem</strong> specifically?</li>
+        <li>Does every NFR name the <strong>response or behaviour</strong> being measured?</li>
+        <li>Does every NFR give a <strong>metric with unit</strong>?</li>
+        <li>Does every NFR give a <strong>target value</strong> at the correct statistical level (percentile where applicable, not raw mean)?</li>
+        <li>Does every NFR state the <strong>condition</strong> under which the measurement is valid (load, environment, operating mode, measurement point)?</li>
+        <li>For tiered NFRs, is the Planguage form (<code>scale</code>, <code>meter</code>, <code>fail</code>, <code>goal</code>, <code>stretch</code>, <code>wish</code>) used rather than a single flat target?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Interface contract completeness</h3>
+      <ul>
+        <li>Does every interface requirement specify <strong>protocol</strong>, <strong>message structure</strong>, <strong>timing</strong>, <strong>error handling</strong>, and <strong>startup / initial state</strong>?</li>
+        <li>Are pre- and post-conditions and invariants stated for each externally-callable operation?</li>
+        <li>Is a versioning and deprecation policy stated for every versioned interface?</li>
+        <li>Are externally-imposed protocols cited by specification (RFC, OIDC version, protocol RFC / draft) rather than by informal name?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Constraints discipline</h3>
+      <ul>
+        <li>Does every inherited constraint cite its source (ADR, regulation, contract, policy)?</li>
+        <li>Does every inherited constraint name the cost of relaxing it?</li>
+        <li>Is every constraint categorised (technical / regulatory / organisational / financial / temporal)?</li>
+        <li>For constraints with behavioural consequences at this scope, are derived requirements authored and cross-linked?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Rationale &mdash; no fabrication</h3>
+      <ul>
+        <li>Does every requirement carry a <code>rationale</code> field with non-trivial content?</li>
+        <li>Is rationale captured at decision time (or, for retrofits, explicitly marked <code>recovery_status: unknown</code> where the original reasoning is lost)?</li>
+        <li>Is rationale in retrofit mode marked with <code>verified</code> or <code>unknown</code> only, never <code>reconstructed</code>?</li>
+        <li>Are rationales audited for circularity (not "because test T passes") and for laundering ("because the current design is right")?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Traceability completeness</h3>
+      <ul>
+        <li>Does every requirement have non-empty <code>derived_from</code>?</li>
+        <li>Does every derived requirement cite the decision (ADR or architectural choice) that introduced it?</li>
+        <li>Are governing ADRs referenced in the front-matter and reflected in at least one requirement or derived requirement in the body?</li>
+        <li>Has the artifact been run through the traceability validator and returned zero orphan requirements and zero unresolved references?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Inspection discipline</h3>
+      <ul>
+        <li>Has the artifact been read from at least the <strong>designer</strong> and <strong>tester</strong> perspectives before review?</li>
+        <li>Where a stakeholder-facing outcome is at stake, has the <strong>user / stakeholder</strong> perspective also been read?</li>
+        <li>Is each perspective's review findings logged, so future revisions can check whether a defect class was missed rather than detected-and-resolved?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Retrofit honesty</h3>
+      <ul>
+        <li>For a retrofit: are behaviour fields marked <code>verified</code> (human-confirmed) or <code>reconstructed</code> (derived from code / tests / schemas)?</li>
+        <li>Are rationale, open alternatives, and intent fields marked <code>verified</code> or <code>unknown</code> only?</li>
+        <li>Does every <code>unknown</code> field have a follow-up owner and action queued?</li>
+        <li>Are derived-from links in a retrofit to <em>observed evidence</em> (file + line; git commit; operational log), not fabricated artifact names?</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--accent-trace);">
+      <h3>Spec Ambiguity Test &mdash; meta-gate</h3>
+      <ul>
+        <li>Could a junior engineer or mid-tier AI, reading only this Requirements artifact (plus its glossary and governing ADRs), derive a defensible Architecture allocation to children, a Detailed Design for each leaf, and a TestSpec whose cases verify every requirement &mdash; without asking clarifying questions?</li>
+      </ul>
+      <p>If the answer is No, the artifact under-specifies its translation role. Revise before accepting. This test overrides every box above: a Requirements artifact that passes all the other checks but fails this one has not done the job Requirements exists to do.</p>
+    </div>
+  </section>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <section id="req-references">
+    <h2>References</h2>
+    <p style="color: var(--fg-muted); font-size: 0.9em;">Primary backing from the engineering-codex (<code>/home/stefanus/repos/engineering-codex/</code>) and named primary sources. Load-bearing claims on this page are anchored in the cited material.</p>
+    <ul>
+      <li><code>wiki/concepts/concept-ears.md</code> and <code>wiki/sources/src-ears-official-mavin.md</code> &mdash; Mavin et al., <em>Easy Approach to Requirements Syntax (EARS)</em>, IEEE RE'09; <em>Big Ears (The Return of EARS)</em>, IEEE RE'10; <em>Listens Learned (8 Years of EARS)</em>, IEEE RE'16. The five EARS patterns, compound-template rules, and adoption evidence used in &sect; 2.3.</li>
+      <li><code>wiki/concepts/concept-requirement-quality.md</code> and <code>wiki/sources/src-incose-42-rule-guide-reqi-2026.md</code> &mdash; INCOSE, <em>Guide to Writing Requirements</em> (42-rule framework; 9+5 quality characteristics). The statement-level quality rules and the nine universal anti-patterns in &sect; 2.4 and &sect; 3.</li>
+      <li><code>wiki/concepts/concept-ubiquitous-language.md</code> &mdash; Evans, <em>Domain-Driven Design Reference</em> (2015); Fowler (2006). The vocabulary-discipline foundation in &sect; 2.1, including the "sentence-level vs. vocabulary-level" distinction and the fragmentation-under-small-teams observation.</li>
+      <li><code>wiki/concepts/concept-design-by-contract.md</code> &mdash; Meyer, <em>Object-Oriented Software Construction</em> (Prentice Hall, 1988 / 1997); Hoare, <em>An Axiomatic Basis for Computer Programming</em>, CACM 12(10), 1969; Parnas, <em>On the Criteria to Be Used in Decomposing Systems into Modules</em>, CACM 15(12), 1972; Liskov &amp; Wing, <em>A Behavioral Notion of Subtyping</em>, TOPLAS 16(6), 1994. Preconditions / postconditions / invariants in &sect; 2.6.</li>
+      <li>Bass, Clements, Kazman. <em>Software Architecture in Practice</em>. Six-component quality-attribute scenario form, covered at scoping level on the <a href="product-brief.html">Product Brief page</a>; referenced here for &sect; 2.5 so the Requirements page does not duplicate.</li>
+      <li><code>wiki/sources/src-shull-pbr-requirements-2000.md</code> &mdash; Shull, Rus, Basili, <em>How Perspective-Based Reading Can Improve Requirements Inspections</em>, IEEE Computer 33(7), 2000; Basili et al., <em>The Empirical Investigation of Perspective-Based Reading</em>, Empirical Software Engineering 1(2), 1996. PBR three-perspective inspection in &sect; 2.8.</li>
+      <li><code>wiki/sources/src-seed-requirement-syntax-beyond-ears.md</code> &mdash; comparative coverage of Rupp/SOPHIST, Planguage (Gilb), CESAR, SysML, and INCOSE. Planguage multi-level target syntax (<code>scale / meter / fail / goal / stretch / wish</code>) in &sect; 2.5.</li>
+      <li><code>wiki/concepts/concept-design-rationale.md</code> &mdash; Kunz &amp; Rittel (IBIS, 1970); Potts &amp; Bruns (1988); Kruchten (2004); Tyree &amp; Akerman (2005); Nygard (ADR blog post, 2011). The capture-at-decision-time principle and the retrofit failure-mode catalogue in &sect; 2.8.</li>
+      <li><a href="https://gdpr-info.eu/art-17-gdpr/">GDPR Article 17 (Right to erasure)</a> &mdash; Regulation (EU) 2016/679. Compliance-constraint worked example in &sect; 2.5 and &sect; 4.5.</li>
+      <li>Wiegers, Karl; Beatty, Joy. <em>Software Requirements</em> (3rd ed., Microsoft Press). Practitioner baseline for requirement classification, rationale discipline, and functional vs. non-functional distinction &mdash; cited here as a widely used industry reference alongside INCOSE.</li>
+      <li>Robertson, Suzanne &amp; James. <em>Mastering the Requirements Process</em> (Volere). The "fit criterion" concept in NFR authoring, echoed in &sect; 2.5's five-element rule and the measurability bar.</li>
+    </ul>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+<script src="../js/app.js"></script>
+</body>
+</html>
