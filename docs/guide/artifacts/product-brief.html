@@ -98,7 +98,7 @@
         <tr><td><code>id</code></td><td>Always <code>PB</code>. Root scope is implicit.</td></tr>
         <tr><td><code>title</code></td><td>The product name.</td></tr>
         <tr><td><code>summary</code></td><td>One sentence: <em>{Product} is a {category} for {audience} that {does what}, so that {outcome}.</em></td></tr>
-        <tr><td><code>status</code></td><td><code>draft</code> &rarr; <code>accepted</code>. Re-enters <code>draft</code> when materially edited.</td></tr>
+        <tr><td><code>status</code></td><td><code>draft</code> &rarr; <code>active</code>. Re-enters <code>draft</code> when materially edited. Transitions to <code>superseded</code> only when a differently-named Brief replaces this one (rare for a root-scope artifact).</td></tr>
         <tr><td><code>date</code></td><td>Date of last acceptance.</td></tr>
         <tr><td><code>recovery_status</code></td><td>Per-section map; only used for retrofit. States: <code>verified</code> | <code>unknown</code>. (No <code>reconstructed</code> on this artifact &mdash; it is human-only throughout.)</td></tr>
       </tbody>
@@ -383,7 +383,7 @@ title: "Ledger Reconciliation Service"
 summary: "Ledger Recon is an internal reconciliation service for the FP&amp;A team
   that compares upstream billing entries against the internal ledger daily,
   so that month-end close completes within two business days."
-status: accepted
+status: active
 date: 2026-04-15
 ---
 
@@ -512,7 +512,7 @@ is succeeding.
     <pre><code>---
 id: PB
 title: "Reconciliation Tool"
-status: accepted
+status: active
 ---
 
 # Product Brief
@@ -562,7 +562,7 @@ it in a real-time view.                                       five-minute pollin
     <pre><code>---
 id: PB
 title: "Ledger Reconciliation Service"
-status: accepted
+status: active
 date: 2022-03-01                                          &larr; Back-dated; no evidence this was the
                                                               original Brief date.
 recovery_status:
@@ -596,7 +596,7 @@ exceptions.                                                        reverse-engin
     <pre><code>---
 id: PB
 title: "Ledger Reconciliation Service (retrofit)"
-status: accepted
+status: active
 date: 2026-04-19                                          &larr; Date of the retrofit record itself,
                                                               not a guessed Brief date.
 recovery_status:

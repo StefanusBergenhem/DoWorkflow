@@ -123,8 +123,8 @@ flowchart LR
         <tr><td><code>parent_scope</code></td><td>Parent scope path; null at root.</td></tr>
         <tr><td><code>derived_from</code></td><td>Upstream artifacts (Product Brief at root; parent Requirements at branches).</td></tr>
         <tr><td><code>governing_adrs</code></td><td>Cross-cutting ADRs that constrain this scope.</td></tr>
-        <tr><td><code>status</code></td><td><code>draft</code> &rarr; <code>accepted</code>. Re-enters <code>draft</code> on material edit.</td></tr>
-        <tr><td><code>date</code></td><td>Date of last acceptance.</td></tr>
+        <tr><td><code>status</code></td><td><code>draft</code> &rarr; <code>active</code>. Re-enters <code>draft</code> on material edit. Transitions to <code>superseded</code> only when a differently-named Requirements document replaces this one (rare).</td></tr>
+        <tr><td><code>date</code></td><td>Date the artifact was last materially modified.</td></tr>
         <tr><td><code>recovery_status</code></td><td>Per-section map, retrofit only. <code>verified</code> | <code>reconstructed</code> (behaviour fields) | <code>unknown</code> (rationale and other human-only fields).</td></tr>
       </tbody>
     </table>
