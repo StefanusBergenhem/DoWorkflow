@@ -98,12 +98,10 @@ flowchart LR
       <li><strong>Not a backlog.</strong> A backlog is work to be done, ordered by value / effort / dependency. Requirements are behavioural specifications, independent of when anyone will build them.</li>
       <li><strong>Not a design.</strong> Requirements say <em>what</em>, not <em>how</em>. Naming a database, a framework, a specific algorithm, or a data structure inside a requirement statement is a category error &mdash; that is ADR, Architecture, or DD territory.</li>
       <li><strong>Not test cases.</strong> Requirements say <em>what the system must do</em>; test cases say <em>how you would prove it</em>. The two are cleanly separated: requirements live here; test cases live in TestSpec. A requirement does not list its test cases inline.</li>
-      <li><strong>Not a feature list.</strong> A feature is a user-visible capability; a requirement is a constraint on behaviour. A single feature typically produces multiple requirements across the five types (functional, QA, interface, data, inherited constraint).</li>
-      <li><strong>Not a wishlist.</strong> "It would be nice if&hellip;" does not belong in Requirements. Every statement is a commitment to verify; if the system doesn't have to satisfy it, it isn't a requirement.</li>
     </ul>
 
     <h3>Retrofit posture</h3>
-    <p>Requirements retrofitted from existing code sit in a <em>mixed-evidence</em> position. The <em>functional</em> behaviour is largely recoverable &mdash; code and tests show what the system does. The <em>rationale</em> is not: nobody left a record of why the system was built to do it that way, what alternatives were considered, or which constraint was binding. The framework's rule is explicit: <strong>rationale is human-only</strong>. A retrofit Requirements document records the behaviour (<code>recovery_status: reconstructed</code> where evidence is solid; <code>verified</code> where a human confirms it) and marks the rationale <code>recovery_status: unknown</code> until a human supplies it. Fabricating a plausible-sounding "why" from training priors is the single sharpest retrofit anti-pattern and the skill layer refuses to emit it.</p>
+    <p>Requirements retrofitted from existing code are mixed evidence: functional behaviour is largely recoverable from code and tests; rationale is not. The framework's rule is explicit &mdash; rationale is human-only. The shape of a retrofit Requirements document, the <code>recovery_status</code> discipline, and the fabrication rule are taught in detail in &sect;2.8 and demonstrated in &sect;4.7.</p>
 
     <h3>Why the framework treats this layer as non-negotiable</h3>
     <p>The Spec Ambiguity Test applies universally: every specification artifact at every layer must let a junior engineer or mid-tier AI implement without guessing. Requirements are the layer where this test bites hardest. Above Requirements (Product Brief), the artifact is narrative and stakeholder-facing; ambiguity can be negotiated in conversation. Below Requirements (Detailed Design), the artifact is already specific to code-producing granularity. Requirements are the translation layer between them. If they are vague, everything below compensates by guessing, and the guesses drift out of alignment with stakeholder intent. No amount of careful downstream design or testing recovers from ambiguous requirements &mdash; it only hardens whichever interpretation got picked.</p>
@@ -209,7 +207,7 @@ flowchart LR
     <p>Two level-confusion errors recur often enough to name. First, NFRs written as functional requirements: <em>"The system shall be fast"</em> reads as functional but is an untestable NFR. Second, design smuggled as a requirement: <em>"The system shall use a distributed cache to store session tokens"</em> reads as functional but is an architectural decision. Move the first to &sect; QA with a measurable target; move the second to ADR / Architecture and, if it implies a testable behaviour at this layer, add the requirement that tests that behaviour.</p>
 
     <h3>2.3 &nbsp; Structured language &mdash; EARS as default, GWT where useful</h3>
-    <p>Free-form natural language makes roughly half the requirements it produces ambiguous. <strong>EARS (Easy Approach to Requirements Syntax)</strong> is five sentence templates that cut most of the ambiguity by forcing the author to classify the requirement before writing it. The templates are learnable in under an hour and are used across aerospace (Rolls-Royce, NASA, Airbus), automotive, medical, and increasingly general software.</p>
+    <p>Free-form natural language makes roughly half the requirements it produces ambiguous. <strong>EARS (Easy Approach to Requirements Syntax)</strong> is five sentence templates that cut most of the ambiguity by forcing the author to classify the requirement before writing it. The templates are learnable in under an hour and are widely adopted across aerospace, automotive, medical, and general software.</p>
 
     <table class="field-table">
       <thead><tr><th>Pattern</th><th>Template</th><th>When to use</th></tr></thead>
@@ -428,13 +426,13 @@ invariants:
       <li><strong>User / stakeholder perspective.</strong> "Does this capture what the stakeholder actually wants?" Surfaces outcomes the requirements fail to express, or over-specification that constrains without justification.</li>
     </ul>
 
-    <p>Empirical evidence (Shull et al., NASA GSFC, 1995&ndash;2000) shows PBR detects defect classes ad-hoc review consistently misses, with effort comparable to or modestly higher than informal walkthroughs. The discipline is cheap to adopt and the yield is specifically the kind of latent ambiguity that cascades into expensive downstream defects. PBR is the default review practice for Requirements artifacts in this framework; teams with an INCOSE-compliance bent can layer a checklist review (the 42-rule framework) on top of PBR, but not instead of it.</p>
+    <p>Empirical evidence (Shull et al., NASA GSFC, 1995&ndash;2000) shows PBR detects defect classes ad-hoc review consistently misses, with effort comparable to or modestly higher than informal walkthroughs. The discipline is cheap to adopt and the yield is specifically the kind of latent ambiguity that cascades into expensive downstream defects. PBR is the default review practice for Requirements artifacts in this framework.</p>
   </section>
 
   <!-- ===================== SECTION 3: ANTI-PATTERNS ===================== -->
   <section id="req-anti-patterns">
     <h2>3. Anti-Patterns</h2>
-    <p class="lead">Nine universal failure modes in individual statements; seven specific to AI-augmented authoring and retrofit. The universal nine have been catalogued for decades across requirements research and audit findings. The AI-era seven are newer and the shape of future audit findings; they deserve explicit naming because their remedies differ from the classical ones.</p>
+    <p class="lead">Nine universal failure modes in individual statements; seven specific to AI-augmented authoring and retrofit. The universal nine are well-catalogued across requirements research and audit findings. The AI-era seven are newer and the shape of future audit findings; they deserve explicit naming because their remedies differ from the classical ones.</p>
 
     <h3>Universal (nine)</h3>
     <ol>
@@ -883,7 +881,7 @@ REQ-R-001:
       <li><code>wiki/sources/src-seed-requirement-syntax-beyond-ears.md</code> &mdash; comparative coverage of Rupp/SOPHIST, Planguage (Gilb), CESAR, SysML, and INCOSE. Planguage multi-level target syntax (<code>scale / meter / fail / goal / stretch / wish</code>) in &sect; 2.5.</li>
       <li><code>wiki/concepts/concept-design-rationale.md</code> &mdash; Kunz &amp; Rittel (IBIS, 1970); Potts &amp; Bruns (1988); Kruchten (2004); Tyree &amp; Akerman (2005); Nygard (ADR blog post, 2011). The capture-at-decision-time principle and the retrofit failure-mode catalogue in &sect; 2.8.</li>
       <li><a href="https://gdpr-info.eu/art-17-gdpr/">GDPR Article 17 (Right to erasure)</a> &mdash; Regulation (EU) 2016/679. Compliance-constraint worked example in &sect; 2.5 and &sect; 4.5.</li>
-      <li>Wiegers, Karl; Beatty, Joy. <em>Software Requirements</em> (3rd ed., Microsoft Press). Practitioner baseline for requirement classification, rationale discipline, and functional vs. non-functional distinction &mdash; cited here as a widely used industry reference alongside INCOSE.</li>
+      <li>Wiegers, Karl; Beatty, Joy. <em>Software Requirements</em> (3rd ed., Microsoft Press). Practitioner baseline for requirement classification, rationale discipline, and functional vs. non-functional distinction.</li>
       <li>Robertson, Suzanne &amp; James. <em>Mastering the Requirements Process</em> (Volere). The "fit criterion" concept in NFR authoring, echoed in &sect; 2.5's five-element rule and the measurability bar.</li>
     </ul>
   </section>

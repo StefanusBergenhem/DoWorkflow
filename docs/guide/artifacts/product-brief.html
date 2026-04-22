@@ -193,7 +193,7 @@ flowchart TB
     </div>
 
     <h3>D. Operational Concept</h3>
-    <p>How the system is used in the real world: scenarios, environments, integrations, modes. The section that most directly drives the Architecture &mdash; an architecture that did not see the operational concept tends to discover it as a rewrite.</p>
+    <p>How the system is used in the real world: scenarios, environments, integrations, modes. The section that most directly drives the Architecture; Architecture reviews this section hardest of any upstream input.</p>
 
     <h4>Seven-question compact form</h4>
     <p>The whole section can be authored against seven questions. Each gets a paragraph or a short list; brevity is virtue.</p>
@@ -248,7 +248,7 @@ flowchart TB
       </tbody>
     </table>
 
-    <p>The ten dimensions above are the floor, not the ceiling. Domain-specific NFRs &mdash; real-time deadlines for control systems, accessibility (WCAG) and internationalisation for user-facing products, deterministic latency for trading systems &mdash; are added as the domain demands. The discipline is to walk the floor list explicitly before adding domain-specific items, not to skip straight to the dimensions the author already had in mind.</p>
+    <p>The ten dimensions above are the floor, not the ceiling. Domain-specific NFRs &mdash; real-time deadlines for control systems, accessibility (WCAG) and internationalisation for user-facing products, deterministic latency for trading systems &mdash; are added as the domain demands.</p>
 
     <h4>Quality-attribute scenario shape</h4>
     <p>For NFRs that are load-bearing enough to need rigour beyond a one-line target, the six-component scenario form keeps the requirement testable:</p>
@@ -334,7 +334,7 @@ response_measure: no user-visible failures; failover within 5s; alert fires with
     <p>Lagging indicators confirm what already happened (quarterly churn, annual revenue, post-launch NPS); leading indicators predict what is about to happen (week-1 retention, signup-to-activation rate, time-to-first-value). A Brief with only lagging indicators tells the team it has failed too late to act. Mix both deliberately: leading indicators for steering, lagging indicators for confirming.</p>
 
     <h4>North Star</h4>
-    <p>The single number that, if it moves, indicates the product is succeeding overall. Not every Brief needs one, but if one cannot be named, it is worth checking whether the Outcomes are actually competing rather than reinforcing. Multiple incompatible primary metrics is the symptom of an unresolved product strategy &mdash; the Brief is not the place to resolve it, but it is the place to surface the conflict honestly rather than papering over it.</p>
+    <p>The single number that, if it moves, indicates the product is succeeding overall. Not every Brief needs one, but if one cannot be named, it is worth checking whether the Outcomes are actually competing rather than reinforcing. If multiple primary metrics conflict, surface it here; do not paper over it.</p>
 
     <h4>Quantify when honest</h4>
     <p>If the metric is real and the baseline known, name the number. If the metric is real but the baseline is to-be-measured, name the metric and write <code>baseline: TBD</code>. If neither baseline nor target is honestly knowable yet, say so and name a date by which the metric will be operationalised. Fabricated numbers are worse than absent ones &mdash; they pass review and then anchor decisions for years.</p>
@@ -764,7 +764,7 @@ unknown &mdash; not preserved.</code></pre>
       <li><code>wiki/concepts/concept-requirement-quality.md</code> &mdash; requirement quality characteristics (unambiguous, complete, singular, verifiable). Backs the Spec Ambiguity Test treatment and the success-criteria measurability bar in &sect; G and &sect; 5.</li>
       <li>Jackson, Michael (2001). <em>Problem Frames: Analysing and Structuring Software Development Problems.</em> Addison-Wesley. The World / Machine distinction used in &sect; B.</li>
       <li>Gause, Donald C. &amp; Weinberg, Gerald M. (1990). <em>Are Your Lights On? How to Figure Out What the Problem Really Is.</em> The "don't take the first problem statement seriously" principle in &sect; B.</li>
-      <li><code>wiki/sources/src-arc42-template-overview.md</code> &mdash; arc42. Structural analogy for the Brief's section discipline; arc42 covers architecture, the Brief covers the layer above, but the principle that named sections force completeness carries.</li>
+      <li><code>wiki/sources/src-arc42-template-overview.md</code> &mdash; arc42. Named-sections-force-completeness principle applied to the Brief's section discipline.</li>
       <li>Doerr, John (2018). <em>Measure What Matters.</em> OKR mechanics referenced in &sect; G as one valid framework among several for success-criteria structure.</li>
       <li>Rodden, Hutchinson, Fu (Google, 2010). <em>Measuring the User Experience on a Large Scale: User-Centered Metrics for Web Applications.</em> The HEART framework referenced in &sect; G.</li>
       <li>Working backwards / PR-FAQ practice. Internal Amazon authoring discipline; widely written about. Used as a forcing-function technique in &sect; C.</li>

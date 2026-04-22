@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VModelWorkflow — V-Model Development Guide</title>
+  <title>VModelWorkflow — AI-Augmented Spec-Driven Development</title>
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
@@ -14,79 +14,56 @@
 <aside class="sidebar">
   <div class="sidebar-header">
     <h1>VModelWorkflow</h1>
-    <div class="subtitle">V-Model Development Guide</div>
+    <div class="subtitle">AI-Augmented Spec-Driven Development</div>
   </div>
 
   <nav class="sidebar-nav">
-    <!-- V-Model Concepts -->
     <div class="nav-group">
-      <span class="nav-group-label">The V-Model</span>
-      <a class="nav-link" data-section="v-model-overview" href="#v-model-overview">What &amp; Why</a>
-      <a class="nav-link" data-section="v-model-diagram" href="#v-model-diagram">Interactive Diagram</a>
-      <a class="nav-link" data-section="v-model-left" href="#v-model-left">Left Side: Specification</a>
-      <a class="nav-link" data-section="v-model-right" href="#v-model-right">Right Side: Verification</a>
-      <a class="nav-link" data-section="v-model-traces" href="#v-model-traces">Traces &amp; Links</a>
-      <a class="nav-link" data-section="v-model-gates" href="#v-model-gates">Gates &amp; Reviews</a>
+      <span class="nav-group-label">Introduction</span>
+      <a class="nav-link" data-section="overview" href="#overview">Overview</a>
+      <a class="nav-link" data-section="four-components" href="#four-components">Four Components</a>
+      <a class="nav-link" data-section="use-cases" href="#use-cases">Use Cases</a>
     </div>
 
-    <!-- Artifacts -->
     <div class="nav-group">
-      <span class="nav-group-label">Artifacts</span>
-      <a class="nav-link" data-section="artifact-envelope" href="#artifact-envelope">Artifact Envelope</a>
+      <span class="nav-group-label">Core Principles</span>
+      <a class="nav-link" data-section="principles" href="#principles">The Ten Principles</a>
+      <a class="nav-link" data-section="spec-ambiguity-test" href="#spec-ambiguity-test">Spec Ambiguity Test</a>
+      <a class="nav-link" data-section="human-leverage" href="#human-leverage">Human Leverage Model</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Artifact Model</span>
+      <a class="nav-link" data-section="artifact-set" href="#artifact-set">The Six Artifacts</a>
+      <a class="nav-link" data-section="scope-tree" href="#scope-tree">Scope Tree</a>
+      <a class="nav-link" data-section="quality-bar" href="#quality-bar">Rigor &amp; Quality Bar</a>
+      <a class="nav-link" data-section="file-shape" href="#file-shape">Files, Directories, IDs</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Per-Artifact Craft</span>
       <a class="nav-link" href="artifacts/product-brief.html">Product Brief</a>
-      <a class="nav-link" href="artifacts/stakeholder-needs.html">Stakeholder Needs</a>
-      <a class="nav-link" href="artifacts/conops.html">Concept of Operations</a>
-      <a class="nav-link" href="artifacts/completeness-analysis.html">Completeness Analysis</a>
       <a class="nav-link" href="artifacts/requirements.html">Requirements</a>
-      <a class="nav-link" data-section="artifact-sw-requirement" href="#artifact-sw-requirement">SW Requirement</a>
       <a class="nav-link" href="artifacts/architecture.html">Architecture</a>
-      <a class="nav-link" href="artifacts/adr.html">ADR (Architecture Decision Record)</a>
+      <a class="nav-link" href="artifacts/adr.html">ADR</a>
       <a class="nav-link" href="artifacts/detailed-design.html">Detailed Design</a>
-      <a class="nav-link" href="artifacts/source-code.html">Source Code</a>
-      <a class="nav-link" href="artifacts/unit-test.html">Unit Test</a>
-      <a class="nav-link" data-section="artifact-system-test-case" href="#artifact-system-test-case">System Test Case</a>
-      <a class="nav-link" data-section="artifact-plans" href="#artifact-plans">Plans <span class="status-badge stub">stub</span></a>
-      <a class="nav-link" data-section="artifact-review-record" href="#artifact-review-record">Review Record <span class="status-badge stub">stub</span></a>
+      <a class="nav-link" href="artifacts/testspec.html">TestSpec</a>
     </div>
 
-    <!-- Traceability -->
     <div class="nav-group">
-      <span class="nav-group-label">Traceability</span>
-      <a class="nav-link" data-section="trace-link-types" href="#trace-link-types">Link Types</a>
-      <a class="nav-link" data-section="trace-staleness" href="#trace-staleness">Staleness Detection</a>
-      <a class="nav-link" data-section="trace-validation" href="#trace-validation">Validation <span class="status-badge stub">stub</span></a>
+      <span class="nav-group-label">Workflows</span>
+      <a class="nav-link" data-section="spec-greenfield" href="#spec-greenfield">Specification (Greenfield)</a>
+      <a class="nav-link" data-section="spec-retrofit" href="#spec-retrofit">Specification (Retrofit)</a>
+      <a class="nav-link" data-section="update-mode" href="#update-mode">Update Mode</a>
+      <a class="nav-link" data-section="build-workflow" href="#build-workflow">Build Workflow</a>
     </div>
 
-    <!-- E2E Walkthrough -->
     <div class="nav-group">
-      <span class="nav-group-label">E2E Walkthrough</span>
-      <a class="nav-link" data-section="e2e-intro" href="#e2e-intro">Calculator Example</a>
-      <a class="nav-link" data-section="e2e-requirements" href="#e2e-requirements">Requirements</a>
-      <a class="nav-link" data-section="e2e-architecture" href="#e2e-architecture">Architecture</a>
-      <a class="nav-link" data-section="e2e-design" href="#e2e-design">Detailed Design</a>
-      <a class="nav-link" data-section="e2e-implementation" href="#e2e-implementation">Implementation</a>
-      <a class="nav-link" data-section="e2e-verification" href="#e2e-verification">Verification</a>
-      <a class="nav-link" data-section="e2e-trace-matrix" href="#e2e-trace-matrix">Trace Matrix</a>
-    </div>
-
-    <!-- Framework -->
-    <div class="nav-group">
-      <span class="nav-group-label">VModelWorkflow Framework</span>
-      <a class="nav-link" data-section="fw-pillars" href="#fw-pillars">Three Pillars</a>
-      <a class="nav-link" data-section="fw-drtdd" href="#fw-drtdd">DRTDD</a>
-      <a class="nav-link" href="skills-architecture.html">Skills Architecture</a>
-      <a class="nav-link" data-section="fw-assurance" href="#fw-assurance">Assurance Levels <span class="status-badge stub">stub</span></a>
+      <span class="nav-group-label">Further Reading</span>
+      <a class="nav-link" data-section="skills" href="#skills">Skills Architecture</a>
+      <a class="nav-link" data-section="references" href="#references">References</a>
     </div>
   </nav>
-
-  <div class="domain-switcher">
-    <label for="domain-select">Domain Vocabulary</label>
-    <select id="domain-select">
-      <option value="generic">Generic V-Model</option>
-      <option value="do178c">DO-178C (Aviation)</option>
-      <option value="aspice">ASPICE / ISO 26262 (Automotive)</option>
-    </select>
-  </div>
 </aside>
 
 <!-- ============================================================
@@ -94,1800 +71,531 @@
      ============================================================ -->
 <main class="main-content">
 
-  <!-- ===================== V-MODEL OVERVIEW ===================== -->
-  <section id="v-model-overview" class="content-section active">
-    <h2>The V-Model: What &amp; Why</h2>
-    <p class="lead">The V-model is a software development lifecycle that pairs every specification activity on the left with a corresponding verification activity on the right. The &ldquo;V&rdquo; shape shows this relationship visually.</p>
+  <!-- ===================== OVERVIEW ===================== -->
+  <section id="overview" class="content-section active">
+    <h2>VModelWorkflow</h2>
+    <p class="lead">A framework for AI-augmented, spec-driven software development with V-model rigor. The goal: software built by AI under tight human design review, where the human leverage point is the spec layer &mdash; not code review.</p>
 
-    <h3>The Core Idea</h3>
-    <p>Traditional waterfall development writes requirements, then designs, then codes, then tests. The problem: testing happens last, and by then you've built something that may not match what was needed. Bugs found late are expensive to fix.</p>
-    <p>The V-model fixes this by <strong>planning verification at the same time as specification</strong>. When you write a requirement, you also define how it will be tested. When you design the architecture, you also define the integration tests. This front-loading of verification thinking catches problems early.</p>
+    <h3>The Problem It Solves</h3>
+    <p>Generating code with an LLM is cheap. Producing code that is <em>correct, maintainable, and traceable to intent</em> is not. Left alone, agents fabricate rationale, paper over ambiguity, and write tests derived from the implementation they just generated. The framework raises the leverage point: humans author specifications under uniform high rigor; agents do the rest under review against those specifications.</p>
 
-    <h3>The Shape</h3>
-    <p>The "V" has two arms and a bottom point:</p>
-    <div class="card">
-      <p><strong>Left arm (going down):</strong> Specification and design, from abstract to concrete.</p>
-      <p>System Requirements &rarr; <span data-term="sw-requirement">SW Requirements</span> &rarr; <span data-term="sw-architecture">SW Architecture</span> &rarr; <span data-term="detailed-design">Detailed Design</span> &rarr; Implementation</p>
-      <p><strong>Bottom point:</strong> Implementation &mdash; where code is actually written.</p>
-      <p><strong>Right arm (going up):</strong> Verification, from concrete to abstract.</p>
-      <p>Unit Tests &rarr; Integration Tests &rarr; <span data-term="sw-verification">SW Verification</span> &rarr; System Tests</p>
-    </div>
+    <h3>Engineering Infrastructure, Not Safety Ceremony</h3>
+    <p>The V-model contributes layered thinking, traceability, and design-test coupling. The framework keeps those and drops the safety-specific baggage: no rigor tiers, no DAL/ASIL mapping, no HW/SW split, no standards-vocabulary wrapper. The remaining rigor is optimised for AI authoring at any domain.</p>
 
-    <h3>Why the V-Model Exists</h3>
-    <p>Safety-critical industries (aviation, automotive, medical devices) cannot afford to discover in production that a requirement was missed or a design was wrong. The cost of failure ranges from product recalls to loss of life.</p>
-    <p>The V-model provides:</p>
+    <h3>What Comes Out of It</h3>
     <ul>
-      <li><strong>Traceability</strong> &mdash; every requirement can be traced to its verification evidence</li>
-      <li><strong>Completeness checking</strong> &mdash; orphan detection reveals gaps before release</li>
-      <li><strong>Change impact analysis</strong> &mdash; when a requirement changes, you know exactly which designs and tests are affected</li>
-      <li><strong>Audit evidence</strong> &mdash; certification bodies can inspect the artifact chain</li>
+      <li>A <strong>scope tree</strong> of specifications covering the whole system, authored from six artifact types.</li>
+      <li>A <strong>traceability graph</strong> where every test traces to a spec element and every requirement traces to an allocation.</li>
+      <li>A <strong>Quality Bar</strong> per artifact type that each artifact passes before it ships downstream.</li>
+      <li>Code and tests that a human can accept or reject because the spec above them is unambiguous.</li>
     </ul>
 
-    <h3>Not Just for Safety-Critical</h3>
-    <p>While the V-model originated in safety-critical domains, its principles benefit any software project that values quality. The rigor can be scaled: a startup might use lightweight artifacts and informal reviews, while an aviation project uses formal verification with independent review boards. The <em>structure</em> is the same &mdash; only the <em>formality</em> changes.</p>
-
-    <h3>Common Misconceptions</h3>
-    <div class="card">
-      <h4>&ldquo;The V-model is waterfall&rdquo;</h4>
-      <p>No. The V-model defines <em>what artifacts you need and how they relate</em>. It does not mandate that you produce them in a strict top-to-bottom sequence. You can work iteratively, incrementally, even use agile sprints &mdash; as long as the artifact relationships are maintained. VModelWorkflow explicitly supports incremental, module-by-module development.</p>
-    </div>
-    <div class="card">
-      <h4>&ldquo;It&rsquo;s only for big projects&rdquo;</h4>
-      <p>The V-model scales down. A small feature might have 3 requirements, 1 architecture artifact, 2 detailed designs, and corresponding tests. The trace links still provide value: you know what's verified and what isn't.</p>
-    </div>
-    <div class="card">
-      <h4>&ldquo;It generates too much documentation&rdquo;</h4>
-      <p>Bad V-model implementations do. Good ones produce <em>exactly</em> the documentation needed for traceability and nothing more. In VModelWorkflow, artifacts are concise YAML files &mdash; not 50-page Word documents.</p>
-    </div>
+    <h3>Status</h3>
+    <p>Framework is in active construction. Post-pivot (2026-04-18), the per-artifact craft documentation is complete for all six artifact types (linked in the sidebar). Schemas, skills, and purpose-built tools are in flight. See <code>docs/plan/BACKLOG.md</code> for current phase.</p>
   </section>
 
-  <!-- ===================== INTERACTIVE DIAGRAM ===================== -->
-  <section id="v-model-diagram" class="content-section">
-    <h2>Interactive V-Model Diagram</h2>
-    <p class="lead">Click any node to navigate to its documentation. Hover over trace arrows to see the relationships between levels.</p>
-
-    <div class="v-diagram-container" id="v-diagram-mount">
-      <!-- SVG injected by v-diagram.js -->
-    </div>
+  <!-- ===================== FOUR COMPONENTS ===================== -->
+  <section id="four-components" class="content-section">
+    <h2>Four Components</h2>
+    <p class="lead">Four independently usable components. Adopt one, adopt all four. Full value comes from combining them.</p>
 
     <div class="card-grid">
       <div class="card">
-        <h4 style="color: var(--accent-left)">Left Side (Specification)</h4>
-        <p>Defines <em>what</em> to build, progressing from abstract system-level needs down to concrete unit designs.</p>
+        <h4>Documentation</h4>
+        <p>Single source of truth. Per artifact type: five sections &mdash; V-model context, best practices, anti-patterns, examples, Quality Bar. AI skills are derived from this, not the other way round.</p>
       </div>
       <div class="card">
-        <h4 style="color: var(--accent-right)">Right Side (Verification)</h4>
-        <p>Verifies <em>that it was built correctly</em>, progressing from concrete unit tests up to system-level validation.</p>
+        <h4>Templates &amp; Schemas</h4>
+        <p>Per-artifact YAML schemas encode structural rigor. Canonical Quality Bar YAML encodes semantic rigor. Scaffolder templates seed new artifacts. Schemas are mechanically validatable.</p>
       </div>
       <div class="card">
-        <h4 style="color: var(--accent-trace)">Horizontal Traces</h4>
-        <p>Dashed lines connect each specification level to its verification counterpart. Every requirement should have a test.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== LEFT SIDE ===================== -->
-  <section id="v-model-left" class="content-section">
-    <h2>Left Side: Specification &amp; Design</h2>
-    <p class="lead">The left arm of the V moves from the abstract (&ldquo;what does the system need to do?&rdquo;) to the concrete (&ldquo;what does this function do, exactly?&rdquo;).</p>
-
-    <h3>Level 0: <span data-term="system-requirement">System Requirements</span></h3>
-    <p>The highest level. Defines what the overall system must do, often derived from customer needs, safety analyses, or regulatory requirements. In a calculator app, this might be: <em>&ldquo;The system shall perform arithmetic operations on user-provided numerical inputs.&rdquo;</em></p>
-    <p>System requirements are allocated to software and hardware. The software portion becomes the input for the next level.</p>
-
-    <h3>Level 1: <span data-term="sw-requirement">SW Requirements</span></h3>
-    <p>Defines what the <em>software</em> must do. These are derived from system requirements and decomposed to be individually testable. Each SW requirement has a defined verification method (test, analysis, inspection, demonstration, or review).</p>
-    <p>A good SW requirement is:</p>
-    <ul>
-      <li><strong>Unambiguous</strong> &mdash; one interpretation only</li>
-      <li><strong>Testable</strong> &mdash; you can write a test for it</li>
-      <li><strong>Traceable</strong> &mdash; linked to the system requirement it comes from</li>
-      <li><strong>Atomic</strong> &mdash; one requirement, one &ldquo;shall&rdquo;</li>
-    </ul>
-
-    <h3>Level 2: <span data-term="sw-architecture">SW Architecture</span></h3>
-    <p>Decomposes the software into components, defines their responsibilities, and specifies the interfaces between them. The architecture answers: <em>&ldquo;How is the software organized to satisfy all the SW requirements?&rdquo;</em></p>
-    <p>SW requirements are <strong>allocated</strong> to architecture components. This allocation is a trace link managed by the traceability layer.</p>
-
-    <h3>Level 3: <span data-term="detailed-design">Detailed Design</span></h3>
-    <p>Describes individual units (functions, classes, modules) at a level of detail sufficient for implementation and test derivation. Each unit belongs to exactly one architecture component.</p>
-    <p>The detailed design defines: inputs, outputs, behavior rules, and error handling. A developer reading the detailed design should be able to implement the code. A tester reading it should be able to derive test cases.</p>
-
-    <h3>Level 4: Implementation</h3>
-    <p>The bottom of the V. Actual source code, written to satisfy the detailed design. In the V-model, implementation is not freewheeling &mdash; it follows a specification.</p>
-  </section>
-
-  <!-- ===================== RIGHT SIDE ===================== -->
-  <section id="v-model-right" class="content-section">
-    <h2>Right Side: Verification</h2>
-    <p class="lead">The right arm of the V verifies that each specification level was correctly implemented. Each right-side activity corresponds to a left-side activity at the same depth.</p>
-
-    <h3>Level 3: Unit Tests</h3>
-    <p>Verify the <span data-term="detailed-design">Detailed Design</span>. Each behavior rule and error handling case in the design becomes a test case. Unit tests are the most granular verification &mdash; they test individual functions or classes in isolation.</p>
-
-    <h3>Level 2: Integration Tests</h3>
-    <p>Verify the <span data-term="sw-architecture">SW Architecture</span>. Integration tests exercise the interfaces between components. They answer: <em>&ldquo;Do the components work together as the architecture defined?&rdquo;</em></p>
-
-    <h3>Level 1: <span data-term="sw-verification">SW Verification</span></h3>
-    <p>Verifies that <span data-term="sw-requirement">SW Requirements</span> are satisfied. This is often called &ldquo;qualification testing&rdquo; or &ldquo;software acceptance testing.&rdquo; It operates at the SW level (not individual components) and checks that the assembled software meets its requirements.</p>
-
-    <h3>Level 0: System Tests</h3>
-    <p>Verifies that <span data-term="system-requirement">System Requirements</span> are satisfied. In the target environment (or a faithful simulation of it). This is the highest-level verification &mdash; does the complete system do what was originally required?</p>
-
-    <h3>The Pairing Principle</h3>
-    <div class="card">
-      <p>The crucial insight: <strong>each left-side artifact is verified by the right-side artifact at the same depth</strong>. This is not coincidence &mdash; it's the structural guarantee that nothing falls through the cracks.</p>
-      <div class="trace-flow">
-        <span class="artifact-ref" data-term="system-requirement">System Req</span>
-        <span class="arrow">&larr; verified by &rarr;</span>
-        <span class="artifact-ref">System Test</span>
-      </div>
-      <div class="trace-flow">
-        <span class="artifact-ref" data-term="sw-requirement">SW Req</span>
-        <span class="arrow">&larr; verified by &rarr;</span>
-        <span class="artifact-ref" data-term="sw-verification">SW Verification</span>
-      </div>
-      <div class="trace-flow">
-        <span class="artifact-ref" data-term="sw-architecture">Architecture</span>
-        <span class="arrow">&larr; verified by &rarr;</span>
-        <span class="artifact-ref">Integration Test</span>
-      </div>
-      <div class="trace-flow">
-        <span class="artifact-ref" data-term="detailed-design">Detail Design</span>
-        <span class="arrow">&larr; verified by &rarr;</span>
-        <span class="artifact-ref">Unit Test</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== TRACES & LINKS ===================== -->
-  <section id="v-model-traces" class="content-section">
-    <h2>Traces &amp; Links</h2>
-    <p class="lead">Traces are the connective tissue of the V-model. They link artifacts together so you can answer: &ldquo;Is everything specified? Is everything verified? Is anything stale?&rdquo;</p>
-
-    <h3>What is a Trace?</h3>
-    <p>A trace is a typed, directional link between two artifacts. For example:</p>
-    <div class="trace-flow">
-      <span class="artifact-ref">SWREQ-042</span>
-      <span class="arrow">&rarr; allocated-to &rarr;</span>
-      <span class="artifact-ref">ARCH-001</span>
-    </div>
-    <p>This says: &ldquo;Software requirement SWREQ-042 is allocated to the architecture defined in ARCH-001.&rdquo;</p>
-
-    <h3>Trace Direction</h3>
-    <p>Traces are stored separately from artifacts (not embedded). Each trace file has a <strong>source</strong> artifact and one or more <strong>target</strong> links. The source is always the artifact being traced <em>from</em>.</p>
-
-    <h3>Why Separate?</h3>
-    <p>Keeping traces in their own files (rather than embedding them in artifacts) is a deliberate design choice:</p>
-    <ul>
-      <li>Artifacts remain clean and focused on their own content</li>
-      <li>Traces can be validated independently by tooling</li>
-      <li>Multiple teams can work on artifacts and traces without merge conflicts</li>
-      <li>The traceability layer (Pillar 2) can evolve independently from the artifact layer (Pillar 1)</li>
-    </ul>
-
-    <h3>Vertical vs Horizontal Traces</h3>
-    <div class="card-grid">
-      <div class="card">
-        <h4>Vertical (down the V)</h4>
-        <p>Link artifacts at different V-levels: a detailed design is <strong>derived-from</strong> a SW requirement. These traces show how high-level needs decompose into concrete designs.</p>
+        <h4>Traceability</h4>
+        <p>Forward links live in artifact front-matter. Reverse relationships (<code>realized_by</code>, <code>verified_by</code>, <code>derives</code>) are computed, not stored. Validation rules enforce completeness, cycle-freedom, and reference integrity.</p>
       </div>
       <div class="card">
-        <h4>Horizontal (across the V)</h4>
-        <p>Link specification to verification at the same level: a detailed design is <strong>verified-by</strong> a unit test. These traces show that each specification has verification evidence.</p>
+        <h4>AI Skills</h4>
+        <p>Craft skills (standalone authoring/review per artifact type) plus framework skills (orchestration, traceability, retrofit). Built against the documentation. Evaluated on the cheapest viable model tier.</p>
       </div>
     </div>
 
-    <p>For the full list of link types with rules and examples, see <a href="#trace-link-types" onclick="window.showSection && showSection('trace-link-types')">Link Types</a>.</p>
-  </section>
-
-  <!-- ===================== GATES & REVIEWS ===================== -->
-  <section id="v-model-gates" class="content-section">
-    <h2>Gates &amp; Reviews</h2>
-    <p class="lead">In the V-model, artifacts don&rsquo;t automatically progress. A human must review and approve each artifact before it becomes part of the verified baseline.</p>
-
-    <h3>Artifact Lifecycle</h3>
-    <p>Every artifact follows this lifecycle:</p>
-    <div class="code-block"><code>draft ──→ in_review ──→ approved ──→ baselined
-  ↑           │                         │
-  └───────────┘                         ↓
-  (rejected)                        superseded</code></div>
-
-    <ul>
-      <li><strong>draft</strong> &mdash; work in progress, not yet ready for review</li>
-      <li><strong>in_review</strong> &mdash; submitted for review, awaiting verdict</li>
-      <li><strong>approved</strong> &mdash; reviewed and accepted by a qualified reviewer</li>
-      <li><strong>baselined</strong> &mdash; frozen in a configuration baseline; changing it requires a new version</li>
-      <li><strong>superseded</strong> &mdash; a newer version has replaced this one</li>
-    </ul>
-
-    <h3>Why Human Gates?</h3>
-    <p>Even with automated validation (schema checks, trace completeness), human judgment remains essential. Automated tools can verify <em>structure</em> but not <em>correctness</em>. A requirement can be syntactically perfect EARS format and still be wrong.</p>
-    <p>Human gates ensure:</p>
-    <ul>
-      <li>Technical correctness (does the requirement actually describe what we need?)</li>
-      <li>Completeness (did we miss any requirements?)</li>
-      <li>Consistency (does this conflict with other artifacts?)</li>
-      <li>Appropriateness (is this the right level of detail?)</li>
-    </ul>
-
-    <h3>Review Records</h3>
-    <p>Reviews are not just approval stamps &mdash; they are artifacts themselves. A review record captures what was reviewed, who reviewed it, what findings were raised, and what the verdict was. This provides audit evidence that due diligence was performed.</p>
-  </section>
-
-  <!-- ===================== ARTIFACT ENVELOPE ===================== -->
-  <section id="artifact-envelope" class="content-section">
-    <h2>Artifact Envelope</h2>
-    <p class="lead">Every V-model artifact shares a common envelope. The envelope provides identity, versioning, and lifecycle tracking. Type-specific content goes in the <code>body</code> field.</p>
-
-    <h3>Fields</h3>
-    <table class="field-table">
-      <thead>
-        <tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="field-name">artifact_id</td>
-          <td><code>string</code></td>
-          <td><span class="required">required</span></td>
-          <td>Human-readable ID. Format: <code>TYPE-nnn</code> (e.g., <code>SWREQ-042</code>, <code>ARCH-001</code>, <code>DD-017</code>)</td>
-        </tr>
-        <tr>
-          <td class="field-name">artifact_type</td>
-          <td><code>string</code></td>
-          <td><span class="required">required</span></td>
-          <td>References an artifact type schema (e.g., <code>sw-requirement</code>, <code>sw-architecture</code>, <code>detailed-design</code>)</td>
-        </tr>
-        <tr>
-          <td class="field-name">version</td>
-          <td><code>string</code></td>
-          <td><span class="required">required</span></td>
-          <td>Semantic version (<code>1.0.0</code>). Major = breaking interface change, Minor = refinement, Patch = correction.</td>
-        </tr>
-        <tr>
-          <td class="field-name">status</td>
-          <td><code>enum</code></td>
-          <td><span class="required">required</span></td>
-          <td><code>draft</code> | <code>in_review</code> | <code>approved</code> | <code>baselined</code> | <code>superseded</code></td>
-        </tr>
-        <tr>
-          <td class="field-name">body</td>
-          <td><code>object</code></td>
-          <td><span class="required">required</span></td>
-          <td>Type-specific content. Structure defined by the artifact type schema.</td>
-        </tr>
-        <tr>
-          <td class="field-name">assurance_level</td>
-          <td><code>integer</code></td>
-          <td><span class="optional">optional</span></td>
-          <td>1 (highest rigor) to 5 (lowest). Maps to DAL A–E or ASIL D–QM depending on domain.</td>
-        </tr>
-        <tr>
-          <td class="field-name">content_hash</td>
-          <td><code>string</code></td>
-          <td><span class="optional">auto</span></td>
-          <td>SHA-256 prefix (8 chars) of the body. Used for staleness detection. Machine-generated.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>Example</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code>artifact_id: "SWREQ-042"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "draft"
-assurance_level: 3
-
-body:
-  title: "Addition operation"
-  statement: "The calculator shall compute the sum of two numerical inputs."
-  verification_method: "test"
-  rationale: "Core arithmetic operation required by system requirement SYSREQ-001."</code>
-    </div>
-
-    <h3>What&rsquo;s Explicitly <em>Not</em> in the Envelope</h3>
+    <h3>Why Independent</h3>
     <div class="card">
-      <p><strong><code>created_by</code></strong> &mdash; Whether a human or an AI agent wrote the artifact is irrelevant to compliance assessment. Quality is determined by review, not authorship.</p>
-      <p><strong><code>reviewed_by</code></strong> &mdash; A name on a field is insufficient evidence. Review evidence is captured in separate Review Record artifacts linked via traceability.</p>
-      <p><strong><code>trace_up</code> / <code>trace_down</code></strong> &mdash; Traceability is managed by Pillar 2 in separate trace files. Artifacts don't know about their links.</p>
-    </div>
-
-    <h3>Two-Tier Identification</h3>
-    <p>Artifacts have two ID forms:</p>
-    <ul>
-      <li><strong>Human-facing:</strong> <code>SWREQ-042</code> &mdash; readable, stable, used in conversations and documents</li>
-      <li><strong>Machine-facing:</strong> <code>SWREQ-042@a3f7c2d1</code> &mdash; includes content hash for change detection</li>
-    </ul>
-    <p>The hash changes when the body content changes, enabling automatic staleness detection in trace links.</p>
-  </section>
-
-  <!-- ===================== SW REQUIREMENT ===================== -->
-  <section id="artifact-sw-requirement" class="content-section">
-    <h2><span data-term="sw-requirement">SW Requirement</span></h2>
-    <span class="level-indicator left">Left Side &middot; Level 1</span>
-    <p class="lead">Defines what the software must do. Derived from system requirements, decomposed to be individually testable.</p>
-
-    <div class="card">
-      <h3>What is a SW Requirement?</h3>
-      <p>If system requirements say <em>&ldquo;what the whole machine needs to do,&rdquo;</em> then SW requirements say <em>&ldquo;what the software&rsquo;s share of that job is.&rdquo;</em></p>
-      <p>Think of it this way: a system requirement might say &ldquo;the coffee machine must brew coffee in under 3 minutes.&rdquo; That&rsquo;s a job for both hardware (the heater, the pump) and software (the control logic). The SW requirement zooms in on just the software&rsquo;s part: &ldquo;The software shall activate the pump within 200ms of receiving a brew command.&rdquo;</p>
-      <p>Each SW requirement must be <strong>individually testable</strong> &mdash; you should be able to write a test case for it. If you can&rsquo;t, it&rsquo;s too vague and needs to be refined.</p>
-
-      <h3>Why bother?</h3>
-      <p>SW requirements are the bridge between what the customer wants and what developers build. Without them:</p>
-      <ul>
-        <li>Developers guess what to implement &mdash; and guess differently</li>
-        <li>Testers don&rsquo;t know what &ldquo;correct&rdquo; looks like</li>
-        <li>There&rsquo;s no way to prove the software does what was asked</li>
-      </ul>
-      <p>In the V-model, SW requirements are Level 1 &mdash; one step below system requirements. They are <strong>derived from</strong> system requirements (traced via Pillar 2) and <strong>allocated to</strong> architecture components. On the right side of the V, SW Verification tests verify that every SW requirement is satisfied.</p>
-    </div>
-
-    <h3>Schema Fields</h3>
-    <table class="field-table">
-      <thead>
-        <tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="field-name">title</td><td><code>string</code></td><td><span class="required">required</span></td><td>Short descriptive name</td></tr>
-        <tr><td class="field-name">statement</td><td><code>string</code></td><td><span class="required">required</span></td><td>The requirement text. Free-form &mdash; any syntax is valid at the schema level.</td></tr>
-        <tr><td class="field-name">verification_method</td><td><code>enum</code></td><td><span class="required">required</span></td><td><code>test</code> | <code>analysis</code> | <code>inspection</code> | <code>demonstration</code> | <code>review</code></td></tr>
-        <tr><td class="field-name">rationale</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Why this requirement exists. Especially valuable for derived requirements.</td></tr>
-        <tr><td class="field-name">source</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Provenance metadata (informational, not a formal trace link).</td></tr>
-        <tr><td class="field-name">attributes</td><td><code>object</code></td><td><span class="optional">optional</span></td><td>Boolean flags: <code>safety_relevant</code>, <code>performance</code>, <code>interface</code>, <code>derived</code></td></tr>
-        <tr><td class="field-name">notes</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Free-form additional context</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Good Example</h3>
-    <div class="example-block good">
-      <div class="example-label">Good Requirement</div>
-      <div class="code-block">
-        <span class="lang-label">yaml</span>
-        <code>artifact_id: "SWREQ-001"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "draft"
-
-body:
-  title: "Addition of two numbers"
-  statement: >
-    When the user provides two numerical inputs and selects the
-    addition operation, the calculator shall display the arithmetic
-    sum of the two inputs.
-  verification_method: "test"
-  rationale: >
-    Core arithmetic operation. Derived from SYSREQ-001 which requires
-    the system to perform basic arithmetic.</code>
-      </div>
-      <p>This requirement is <strong>testable</strong> (clear inputs, operation, expected output), <strong>unambiguous</strong> (one interpretation), and <strong>atomic</strong> (one &ldquo;shall&rdquo;).</p>
-    </div>
-
-    <div class="example-block bad">
-      <div class="example-label">Bad Requirement</div>
-      <div class="code-block">
-        <span class="lang-label">yaml</span>
-        <code>body:
-  title: "Calculations"
-  statement: "The calculator should do math correctly and quickly."
-  verification_method: "test"</code>
-      </div>
-      <p>Problems: <strong>vague</strong> (&ldquo;math&rdquo; means what?), <strong>compound</strong> (&ldquo;correctly and quickly&rdquo; are two concerns), uses <strong>&ldquo;should&rdquo;</strong> instead of &ldquo;shall&rdquo; (ambiguous obligation), and <strong>not testable</strong> (how do you test &ldquo;quickly&rdquo; without a threshold?).</p>
-    </div>
-
-    <h3>Trace Connections</h3>
-    <div class="trace-flow">
-      <span class="artifact-ref">SYSREQ-nnn</span>
-      <span class="arrow">&rarr; derived-from &rarr;</span>
-      <span class="artifact-ref">SWREQ-nnn</span>
-      <span class="arrow">&rarr; allocated-to &rarr;</span>
-      <span class="artifact-ref">ARCH-nnn</span>
-    </div>
-    <div class="trace-flow">
-      <span class="artifact-ref">SWREQ-nnn</span>
-      <span class="arrow">&rarr; verified-by &rarr;</span>
-      <span class="artifact-ref">SW Verification Tests</span>
+      <p><strong>Documentation alone</strong> &mdash; teaches the craft.</p>
+      <p><strong>Templates + docs</strong> &mdash; manual spec authoring.</p>
+      <p><strong>Traceability + templates</strong> &mdash; automated completeness checking.</p>
+      <p><strong>Craft skills + docs</strong> &mdash; AI-assisted spec authoring without framework-specific machinery.</p>
+      <p><strong>All four</strong> &mdash; full AI-augmented spec-driven development.</p>
     </div>
   </section>
 
-  <!-- ===================== SW ARCHITECTURE ===================== -->
-  <section id="artifact-sw-architecture" class="content-section">
-    <h2><span data-term="sw-architecture">SW Architecture</span></h2>
-    <span class="level-indicator left">Left Side &middot; Level 2</span>
-    <p class="lead">Decomposes the software into components, defines their responsibilities, and specifies the interfaces between them.</p>
+  <!-- ===================== USE CASES ===================== -->
+  <section id="use-cases" class="content-section">
+    <h2>Use Cases</h2>
 
-    <div class="card">
-      <h3>What is a SW Architecture?</h3>
-      <p>If SW requirements say <em>&ldquo;what the software must do,&rdquo;</em> then the architecture says <em>&ldquo;how the software is organized to do it.&rdquo;</em></p>
-      <p>Think of it like designing a house. The requirements say you need a kitchen, two bedrooms, and a bathroom. The architecture is the floor plan &mdash; it decides where each room goes, how big it is, and how they connect (doors, hallways). It doesn&rsquo;t specify the color of the walls or the type of tiles &mdash; that&rsquo;s detailed design.</p>
-      <p>In software, the architecture breaks the system into <strong>components</strong> (the rooms), assigns each one a clear <strong>responsibility</strong> (what it does), and defines the <strong>interfaces</strong> between them (how they talk to each other).</p>
+    <h3>Greenfield Development</h3>
+    <p>Top-down through the scope tree. Start at the root with a Product Brief. Decompose into branches (Requirements + Architecture + TestSpec at each level). Terminate at leaves with a Detailed Design + TestSpec. Each layer's specification is authored under human steering before any code is written; agents handle the mechanical decomposition work under review.</p>
 
-      <h3>Why bother?</h3>
-      <p>Without architecture, software grows organically into a tangle where everything depends on everything else. Architecture prevents this by:</p>
-      <ul>
-        <li><strong>Dividing the problem</strong> &mdash; each component can be designed, built, and tested independently</li>
-        <li><strong>Defining boundaries</strong> &mdash; interfaces make it clear what each component promises to others</li>
-        <li><strong>Enabling integration testing</strong> &mdash; on the right side of the V (Level 2), integration tests verify these interfaces work</li>
-      </ul>
-      <p>SW Architecture is Level 2 in the V-model. SW requirements are <strong>allocated to</strong> architecture components (traced via Pillar 2). Each component is then fleshed out in detailed designs at Level 3.</p>
-    </div>
+    <h3>Legacy Retrofit (Primary Market Entry)</h3>
+    <p>Bottom-up from existing code. Topology discovery proposes a scope tree. Per-leaf recovery drafts Detailed Design and TestSpec from code + tests. Branch and root recovery draft Architecture, Requirements, ADRs from child contracts. Human fills rationale; AI never fabricates it. The retrofit output is an honest floor of documentation &mdash; an artifact set with many <code>recovery_status: unknown</code> fields is the correct outcome when rationale is lost, not a partial failure.</p>
 
-    <h3>Schema Fields</h3>
-    <table class="field-table">
-      <thead>
-        <tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="field-name">title</td><td><code>string</code></td><td><span class="required">required</span></td><td>Short descriptive name</td></tr>
-        <tr><td class="field-name">description</td><td><code>string</code></td><td><span class="required">required</span></td><td>High-level overview of scope</td></tr>
-        <tr><td class="field-name">components</td><td><code>list</code></td><td><span class="required">required</span></td><td>Building blocks. Each has <code>id</code>, <code>description</code>, <code>responsibilities[]</code></td></tr>
-        <tr><td class="field-name">interfaces</td><td><code>list</code></td><td><span class="optional">optional</span></td><td>Communication paths: <code>from</code>, <code>to</code>, <code>mechanism</code>, <code>data</code></td></tr>
-        <tr><td class="field-name">design_rationale</td><td><code>string</code></td><td><span class="required">required</span></td><td>Why decomposed this way. Trade-offs, reasoning.</td></tr>
-        <tr><td class="field-name">diagram</td><td><code>string</code></td><td><span class="optional">auto</span></td><td>Mermaid diagram (tool-generated from components + interfaces)</td></tr>
-        <tr><td class="field-name">constraints</td><td><code>list</code></td><td><span class="optional">optional</span></td><td>Cross-component architectural constraints</td></tr>
-        <tr><td class="field-name">notes</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Free-form additional context</td></tr>
-      </tbody>
-    </table>
+    <h3>Target Audience</h3>
+    <p>Mid-to-senior software engineers and architects orchestrating AI agents on real codebases. Not a product-management tool; not a rigor-optional framework. If the rigor is not needed for the work at hand, this is not the right tool.</p>
 
-    <h3>Example: Calculator Architecture</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code>artifact_id: "ARCH-001"
-artifact_type: "sw-architecture"
-version: "1.0.0"
-status: "draft"
-
-body:
-  title: "Calculator Application Architecture"
-  description: >
-    Decomposes the calculator into input parsing, arithmetic engine,
-    and output formatting components with clean interfaces.
-
-  components:
-    - id: "input-parser"
-      description: "Parses and validates user input into structured operands"
-      responsibilities:
-        - "Parse numerical input strings into numeric values"
-        - "Validate input is within acceptable range"
-        - "Report parse errors with descriptive messages"
-
-    - id: "arithmetic-engine"
-      description: "Performs arithmetic operations on validated operands"
-      responsibilities:
-        - "Execute addition, subtraction, multiplication, division"
-        - "Handle edge cases (division by zero, overflow)"
-        - "Return structured results with operation metadata"
-
-    - id: "output-formatter"
-      description: "Formats computation results for display"
-      responsibilities:
-        - "Format numeric results with appropriate precision"
-        - "Format error messages for user display"
-
-  interfaces:
-    - from: "input-parser"
-      to: "arithmetic-engine"
-      mechanism: "function call"
-      data: "Parsed operands (left: number, right: number, operator: enum)"
-
-    - from: "arithmetic-engine"
-      to: "output-formatter"
-      mechanism: "function call"
-      data: "Computation result (value: number, operation: string) or error"
-
-  design_rationale: >
-    Separated parsing from computation to allow independent testing
-    and potential reuse of the arithmetic engine. The output formatter
-    is isolated so display format can change without affecting logic.</code>
-    </div>
-
-    <h3>Trace Connections</h3>
-    <div class="trace-flow">
-      <span class="artifact-ref">SWREQ-nnn</span>
-      <span class="arrow">&rarr; allocated-to &rarr;</span>
-      <span class="artifact-ref">ARCH-nnn (component)</span>
-    </div>
-    <div class="trace-flow">
-      <span class="artifact-ref">ARCH-nnn</span>
-      <span class="arrow">&rarr; verified-by &rarr;</span>
-      <span class="artifact-ref">Integration Tests</span>
-    </div>
+    <h3>First Pilot</h3>
+    <p>Java 17, Gradle, JUnit 5. A legacy codebase of ~100k lines, ~10% test coverage, requirements in mixed Word/spreadsheet/DOORS formats. The retrofit path is the primary entry vector.</p>
   </section>
 
-  <!-- ===================== DETAILED DESIGN ===================== -->
-  <section id="artifact-detailed-design" class="content-section">
-    <h2><span data-term="detailed-design">Detailed Design</span></h2>
-    <span class="level-indicator left">Left Side &middot; Level 3</span>
-    <p class="lead">Describes components and their units at a level of detail sufficient for implementation and test derivation. Written as Markdown with YAML frontmatter.</p>
+  <!-- ===================== PRINCIPLES ===================== -->
+  <section id="principles" class="content-section">
+    <h2>The Ten Core Principles</h2>
+    <p class="lead">Load-bearing axioms. Every later decision in the framework implements one or more of these.</p>
 
-    <div class="card">
-      <h3>What is a Detailed Design?</h3>
-      <p>If the architecture is the floor plan, the detailed design is the <em>blueprint for each room</em>. It starts at the <strong>component</strong> level &mdash; the map of what exists, why, and how it connects &mdash; then adds <strong>unit-level</strong> detail where needed: inputs, outputs, behavior rules, and error handling, specific enough that a developer can implement from it and a tester can derive test cases from it.</p>
-
-      <h3>Why bother?</h3>
-      <p>This is where many teams skip straight to coding and regret it later:</p>
-      <ul>
-        <li><strong>Developers get a spec, not a guess</strong> &mdash; no ambiguity about what to build</li>
-        <li><strong>Testers get test cases directly</strong> &mdash; each behavior rule (B1, B2...) and error condition (E1, E2...) becomes a test</li>
-        <li><strong>Code reviews have a reference</strong> &mdash; does the code match the design?</li>
-        <li><strong>Future maintainers understand intent</strong> &mdash; why the code does what it does, not just how</li>
-        <li><strong>Assessors see proportional effort</strong> &mdash; detail scales with criticality, not one-size-fits-all</li>
-      </ul>
-      <p>Detailed Design is Level 3 in the V-model &mdash; the last step before implementation. On the right side, unit tests (also Level 3) verify that each unit behaves exactly as its detailed design specifies.</p>
-
-      <div class="callout callout-warning">
-        <strong>Design must exist before code.</strong> If you write the detailed design after implementing the code, the unit test becomes meaningless &mdash; you&rsquo;re just documenting what already exists, not verifying that code fulfils a design. This is the #1 assessment failure in ASPICE SWE.3.
-      </div>
-    </div>
-
-    <!-- ---- Layered Approach ---- -->
-    <h3>Layered Design: Scale with Criticality</h3>
-    <p>Not every unit needs the same level of documentation. Detailed design uses an <strong>additive layering</strong> model &mdash; higher layers build on lower layers, you never skip a layer:</p>
-
-    <table class="field-table">
-      <thead>
-        <tr><th>Layer</th><th>What It Covers</th><th>When Required</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Layer 1</strong><br>Component Design</td>
-          <td>Purpose, external interfaces, unit inventory, shared patterns, constraints. The <em>map</em> of what exists.</td>
-          <td>Always. Every component gets a Layer 1 regardless of criticality.</td>
-        </tr>
-        <tr>
-          <td><strong>Layer 2</strong><br>Unit Contracts</td>
-          <td>Per-unit interfaces (typed inputs/outputs), behavior rules, error handling, configuration, internal state.</td>
-          <td>ASIL A+ / DAL D+ / IEC 62304 Class B+ &mdash; or any non-trivial unit you want proper test derivation for.</td>
-        </tr>
-        <tr>
-          <td><strong>Layer 3</strong><br>Deep Evidence</td>
-          <td>Design rationale, state machines/sequence diagrams, concurrency model, negative requirements.</td>
-          <td>ASIL C-D / DAL A-C / IEC 62304 Class C &mdash; or any safety-critical or highly complex unit.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>Layer 2 and 3 content for units can either be <strong>embedded in the component document</strong> (practical when a component has few units) or written as <strong>separate unit documents</strong> (better when units are complex enough to warrant their own file). Both approaches are equally valid for compliance.</p>
-
-    <!-- ---- Document Format ---- -->
-    <h3>Document Format</h3>
-    <p>Detailed designs are <strong>Markdown files</strong> (<code>.md</code>) with YAML frontmatter. This makes them readable by humans and assessors while remaining parseable by agents and the traceability engine.</p>
-
-    <h4>Frontmatter</h4>
-    <table class="field-table">
-      <thead>
-        <tr><th>Field</th><th></th><th>Description</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="field-name">artifact_id</td><td><span class="required">required</span></td><td><code>CD-nnn</code> for component designs, <code>DD-nnn</code> for standalone unit designs</td></tr>
-        <tr><td class="field-name">artifact_type</td><td><span class="required">required</span></td><td>Always <code>detailed-design</code></td></tr>
-        <tr><td class="field-name">version</td><td><span class="required">required</span></td><td>Semantic version (e.g., <code>1.0.0</code>)</td></tr>
-        <tr><td class="field-name">status</td><td><span class="required">required</span></td><td><code>draft</code> | <code>in_review</code> | <code>approved</code> | <code>baselined</code> | <code>superseded</code></td></tr>
-        <tr><td class="field-name">component</td><td><span class="required">required</span></td><td>Architecture component ID (e.g., <code>fuel-control</code>)</td></tr>
-        <tr><td class="field-name">layer</td><td><span class="required">required</span></td><td>Highest layer in this document: <code>1</code>, <code>2</code>, or <code>3</code></td></tr>
-        <tr><td class="field-name">trace_from</td><td><span class="required">required</span></td><td>List of architecture/requirement IDs this design traces from</td></tr>
-        <tr><td class="field-name">unit_id</td><td><span class="optional">optional</span></td><td>Required only for standalone unit documents (<code>DD-nnn</code>)</td></tr>
-        <tr><td class="field-name">assurance_level</td><td><span class="optional">optional</span></td><td>1 (highest, DAL A / ASIL D) to 5 (lowest, QM)</td></tr>
-      </tbody>
-    </table>
-
-    <!-- ---- Layer 1 Sections ---- -->
-    <h3>Layer 1 Sections: Component Design</h3>
-    <p>Every detailed design document starts with these sections. They provide the component-level overview &mdash; the map that gives context to any unit-level detail below.</p>
-
-    <table class="field-table">
-      <thead>
-        <tr><th>Section</th><th>What To Write</th><th>Common Mistakes</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="field-name">## Purpose</td>
-          <td>What this component does and why it exists in the architecture. Ask yourself: <em>&ldquo;If this component were deleted, what would break?&rdquo;</em> 1&ndash;3 paragraphs. Not a restatement of the architecture description &mdash; focus on this component&rsquo;s specific role.</td>
-          <td>Copying the architecture description verbatim. Too vague (&ldquo;handles fuel stuff&rdquo;). Too long (implementation details leaking in).</td>
-        </tr>
-        <tr>
-          <td class="field-name">## External Interfaces</td>
-          <td>How this component communicates with <em>other</em> components. Table with columns: <code>Direction | Partner Component | Mechanism | Data | Description</code>. This is the component&rsquo;s boundary as seen from outside &mdash; not internal unit-to-unit calls.</td>
-          <td>Listing internal interfaces. Missing the mechanism (function call? message queue? shared memory?). Describing data format instead of data meaning.</td>
-        </tr>
-        <tr>
-          <td class="field-name">## Unit Inventory</td>
-          <td>All units in this component, each with its design layer and a one-line description. Table with columns: <code>Unit ID | Layer | Brief Description</code>. This is the table of contents for the component&rsquo;s internals. <strong>Every</strong> unit must appear &mdash; even trivial ones.</td>
-          <td>Forgetting trivial units (DTOs, config holders). Layer column missing or wrong. Descriptions that are too vague to distinguish units.</td>
-        </tr>
-        <tr>
-          <td class="field-name">## Shared Patterns</td>
-          <td>Design decisions that apply across <em>multiple units</em> in this component. Document once here instead of repeating in every unit. Typical patterns:
-            <ul>
-              <li><strong>Error strategy</strong> &mdash; How do units report errors? Exceptions? Result types? Error codes?</li>
-              <li><strong>Threading model</strong> &mdash; Single-threaded? Thread-per-request? What about shared state?</li>
-              <li><strong>Resource management</strong> &mdash; Who owns lifecycle of shared resources (connections, file handles)?</li>
-              <li><strong>Common data types</strong> &mdash; Shared enums, value objects, or structs used across units.</li>
-            </ul>
-            If a unit <em>deviates</em> from a shared pattern, document the deviation in that unit&rsquo;s section, not here.</td>
-          <td>Writing generic best practices (&ldquo;we use clean code&rdquo;) instead of concrete component decisions. Omitting this section because &ldquo;it&rsquo;s obvious&rdquo; &mdash; assessors can&rsquo;t verify what isn&rsquo;t written. Putting unit-specific decisions here.</td>
-        </tr>
-        <tr>
-          <td class="field-name">## Constraints</td>
-          <td>Non-functional requirements that apply to the component as a whole: performance budgets, memory limits, certification requirements, deployment constraints. Only component-wide constraints &mdash; unit-specific constraints go in the unit&rsquo;s section.</td>
-          <td>Mixing functional and non-functional. Listing constraints that only apply to one unit.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- ---- Layer 2 Sections ---- -->
-    <h3>Layer 2 Sections: Unit Interface Contracts</h3>
-    <p>Added per unit that needs detailed specification. When embedded in the component document, use <code>## Unit Name (UnitId)</code> as the heading with <code>###</code> for subsections. When in a separate file, the unit name is the document title and subsections use <code>##</code>.</p>
-
-    <table class="field-table">
-      <thead>
-        <tr><th>Section</th><th>What To Write</th><th>ID Convention</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="field-name">### Purpose</td>
-          <td>What this specific unit does. 1&ndash;2 sentences. Clear enough that someone can decide whether a given code change belongs in this unit or not.</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr>
-          <td class="field-name">### Interfaces<br>&ensp;#### Inputs</td>
-          <td>Table: <code>ID | Name | Type | Unit | Constraints | Description</code>. Type uses language-agnostic names (float, integer, enum, etc.). Constraints column: valid ranges, enum values, lengths.</td>
-          <td><code>I1, I2, I3...</code></td>
-        </tr>
-        <tr>
-          <td class="field-name">&ensp;#### Outputs</td>
-          <td>Same table format. For union/variant outputs, add a row per variant with the variant name in Description.</td>
-          <td><code>O1, O2, O3...</code></td>
-        </tr>
-        <tr>
-          <td class="field-name">### Behavior</td>
-          <td>Table: <code>ID | Condition | Result</code>. Each row is one testable rule. Be specific enough to write an assertion: &ldquo;Returns error&rdquo; is too vague; &ldquo;Returns Error(INVALID_SYNC, offset 0)&rdquo; is testable. For sequential algorithms, use &ldquo;after B1&rdquo;, &ldquo;after B2 succeeds&rdquo; in Condition.</td>
-          <td><code>B1, B2, B3...</code></td>
-        </tr>
-        <tr>
-          <td class="field-name">### Error Handling</td>
-          <td>Table: <code>ID | Condition | Response</code>. Every foreseeable error condition. If the unit has no error cases, state that explicitly with one row.</td>
-          <td><code>E1, E2, E3...</code></td>
-        </tr>
-        <tr>
-          <td class="field-name">### Configuration</td>
-          <td>Table: <code>Name | Type | Default | Description</code>. Parameters set at init/deployment time. Only present if the unit has configurable parameters.</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr>
-          <td class="field-name">### Internal State</td>
-          <td>Table: <code>Name | Type | Description</code>. State retained between invocations. Omit entirely for stateless units.</td>
-          <td>&mdash;</td>
-        </tr>
-        <tr>
-          <td class="field-name">### Constraints</td>
-          <td>Unit-specific non-functional requirements (thread-safety, timing, determinism). Only what&rsquo;s specific to this unit &mdash; component-wide constraints stay in Layer 1.</td>
-          <td>&mdash;</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- ---- Layer 3 Sections ---- -->
-    <h3>Layer 3 Sections: Deep Design Evidence</h3>
-    <p>Added for safety-critical or highly complex units. Required at ASIL C-D / DAL A-C / IEC 62304 Class C.</p>
-
-    <table class="field-table">
-      <thead>
-        <tr><th>Section</th><th>What To Write</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="field-name">### Design Rationale</td>
-          <td><strong>WHY</strong> this design, not just what it is. For each significant decision: what was decided, what alternatives were considered, why this approach was chosen. This is what separates design from code paraphrase. Can be a table (<code>Decision | Alternatives | Justification</code>) or structured prose.</td>
-        </tr>
-        <tr>
-          <td class="field-name">### Dynamic Behavior</td>
-          <td>State machines, sequence diagrams, timing diagrams for units with complex runtime behavior. Use Mermaid or PlantUML code blocks. Only needed when the Behavior table alone doesn&rsquo;t capture temporal or state aspects.</td>
-        </tr>
-        <tr>
-          <td class="field-name">### Concurrency Model</td>
-          <td>Thread-safety guarantees, synchronization mechanisms, shared state access patterns. Required when the unit may be accessed from multiple threads or contexts.</td>
-        </tr>
-        <tr>
-          <td class="field-name">### Negative Requirements</td>
-          <td>What this unit explicitly must NOT do. Prevents scope creep and clarifies responsibility boundaries. Examples: &ldquo;Must not allocate heap memory&rdquo;, &ldquo;Must not perform I/O&rdquo;, &ldquo;Must not modify input parameters.&rdquo;</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- ---- Traceability IDs ---- -->
-    <h3>Traceability IDs</h3>
-    <p>Every table row has an ID column. These IDs enable fine-grained traceability between design elements and test cases:</p>
-    <div class="code-block">
-      <span class="lang-label">traceability</span>
-      <code>DD-001.B3  &rarr; Behavior rule 3 in unit design DD-001
-DD-001.E1  &rarr; Error handling rule 1
-DD-001.I2  &rarr; Input #2 (for interface tracing)
-CD-001.FuelRateLimiter.B3  &rarr; When unit is embedded in component doc</code>
-    </div>
-
-    <!-- ---- Example ---- -->
-    <h3>Example: Arithmetic Engine (Component with Embedded Unit)</h3>
-    <div class="code-block">
-      <span class="lang-label">markdown</span>
-      <code>---
-artifact_id: CD-010
-artifact_type: detailed-design
-version: 1.0.0
-status: draft
-component: arithmetic-engine
-layer: 2
-trace_from: [ARCH-007]
----
-
-# Arithmetic Engine
-
-## Purpose
-
-Performs basic arithmetic operations on two numerical operands.
-The system&rsquo;s only computation component &mdash; all other components
-delegate arithmetic to this one rather than implementing their own.
-
-## External Interfaces
-
-| Direction | Partner Component | Mechanism | Data | Description |
-|-----------|-------------------|-----------|------|-------------|
-| Receives | expression-parser | function call | OperationRequest | Two operands + operator |
-| Provides | expression-parser | return value | OperationResult | Computed value or error |
-
-## Unit Inventory
-
-| Unit ID | Layer | Brief Description |
-|---------|-------|-------------------|
-| ArithmeticEngine | 2 | Executes arithmetic ops, detects division-by-zero and overflow |
-
-## Shared Patterns
-
-### Error Strategy
-
-All units return result unions (success | error) &mdash; no exceptions thrown.
-Error codes are domain-specific strings (e.g., DIVISION_BY_ZERO, OVERFLOW).
-
-## Constraints
-
-- Must be stateless &mdash; no state retained between calls
-- Must complete in constant time
-
----
-
-## Arithmetic Engine (ArithmeticEngine)
-
-### Purpose
-
-Executes a single arithmetic operation on two float operands.
-
-### Interfaces
-
-#### Inputs
-
-| ID | Name | Type | Unit | Constraints | Description |
-|----|------|------|------|-------------|-------------|
-| I1 | left | float | &mdash; | &mdash; | Left operand |
-| I2 | right | float | &mdash; | &mdash; | Right operand |
-| I3 | operator | enum | &mdash; | add, subtract, multiply, divide | Operation to perform |
-
-#### Outputs
-
-| ID | Name | Type | Unit | Constraints | Description |
-|----|------|------|------|-------------|-------------|
-| O1 | result.value | float | &mdash; | &mdash; | Success: computed result |
-| O2 | result.operation | string | &mdash; | &mdash; | Success: operation performed |
-| O3 | result.code | string | &mdash; | &mdash; | Error: error code |
-| O4 | result.message | string | &mdash; | &mdash; | Error: human-readable message |
-
-### Behavior
-
-| ID | Condition | Result |
-|----|-----------|--------|
-| B1 | operator is add | Return success: left + right |
-| B2 | operator is subtract | Return success: left - right |
-| B3 | operator is multiply | Return success: left * right |
-| B4 | operator is divide AND right != 0 | Return success: left / right |
-
-### Error Handling
-
-| ID | Condition | Response |
-|----|-----------|----------|
-| E1 | operator is divide AND right is 0 | Return error: code DIVISION_BY_ZERO |
-| E2 | result exceeds representable range | Return error: code OVERFLOW |</code>
-    </div>
-
-    <!-- ---- Trace Connections ---- -->
-    <h3>Trace Connections</h3>
-    <div class="trace-flow">
-      <span class="artifact-ref">SWREQ-nnn</span>
-      <span class="arrow">&rarr; derived-from &rarr;</span>
-      <span class="artifact-ref">CD-nnn / DD-nnn</span>
-      <span class="arrow">&rarr; implemented-by &rarr;</span>
-      <span class="artifact-ref">source file</span>
-    </div>
-    <div class="trace-flow">
-      <span class="artifact-ref">DD-nnn.B3</span>
-      <span class="arrow">&rarr; verified-by &rarr;</span>
-      <span class="artifact-ref">test case</span>
-    </div>
-    <p>Fine-grained trace: each behavior rule (B1, B2...) and error condition (E1, E2...) links directly to the test case that verifies it.</p>
-  </section>
-
-  <!-- ===================== SYSTEM REQUIREMENT ===================== -->
-  <section id="artifact-system-requirement" class="content-section">
-    <h2><span data-term="system-requirement">System Requirement</span></h2>
-    <span class="level-indicator left">Left Side &middot; Level 0</span>
-    <p class="lead">Defines what the <em>system</em> must do &mdash; before anyone thinks about software, hardware, or how to build it.</p>
-
-    <div class="card">
-      <h3>What is a System Requirement?</h3>
-      <p>A system requirement is the answer to: <em>&ldquo;What does this thing need to do?&rdquo;</em> &mdash; before anyone thinks about software, hardware, or how to build it.</p>
-      <p>Imagine you&rsquo;re building a coffee machine. Before anyone writes code or designs circuits, someone needs to write down: &ldquo;It must brew coffee in under 3 minutes,&rdquo; &ldquo;It must not exceed 85&thinsp;dB noise,&rdquo; &ldquo;It must shut off automatically after 30 minutes.&rdquo; Those are system requirements &mdash; they describe what the <em>whole system</em> must do, in terms a customer or regulator would understand.</p>
-
-      <h3>Why bother?</h3>
-      <p>Everything in the V-model flows down from system requirements:</p>
-      <ul>
-        <li><strong>SW requirements</strong> are derived from system requirements</li>
-        <li><strong>Architecture decisions</strong> are justified by system requirements</li>
-        <li><strong>Tests at the top of the right side</strong> verify system requirements</li>
-      </ul>
-      <p>If you skip them or get them wrong, everything below is built on sand. You might build software that passes all its tests but doesn&rsquo;t actually satisfy what the customer needed &mdash; because nobody wrote down what that was.</p>
-      <p>In regulated industries this isn&rsquo;t optional. Auditors will ask: <em>&ldquo;Show me the system requirement. Show me how it traces down to software. Show me how it traces back up to verification.&rdquo;</em> If you can&rsquo;t, you don&rsquo;t certify.</p>
-
-      <h3>Where it sits in the V</h3>
-      <pre>    System Requirements  &larr; YOU ARE HERE
-           &darr;
-     SW Requirements
-           &darr;
-     SW Architecture
-           &darr;
-     Detailed Design
-           &darr;
-      Implementation</pre>
-      <p>System requirements are Level 0 &mdash; the top of the left side. They are <strong>origin artifacts</strong>: they don&rsquo;t derive from other artifacts in the framework, they derive from the real world (customer needs, safety analysis, regulations).</p>
-    </div>
-
-    <h3>Schema Fields</h3>
-    <table class="field-table">
-      <thead>
-        <tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="field-name">title</td><td><code>string</code></td><td><span class="required">required</span></td><td>Short descriptive name</td></tr>
-        <tr><td class="field-name">statement</td><td><code>string</code></td><td><span class="required">required</span></td><td>The requirement text. Free-form &mdash; any syntax valid at the schema level.</td></tr>
-        <tr><td class="field-name">requirement_type</td><td><code>enum</code></td><td><span class="required">required</span></td><td><code>functional</code> | <code>performance</code> | <code>safety</code> | <code>interface</code> | <code>environmental</code> | <code>constraint</code></td></tr>
-        <tr><td class="field-name">verification_method</td><td><code>enum</code></td><td><span class="required">required</span></td><td><code>test</code> | <code>analysis</code> | <code>inspection</code> | <code>demonstration</code> | <code>review</code></td></tr>
-        <tr><td class="field-name">rationale</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Why this requirement exists.</td></tr>
-        <tr><td class="field-name">acceptance_criteria</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>How stakeholders confirm satisfaction (distinct from the technical verification method).</td></tr>
-        <tr><td class="field-name">source</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Provenance metadata (informational, not a formal trace link).</td></tr>
-        <tr><td class="field-name">attributes</td><td><code>object</code></td><td><span class="optional">optional</span></td><td>Boolean flags: <code>safety_relevant</code>, <code>performance</code>, <code>interface</code>, <code>regulatory</code></td></tr>
-        <tr><td class="field-name">notes</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Free-form additional context</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Good Example</h3>
-    <div class="example-block good">
-      <div class="example-label">Good System Requirement</div>
-      <div class="code-block">
-        <span class="lang-label">yaml</span>
-        <code>artifact_id: "SYSREQ-002"
-artifact_type: "system-requirement"
-version: "1.0.0"
-status: "draft"
-
-body:
-  title: "Fuel Rate Limiting"
-  statement: >
-    The system shall limit fuel flow rate to no more than 150 L/h
-    when engine temperature exceeds 95 degrees Celsius.
-  requirement_type: "safety"
-  verification_method: "test"
-  acceptance_criteria: >
-    System demonstrates rate limiting activates within 500ms of
-    temperature threshold crossing during acceptance testing.
-  rationale: >
-    Prevents fuel system overpressure during high-temperature
-    operation. Required by safety analysis SA-003.
-  source: "Customer specification CS-2024-Rev3, Section 4.2.1"
-  attributes:
-    safety_relevant: true
-    regulatory: true</code>
-      </div>
-      <p>This requirement is <strong>testable</strong> (clear threshold and timing), <strong>unambiguous</strong> (specific numbers), <strong>atomic</strong> (one &ldquo;shall&rdquo;), and <strong>classified</strong> (safety + regulatory flags help auditors filter).</p>
-    </div>
-
-    <div class="example-block bad">
-      <div class="example-label">Bad System Requirement</div>
-      <div class="code-block">
-        <span class="lang-label">yaml</span>
-        <code>body:
-  title: "Fuel Safety"
-  statement: "The system should handle fuel safely and efficiently."
-  requirement_type: "safety"
-  verification_method: "review"</code>
-      </div>
-      <p>Problems: <strong>vague</strong> (&ldquo;safely and efficiently&rdquo; means what?), <strong>compound</strong> (two concerns in one statement), uses <strong>&ldquo;should&rdquo;</strong> instead of &ldquo;shall&rdquo; (ambiguous obligation), and <strong>not testable</strong> (no measurable threshold).</p>
-    </div>
-
-    <h3>Trace Connections</h3>
-    <div class="trace-flow">
-      <span class="artifact-ref">Customer / Regulatory Source</span>
-      <span class="arrow">&rarr; captured in &rarr;</span>
-      <span class="artifact-ref">SYSREQ-nnn</span>
-      <span class="arrow">&rarr; derived-from &rarr;</span>
-      <span class="artifact-ref">SWREQ-nnn</span>
-    </div>
-    <div class="trace-flow">
-      <span class="artifact-ref">SYSREQ-nnn</span>
-      <span class="arrow">&rarr; allocated-to &rarr;</span>
-      <span class="artifact-ref">SW / HW</span>
-    </div>
-    <div class="trace-flow">
-      <span class="artifact-ref">SYSREQ-nnn</span>
-      <span class="arrow">&rarr; verified-by &rarr;</span>
-      <span class="artifact-ref">System Tests</span>
-    </div>
-  </section>
-
-  <!-- ===================== SYSTEM TEST CASE ===================== -->
-  <section id="artifact-system-test-case" class="content-section">
-    <h2>System Test Case</h2>
-    <span class="level-indicator right">Right Side &middot; Level 0</span>
-    <p class="lead">Defines how a <span data-term="system-requirement">system requirement</span> is verified at the system level &mdash; the top of the right side of the V.</p>
-
-    <div class="card">
-      <h3>What is a System Test Case?</h3>
-      <p>A system test case answers: <em>&ldquo;How do we prove the system does what the requirement says?&rdquo;</em></p>
-      <p>Remember the coffee machine example? You wrote &ldquo;It must brew coffee in under 3 minutes.&rdquo; Now you need to define: put water in the tank, insert a pod, press start, measure time until coffee is dispensed. That procedure, together with the expected result (&ldquo;coffee dispensed in under 3 minutes&rdquo;), is your system test case.</p>
-
-      <h3>Why a YAML artifact?</h3>
-      <p>Lower on the V, tests are code &mdash; unit tests, integration tests, qualification tests. They live as real test files and are linked via Pillar 2 trace files. But system-level testing is different:</p>
-      <ul>
-        <li><strong>Often not code</strong> &mdash; manual procedures, hardware-in-the-loop scripts, bench tests, field demonstrations</li>
-        <li><strong>Multiple verification methods</strong> &mdash; test, analysis, inspection, demonstration, review</li>
-        <li><strong>External environments</strong> &mdash; may require simulators, rigs, or target hardware</li>
-      </ul>
-      <p>Because system tests often can&rsquo;t live as executable code, they need their own artifact format. Each step combines the action with the expected result &mdash; avoiding the common V-model confusion of splitting procedure and expected results into separate documents.</p>
-
-      <h3>Where it sits in the V</h3>
-      <pre>System Requirements  ────  System Test Cases  &larr; YOU ARE HERE
-         &darr;                         &uarr;
-   SW Requirements      SW Verification Tests
-         &darr;                         &uarr;
-   SW Architecture       Integration Tests
-         &darr;                         &uarr;
-   Detailed Design          Unit Tests
-         &darr;                         &uarr;
-         └──── Implementation ────┘</pre>
-      <p>System test cases are Level 0 &mdash; the top of the right side. They mirror system requirements on the left.</p>
-    </div>
-
-    <h3>Schema Fields</h3>
-    <table class="field-table">
-      <thead>
-        <tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="field-name">title</td><td><code>string</code></td><td><span class="required">required</span></td><td>Short descriptive name for this test case</td></tr>
-        <tr><td class="field-name">objective</td><td><code>string</code></td><td><span class="required">required</span></td><td>What this test verifies and why.</td></tr>
-        <tr><td class="field-name">verification_method</td><td><code>enum</code></td><td><span class="required">required</span></td><td><code>test</code> | <code>analysis</code> | <code>inspection</code> | <code>demonstration</code> | <code>review</code></td></tr>
-        <tr><td class="field-name">preconditions</td><td><code>list</code></td><td><span class="required">required</span></td><td>What must be true before this test can be executed.</td></tr>
-        <tr>
-          <td class="field-name">steps</td><td><code>list</code></td><td><span class="required">required</span></td>
-          <td>Ordered sequence of actions and expected results. Each step has:<br>
-            <code>step_number</code> (integer) &mdash; sequential, starting at 1<br>
-            <code>action</code> (string) &mdash; what the tester does<br>
-            <code>expected_result</code> (string) &mdash; what should happen, written to be unambiguously pass/fail
-          </td>
-        </tr>
-        <tr><td class="field-name">postconditions</td><td><code>list</code></td><td><span class="optional">optional</span></td><td>State after the test completes (cleanup, restoration).</td></tr>
-        <tr><td class="field-name">test_data</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Description of required test data, inputs, or datasets.</td></tr>
-        <tr><td class="field-name">environment</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Required test environment (platform, equipment, configuration).</td></tr>
-        <tr><td class="field-name">notes</td><td><code>string</code></td><td><span class="optional">optional</span></td><td>Free-form additional context.</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Good Example</h3>
-    <div class="example-block good">
-      <div class="example-label">Good System Test Case</div>
-      <div class="code-block">
-        <span class="lang-label">yaml</span>
-        <code>artifact_id: "SYSTEST-001"
-artifact_type: "system-test-case"
-version: "1.0.0"
-status: "draft"
-
-body:
-  title: "Arithmetic Operations — End-to-End"
-  objective: >
-    Verify that the calculator correctly performs all four arithmetic
-    operations with user-provided inputs and displays the result.
-  verification_method: "test"
-
-  preconditions:
-    - "Calculator application is running"
-    - "No previous calculation state (fresh session)"
-
-  steps:
-    - step_number: 1
-      action: "Enter 12 as the first operand and 4 as the second operand, select addition"
-      expected_result: "Display shows 16"
-    - step_number: 2
-      action: "Enter 12 as the first operand and 4 as the second operand, select subtraction"
-      expected_result: "Display shows 8"
-    - step_number: 3
-      action: "Enter 12 as the first operand and 4 as the second operand, select multiplication"
-      expected_result: "Display shows 48"
-    - step_number: 4
-      action: "Enter 12 as the first operand and 4 as the second operand, select division"
-      expected_result: "Display shows 3"
-
-  postconditions:
-    - "Calculator returns to ready state after each operation"
-
-  environment: "Host platform, release build"</code>
-      </div>
-      <p>Each step has a <strong>specific action</strong> and an <strong>unambiguous expected result</strong>. A tester can execute this and determine pass/fail without interpretation. The objective explains <em>what</em> is being verified without requiring a lookup of the linked requirement.</p>
-    </div>
-
-    <div class="example-block bad">
-      <div class="example-label">Bad System Test Case</div>
-      <div class="code-block">
-        <span class="lang-label">yaml</span>
-        <code>body:
-  title: "Calculator Test"
-  objective: "Test the calculator"
-  verification_method: "test"
-
-  preconditions: []
-
-  steps:
-    - step_number: 1
-      action: "Use the calculator"
-      expected_result: "It works correctly"</code>
-      </div>
-      <p>Problems: <strong>vague objective</strong> (test what about the calculator?), <strong>empty preconditions</strong> (what state is assumed?), <strong>non-specific action</strong> (&ldquo;use&rdquo; how?), and <strong>untestable expected result</strong> (&ldquo;works correctly&rdquo; is not a pass/fail criterion).</p>
-    </div>
-
-    <h3>Trace Connections</h3>
-    <div class="trace-flow">
-      <span class="artifact-ref">SYSREQ-nnn</span>
-      <span class="arrow">&rarr; verified-by &rarr;</span>
-      <span class="artifact-ref">SYSTEST-nnn</span>
-    </div>
-    <p>System test cases have a many-to-many relationship with system requirements, managed by Pillar 2 trace files. One system requirement may need multiple test cases (different verification methods or scenarios), and one test case may verify multiple system requirements.</p>
-  </section>
-
-  <!-- ===================== PLANS (STUB) ===================== -->
-  <section id="artifact-plans" class="content-section">
-    <h2>Plans</h2>
-    <div class="stub-banner">
-      <h3>Coming Soon</h3>
-      <p>Plan schemas are in the backlog: Development Plan, Verification Plan, Configuration Management Plan, Quality Assurance Plan.</p>
-      <p>Plans define <em>how</em> the project will be executed, verified, and controlled. They are living documents that evolve as the project progresses.</p>
-    </div>
-  </section>
-
-  <!-- ===================== REVIEW RECORD (STUB) ===================== -->
-  <section id="artifact-review-record" class="content-section">
-    <h2>Review Record</h2>
-    <div class="stub-banner">
-      <h3>Coming Soon</h3>
-      <p>Review record schema is in the backlog. Review records capture: what was reviewed, the checklist used, findings raised, and the verdict (approved/rejected).</p>
-      <p>Reviews are first-class artifacts, not annotations. They are linked to the reviewed artifact via traceability.</p>
-    </div>
-  </section>
-
-  <!-- ===================== LINK TYPES ===================== -->
-  <section id="trace-link-types" class="content-section">
-    <h2>Link Types</h2>
-    <p class="lead">Each trace link has a type that defines the nature of the relationship. Here are all currently defined link types.</p>
-
-    <div class="card">
-      <h4><code>allocated-to</code></h4>
-      <p>A requirement is allocated to an architecture component for realization.</p>
-      <div class="trace-flow">
-        <span class="artifact-ref">SWREQ-042</span>
-        <span class="arrow">&rarr; allocated-to &rarr;</span>
-        <span class="artifact-ref">ARCH-001</span>
-      </div>
-      <p><strong>Source:</strong> artifact &rarr; <strong>Target:</strong> artifact</p>
-    </div>
-
-    <div class="card">
-      <h4><code>derived-from</code></h4>
-      <p>Source artifact was derived from the target artifact. Used for vertical traceability between V-model levels.</p>
-      <div class="trace-flow">
-        <span class="artifact-ref">DD-001</span>
-        <span class="arrow">&rarr; derived-from &rarr;</span>
-        <span class="artifact-ref">SWREQ-042</span>
-      </div>
-      <p><strong>Source:</strong> artifact &rarr; <strong>Target:</strong> artifact</p>
-    </div>
-
-    <div class="card">
-      <h4><code>implemented-by</code></h4>
-      <p>Source artifact is realized in the target code file.</p>
-      <div class="trace-flow">
-        <span class="artifact-ref">DD-001</span>
-        <span class="arrow">&rarr; implemented-by &rarr;</span>
-        <span class="artifact-ref">src/ArithmeticEngine.java</span>
-      </div>
-      <p><strong>Source:</strong> artifact &rarr; <strong>Target:</strong> file</p>
-    </div>
-
-    <div class="card">
-      <h4><code>verified-by</code></h4>
-      <p>Source artifact is verified by the target test file.</p>
-      <div class="trace-flow">
-        <span class="artifact-ref">DD-001</span>
-        <span class="arrow">&rarr; verified-by &rarr;</span>
-        <span class="artifact-ref">test/ArithmeticEngineTest.java</span>
-      </div>
-      <p><strong>Source:</strong> artifact &rarr; <strong>Target:</strong> file</p>
-    </div>
-
-    <div class="card">
-      <h4><code>results</code></h4>
-      <p>Source links to its test execution output. Requires <code>format</code> field (e.g., <code>junit-xml</code>).</p>
-      <div class="trace-flow">
-        <span class="artifact-ref">DD-001</span>
-        <span class="arrow">&rarr; results &rarr;</span>
-        <span class="artifact-ref">build/TEST-ArithmeticEngineTest.xml</span>
-      </div>
-      <p><strong>Source:</strong> artifact &rarr; <strong>Target:</strong> file</p>
-    </div>
-
-    <div class="card">
-      <h4><code>coverage</code></h4>
-      <p>Source links to its code coverage report. Requires <code>format</code> field (e.g., <code>jacoco</code>).</p>
-      <div class="trace-flow">
-        <span class="artifact-ref">DD-001</span>
-        <span class="arrow">&rarr; coverage &rarr;</span>
-        <span class="artifact-ref">build/jacoco/ArithmeticEngine.html</span>
-      </div>
-      <p><strong>Source:</strong> artifact &rarr; <strong>Target:</strong> file</p>
-    </div>
-  </section>
-
-  <!-- ===================== STALENESS ===================== -->
-  <section id="trace-staleness" class="content-section">
-    <h2>Staleness Detection</h2>
-    <p class="lead">When an artifact changes, its trace links may become stale. Content hashing detects this automatically.</p>
-
-    <h3>How It Works</h3>
-    <p>Every artifact has a <code>content_hash</code> &mdash; the first 8 characters of the SHA-256 hash of its body content. When a trace link is created or rebased, both the source hash and target hash are recorded in the trace file:</p>
-
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code>source: "DD-001"
-source_hash: "a3f7c2d1"    # hash at time of last verification
-
-links:
-  - type: "implemented-by"
-    target: "src/ArithmeticEngine.java"
-    target_hash: "b8e4f123"  # hash at time of last verification</code>
-    </div>
-
-    <h3>Detection Flow</h3>
-    <p>The traceability tool (Pillar 2) compares stored hashes against current hashes:</p>
     <ol>
-      <li>Compute current hash of <code>DD-001</code>'s body</li>
-      <li>Compare against stored <code>source_hash</code> (<code>a3f7c2d1</code>)</li>
-      <li>If different → the source artifact changed since the trace was last verified</li>
-      <li>Same process for each target</li>
+      <li>
+        <strong>Documentation is the foundation.</strong>
+        Domain knowledge lives in docs first; schemas, templates, skills are derived. If we cannot explain it in docs, we cannot claim AI skills will produce compliant output.
+      </li>
+      <li>
+        <strong>Spec Ambiguity Test.</strong>
+        Every specification artifact &mdash; at every layer &mdash; must be unambiguous enough that a junior engineer or low-mid-tier AI could act on it without guessing. Meta-gate for all specification work.
+      </li>
+      <li>
+        <strong>Uniform high rigor.</strong>
+        No rigor tiers. Every artifact is authored at maximum rigor. Rigor is encoded per-artifact as a Quality Bar checklist, not as a configurable level.
+      </li>
+      <li>
+        <strong>Workflow decoupling.</strong>
+        Specification, Build, and Retrofit are independent workflows, loosely coupled through artifacts only. No workflow calls, subscribes to, or has runtime knowledge of another.
+      </li>
+      <li>
+        <strong>Tool/skill split.</strong>
+        Tools do mechanical deterministic work (no LLM). Skills do interpretive creative work (LLM-driven). Never skills for what tools can do; never tools for what needs judgment.
+      </li>
+      <li>
+        <strong>Tools as independent products.</strong>
+        The framework bundles no tools. Tools live in their own repos, are distributed separately, and are invoked via stable CLI contracts. Each project declares its available subset.
+      </li>
+      <li>
+        <strong>Retrofit never fabricates.</strong>
+        AI must never invent content that is not derivable from code, tests, or committed evidence. Human-only fields default to <code>recovery_status: unknown</code> unless a human supplies them.
+      </li>
+      <li>
+        <strong>Human leverage at the spec level.</strong>
+        The human reviews specifications &mdash; where design intent lives &mdash; not code. Upper layers have higher human involvement per change; lower layers have higher AI autonomy.
+      </li>
+      <li>
+        <strong>Components are independent (SOLID).</strong>
+        No forced coupling between Documentation, Templates, Traceability, and Skills. Adopt incrementally.
+      </li>
+      <li>
+        <strong>Tests derive from the layer's artifact, not from the code below.</strong>
+        Unit tests derive from Detailed Design. Integration tests from Architecture. System tests from Product Brief + root Requirements. V-model verification restored.
+      </li>
+    </ol>
+  </section>
+
+  <!-- ===================== SPEC AMBIGUITY TEST ===================== -->
+  <section id="spec-ambiguity-test" class="content-section">
+    <h2>The Spec Ambiguity Test</h2>
+    <p class="lead">The universal meta-gate. Every specification artifact at every layer must pass it before it is allowed downstream.</p>
+
+    <div class="card" style="border-left: 4px solid var(--accent-trace);">
+      <h4>The Test</h4>
+      <p>Could a <em>junior engineer or low-mid-tier AI</em> act on this artifact and produce correct work &mdash; without guessing, without hunting external context, without pinging the author?</p>
+      <p>If no, the artifact is not ready. The layer above is not done.</p>
+    </div>
+
+    <h3>Why This Is the Right Bar</h3>
+    <ul>
+      <li>Senior engineers silently patch ambiguity with expertise. Juniors reveal it. Low-mid-tier AI reveals it cheaply and at scale.</li>
+      <li>If the cheapest capable worker can produce correct work from the spec, the spec is doing its job. If only the senior author can, the spec is a stand-in for tribal knowledge.</li>
+      <li>The framework's value proposition &mdash; AI agents producing well-structured software under human design review &mdash; collapses the moment specifications require interpretation beyond what a low-mid-tier model can do.</li>
+    </ul>
+
+    <h3>Where It Bites</h3>
+    <p>Every Quality Bar checklist on every artifact page ends with the Spec Ambiguity Test as its meta-gate. Passing every other checklist item does not substitute for passing this one. Failing this one blocks the artifact regardless of other passes.</p>
+  </section>
+
+  <!-- ===================== HUMAN LEVERAGE MODEL ===================== -->
+  <section id="human-leverage" class="content-section">
+    <h2>Human Leverage Model</h2>
+    <p class="lead">Human drives at the strategic level. AI executes at the tactical level. Human verifies at the quality gate. Not an autonomous pipeline with checkpoints.</p>
+
+    <h3>Autonomy Gradient</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>Layer / Artifact</th><th>Agent Role</th><th>Human Role</th><th>Agent Autonomy</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Product Brief</td><td>Proposes structure, checks gaps, drafts candidate outcomes</td><td>Drives all content &mdash; only humans know stakeholders and intent</td><td>Low</td></tr>
+        <tr><td>Requirements (non-leaf)</td><td>Structures, checks completeness, suggests EARS, flags ambiguity</td><td>Drives content; validates against parent allocation</td><td>Medium</td></tr>
+        <tr><td>Architecture (non-leaf)</td><td>Proposes decomposition, checks consistency, drafts Composition</td><td>Decides trade-offs; decides technology picks &rarr; ADRs</td><td>Medium</td></tr>
+        <tr><td>ADR</td><td>Drafts from discussion, enforces reversibility prompt</td><td>Owns the decision</td><td>Medium drafting / Low decision</td></tr>
+        <tr><td>Detailed Design (leaf)</td><td>Heavy lifting on specification</td><td>Validates trade-offs, approves</td><td>Medium-High</td></tr>
+        <tr><td>TestSpec</td><td>Derives cases using derivation strategies</td><td>Reviews coverage against intent</td><td>Medium-High</td></tr>
+        <tr><td>Build (code + tests)</td><td>Autonomous executor given a complete spec</td><td>Reviews output</td><td>High</td></tr>
+      </tbody>
+    </table>
+
+    <p>Upper layers are interactive advisors. Lower layers are autonomous executors. Skill design matches the autonomy level of the layer it targets.</p>
+  </section>
+
+  <!-- ===================== ARTIFACT SET ===================== -->
+  <section id="artifact-set" class="content-section">
+    <h2>The Six Artifacts</h2>
+    <p class="lead">One anchor artifact at the root. Four at every non-leaf scope. One at every leaf. ADRs cross-cutting across scopes. Every spec element is verified by tests at its own layer.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Artifact</th><th>Lives at</th><th>Job</th><th>Verified by</th><th>Page</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Product Brief</strong></td>
+          <td>Root only</td>
+          <td>Anchor: why, for whom, what problem</td>
+          <td>Stakeholder review</td>
+          <td><a href="artifacts/product-brief.html">product-brief.html</a></td>
+        </tr>
+        <tr>
+          <td><strong>Requirements</strong></td>
+          <td>Non-leaf scopes</td>
+          <td>Testable behavior specifications</td>
+          <td>Acceptance / integration tests</td>
+          <td><a href="artifacts/requirements.html">requirements.html</a></td>
+        </tr>
+        <tr>
+          <td><strong>Architecture</strong></td>
+          <td>Non-leaf scopes</td>
+          <td>Decomposition + composition pattern</td>
+          <td>Integration tests</td>
+          <td><a href="artifacts/architecture.html">architecture.html</a></td>
+        </tr>
+        <tr>
+          <td><strong>ADR</strong></td>
+          <td>Cross-cutting</td>
+          <td>Justify individual load-bearing decisions</td>
+          <td>Review</td>
+          <td><a href="artifacts/adr.html">adr.html</a></td>
+        </tr>
+        <tr>
+          <td><strong>Detailed Design</strong></td>
+          <td>Leaf scopes</td>
+          <td>Internal logic, contracts, algorithms</td>
+          <td>Unit tests</td>
+          <td><a href="artifacts/detailed-design.html">detailed-design.html</a></td>
+        </tr>
+        <tr>
+          <td><strong>TestSpec</strong></td>
+          <td>Every scope</td>
+          <td>Test specification for this scope</td>
+          <td>(its own test code)</td>
+          <td><a href="artifacts/testspec.html">testspec.html</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>ADRs Are Cross-Cutting</h3>
+    <p>ADRs are pulled out as first-class artifacts, not inlined in Architecture. They live in a flat <code>/specs/adrs/</code> directory and are referenced by <code>governing_adrs</code> from any spec artifact they bound. Authoring default: <em>during</em> Architecture authoring as the composition exposes a decision.</p>
+
+    <h3>TestSpec Has Three Flavors</h3>
+    <p>Same envelope, different weight per layer. <strong>Leaf</strong> tests are unit tests &mdash; thin TestSpec cases; test code carries most of the intent. <strong>Branch</strong> tests are integration tests &mdash; preconditions, fixtures, doubles. <strong>Root</strong> tests are system / e2e scenarios &mdash; heavy steps, preconditions, expected; scenarios map to Product Brief outcomes.</p>
+
+    <p>The canonical structural reference for all six artifacts is <code>docs/plan/TARGET_ARCHITECTURE.md §5.3</code>. Each sidebar-linked page teaches the craft for one artifact under the five-section structure.</p>
+  </section>
+
+  <!-- ===================== SCOPE TREE ===================== -->
+  <section id="scope-tree" class="content-section">
+    <h2>Scope Tree</h2>
+    <p class="lead">The system is modelled as a tree of scopes, discovered per-system, of variable depth. The same decision types apply at every depth.</p>
+
+    <h3>Abstract Vocabulary</h3>
+    <ul>
+      <li><strong>Root</strong> &mdash; the whole product. Exactly one per system. Holds the Product Brief.</li>
+      <li><strong>Branch</strong> &mdash; any non-leaf scope. Holds its own Requirements, Architecture, TestSpec, and child scopes.</li>
+      <li><strong>Leaf</strong> &mdash; where subdivision stops earning its keep. Holds a Detailed Design, TestSpec, and ultimately code.</li>
+    </ul>
+
+    <p>Projects may tag scopes with domain-local names (<code>level_name: "subsystem" | "component" | "module"</code>) for display. The framework still uses root/branch/leaf internally. <strong>Layer axis = decision kind, not structural scope.</strong> Requirements / architecture / design / tests are decision types that apply at any scope depth.</p>
+
+    <h3>Heuristics for When to Subdivide</h3>
+    <ul>
+      <li><strong>Depth test</strong> &mdash; if children interact in ways the parent's Architecture cannot explain, go deeper.</li>
+      <li><strong>Cognitive-load test</strong> &mdash; a scope should fit in one Requirements+Architecture pair a reviewer can hold in their head.</li>
+      <li><strong>Change-blast test</strong> &mdash; if subdividing would not let parts change independently, you have gone too deep.</li>
+    </ul>
+
+    <h3>Deployment and Wiring</h3>
+    <p>Architecture Composition is the authoritative spec for runtime pattern, wiring approach, and deployment intent. IaC artifacts (terraform / Kubernetes / docker-compose) implement that intent &mdash; no separate Detailed Design layer above them. Integration and end-to-end coverage are carried by branch- and root-scope TestSpec tracing to Architecture Composition and child interfaces.</p>
+  </section>
+
+  <!-- ===================== QUALITY BAR ===================== -->
+  <section id="quality-bar" class="content-section">
+    <h2>Rigor &amp; Quality Bar</h2>
+    <p class="lead">No tiers. No T0/T1/T2, no DAL, no ASIL. Every artifact is authored at uniform highest rigor, encoded per-artifact as a Quality Bar checklist.</p>
+
+    <h3>Why Uniform</h3>
+    <p>Tier systems create escape valves that defeat themselves. The rigor-cost curve is flat for AI authoring: the marginal cost of producing a well-structured artifact versus a lightly-structured one is negligible once the authoring skill exists. Tiers add configuration complexity, invite miscalibration, and give authors a plausible-deniability lever for cutting corners.</p>
+
+    <h3>Two Layers of Rigor</h3>
+    <div class="card-grid">
+      <div class="card">
+        <h4>Structural (mechanical)</h4>
+        <p>Lives in the artifact schema. Mandatory sections, required fields, required traceability links. Mechanically validatable: <code>vmodel validate &lt;artifact&gt;</code> returns pass/fail.</p>
+      </div>
+      <div class="card">
+        <h4>Semantic (Quality Bar)</h4>
+        <p>A concrete Yes/No checklist grouped by concern, subject to the Spec Ambiguity Test as its meta-gate. Authored as the fifth section in each artifact page; extracted as canonical YAML in Phase 3.</p>
+      </div>
+    </div>
+
+    <h3>Cascade</h3>
+    <p>Quality Bar is additive per layer. Upstream failure blocks downstream approval. A leaf Detailed Design cannot pass review if its parent Architecture Quality Bar has unresolved items. Tooling surfaces the chain rather than allowing a reviewer to rubber-stamp a leaf on top of a broken parent.</p>
+
+    <h3>No Relaxed Variants</h3>
+    <p>There is no "lightweight mode" for small projects or prototypes. If the rigor is not needed, the framework is not the right tool.</p>
+
+    <h3>Per-Artifact Dimensions</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>Artifact</th><th>Key dimensions</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Product Brief</td><td>Stakeholder completeness, problem evidence, outcome specificity, non-goals explicit, success criteria measurable</td></tr>
+        <tr><td>Requirements</td><td>EARS where apt, rationale present, QAs measurable, interface contracts, constraint inheritance traced</td></tr>
+        <tr><td>Architecture</td><td>Composition section complete (patterns, wiring, deployment intent), every child allocated, every req allocated, ADRs linked, interfaces contracted</td></tr>
+        <tr><td>ADR</td><td>Context specific, &ge; 2 alternatives, reversibility sub-prompt answered, affected scopes listed</td></tr>
+        <tr><td>Detailed Design</td><td>Junior-implementable, contracts on every public function, state machines explicit, error handling complete, language-portable</td></tr>
+        <tr><td>TestSpec</td><td>Derivation strategies applied, coverage targets declared, every spec element has &ge; 1 test, non-empty <code>verifies</code> on every case</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== FILE SHAPE ===================== -->
+  <section id="file-shape" class="content-section">
+    <h2>Files, Directories, IDs</h2>
+
+    <h3>File Shape</h3>
+    <p>Single-file Markdown per artifact. YAML front-matter for metadata and outgoing traceability links. Body: prose sections + embedded YAML blocks for repeated structured items (per-requirement, per-child, per-test-case, per-function) + Mermaid diagrams. <strong>Artifacts are self-contained</strong> &mdash; an artifact that requires a separate lookup to be understood fails the Spec Ambiguity Test.</p>
+
+    <h3>Directory Layout</h3>
+    <p>The scope tree mirrors the directory tree under a configurable <code>/specs/</code> root. ADRs flat in <code>/specs/adrs/</code>.</p>
+
+    <div class="code-block"><code>/specs/
+  product_brief.md            # root scope
+  requirements.md             # root scope
+  architecture.md             # root scope
+  testspec.md                 # root scope
+  /adrs/                      # flat, cross-cutting
+    adr-001-use-postgres.md
+  /app/                       # branch scope
+    requirements.md
+    architecture.md
+    testspec.md
+    /checkout/                # leaf scope
+      detailed_design.md
+      testspec.md</code></div>
+
+    <p>Root-scope artifacts live directly at <code>/specs/</code>. "Root" is implicit, not a directory name. Scope directories use <code>kebab-case</code>; artifact filenames are <code>snake_case</code>.</p>
+
+    <h3>ID Scheme</h3>
+    <p>Prefix-scope-sequence, stable across file renames. Traceability links reference IDs, not paths.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Artifact</th><th>Format</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Product Brief</td><td><code>PB</code></td><td><code>PB</code></td></tr>
+        <tr><td>Requirement</td><td><code>REQ-{scope}-{seq}</code></td><td><code>REQ-app-checkout-042</code></td></tr>
+        <tr><td>Architecture</td><td><code>ARCH-{scope}</code></td><td><code>ARCH-app-checkout</code></td></tr>
+        <tr><td>Detailed Design</td><td><code>DD-{scope}-{name}</code></td><td><code>DD-app-checkout-discount-calc</code></td></tr>
+        <tr><td>TestSpec</td><td><code>TS-{scope}</code></td><td><code>TS-app-checkout</code></td></tr>
+        <tr><td>Test Case</td><td><code>TC-{testspec-id}-{seq}</code></td><td><code>TC-TS-app-checkout-007</code></td></tr>
+        <tr><td>ADR</td><td><code>ADR-{seq}-{slug}</code></td><td><code>ADR-012-use-postgres</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ===================== SPEC GREENFIELD ===================== -->
+  <section id="spec-greenfield" class="content-section">
+    <h2>Specification Workflow &mdash; Greenfield</h2>
+    <p class="lead">Top-down from root scope. Per-layer unified pattern: specify &rarr; (build elsewhere) &rarr; allocate to children &rarr; recurse.</p>
+
+    <h3>Per-Layer Pattern</h3>
+    <div class="code-block"><code>Input: parent allocation (or Product Brief at root)
+        &darr;
+   SPECIFY (what)
+   &mdash; Non-leaf: Requirements + Architecture
+   &mdash; Leaf:     Detailed Design
+   &mdash; Any:      ADRs (technical picks &rarr; constraints flow down)
+   &mdash; Any:      TestSpec (authored here, before any code)
+        &darr;
+   (Build workflow &mdash; separately, elsewhere)
+   &mdash; Root:    deploy orchestration + e2e / system tests
+   &mdash; Branch:  wiring / glue code   + integration tests
+   &mdash; Leaf:    code                 + unit tests
+        &darr;
+   Non-leaf: allocate reqs to children &rarr; recurse</code></div>
+
+    <h3>Completion Criterion Per Scope</h3>
+    <ul>
+      <li>Every spec artifact passes its Quality Bar (structural + semantic).</li>
+      <li>Traceability validation passes for the scope.</li>
+      <li>Every TestSpec case has non-empty <code>verifies</code>.</li>
+      <li>No <code>recovery_status: unknown</code> on any blocking field.</li>
+    </ul>
+    <p>Anyone can query this. The Specification workflow emits it <em>at nobody</em>; it is a derived property of the traceability graph.</p>
+
+    <h3>Human-Gate Gradient</h3>
+    <p>Higher layers drive more human involvement per change; lower layers have higher AI autonomy. This is a property of skills and flow, not encoded in schemas. See <a href="#human-leverage" onclick="window.showSection &amp;&amp; showSection('human-leverage')">Human Leverage Model</a>.</p>
+  </section>
+
+  <!-- ===================== SPEC RETROFIT ===================== -->
+  <section id="spec-retrofit" class="content-section">
+    <h2>Specification Workflow &mdash; Retrofit</h2>
+    <p class="lead">Not a separate workflow. The Specification workflow run bottom-up with a topology-discovery phase prepended. Same artifact set, same Quality Bar, same Spec Ambiguity Test.</p>
+
+    <h3>Four Phases</h3>
+    <ol>
+      <li><strong>Topology discovery.</strong> Dependency / package / module analysis produces a candidate scope tree. AI proposes; human validates. Output: an agreed scope tree before any artifact authoring.</li>
+      <li><strong>Leaf recovery.</strong> Per leaf, from code + existing tests, draft a Detailed Design, TestSpec, and leaf ADRs for visible technology. Human adds intent (why this leaf exists, what invariants must hold). Spec Ambiguity Test is the gate.</li>
+      <li><strong>Branch + root recovery.</strong> Bottom-up. Draft Architecture from child designs (composition pattern, interfaces, allocations). Draft Requirements from child contracts + externally supplied QAs. Draft TestSpec (integration at branch, system at root). Draft ADRs for visible technology. Human supplies missing rationale.</li>
+      <li><strong>Product Brief recovery</strong> (optional). Requires conversations with product owners / users. Deferred when stakeholders are inaccessible; the system runs on everything below without it.</li>
     </ol>
 
-    <h3>Staleness States</h3>
+    <h3>Read-Only on Code</h3>
+    <p>Retrofit produces specifications + a gap report. Code modifications are a separate follow-up activity.</p>
+
+    <h3>Recovery Status Discipline</h3>
+    <p>Fields split by type.</p>
     <div class="card-grid">
       <div class="card">
-        <h4>Fresh</h4>
-        <p>All hashes match. The trace link is still valid.</p>
+        <h4>Code-derivable fields</h4>
+        <p>Evidence exists in code, tests, git, schemas, committed comments.</p>
+        <p>Allowed states: <code>verified</code> | <code>reconstructed</code> | <code>unknown</code>.</p>
       </div>
-      <div class="card">
-        <h4>Source-Stale</h4>
-        <p>The source artifact changed. The link may no longer be accurate. Needs re-verification.</p>
-      </div>
-      <div class="card">
-        <h4>Target-Stale</h4>
-        <p>The target changed (code was modified, test was rewritten). The link may no longer reflect reality.</p>
-      </div>
-      <div class="card">
-        <h4>Both-Stale</h4>
-        <p>Both sides changed. Highest priority for review.</p>
+      <div class="card" style="border-left: 4px solid var(--accent-trace);">
+        <h4>Human-only fields</h4>
+        <p>No code-derivable source. ADR context / alternatives / rationale / anticipated consequences. Requirements rationale. Product Brief sections. Detailed Design intent.</p>
+        <p>Allowed states: <code>verified</code> | <code>unknown</code> only. <strong>No <code>reconstructed</code> state.</strong></p>
       </div>
     </div>
+    <p>The retrofit skill <strong>must refuse</strong> to populate human-only fields with AI inference. Enforced at the skill / tool level. Fabrication of rationale is a hard rule violation, not a quality issue.</p>
 
-    <h3>Rebasing</h3>
-    <p>When a human confirms that a stale link is still valid (the changes don't affect the relationship), the tool <strong>rebases</strong> the link by updating the stored hashes to the current values. This is an explicit human action, not automatic.</p>
-  </section>
-
-  <!-- ===================== TRACE VALIDATION (STUB) ===================== -->
-  <section id="trace-validation" class="content-section">
-    <h2>Trace Validation</h2>
-    <div class="stub-banner">
-      <h3>Coming Soon</h3>
-      <p>Trace validation rules are in the backlog: link type rules (which artifact types can be source/target), completeness rules (required links per artifact type per assurance level), orphan detection, and coverage metrics.</p>
-    </div>
-  </section>
-
-  <!-- ===================== E2E: INTRO ===================== -->
-  <section id="e2e-intro" class="content-section">
-    <h2>End-to-End: Calculator Example</h2>
-    <p class="lead">This walkthrough takes a simple calculator application through the entire V-model, showing every artifact and every trace link from system requirement down to unit test.</p>
-
-    <h3>The Project</h3>
-    <p>We&rsquo;re building a basic arithmetic calculator. It takes two numbers and an operator, and returns the result. Simple enough to understand in minutes, but rich enough to demonstrate every V-model concept.</p>
-
-    <h3>What You&rsquo;ll See</h3>
-    <ol>
-      <li><strong>System Requirement</strong> &rarr; defines what the system must do at the highest level</li>
-      <li><strong>SW Requirements</strong> &rarr; decompose the system requirement into testable software requirements</li>
-      <li><strong>Architecture</strong> &rarr; organize the software into components</li>
-      <li><strong>Detailed Design</strong> &rarr; specify each unit precisely</li>
-      <li><strong>Implementation</strong> &rarr; write the code</li>
-      <li><strong>Verification</strong> &rarr; unit tests, integration tests, back up the V</li>
-      <li><strong>Trace Matrix</strong> &rarr; the complete picture showing every link</li>
-    </ol>
-
-    <p>Navigate each step using the sidebar, or read through sequentially.</p>
-  </section>
-
-  <!-- ===================== E2E: REQUIREMENTS ===================== -->
-  <section id="e2e-requirements" class="content-section">
-    <h2>Calculator: Requirements</h2>
-    <span class="level-indicator left">Left Side &middot; Levels 0–1</span>
-
-    <h3>System Requirement</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code>artifact_id: "SYSREQ-001"
-artifact_type: "system-requirement"
-version: "1.0.0"
-status: "approved"
-
-body:
-  title: "Arithmetic Operations"
-  statement: >
-    The system shall perform addition, subtraction, multiplication,
-    and division operations on two user-provided numerical inputs
-    and display the result.
-  requirement_type: "functional"
-  verification_method: "test"
-  rationale: >
-    Core capability defining the system's purpose as a basic
-    arithmetic calculator.</code>
-    </div>
-
-    <h3>Derived SW Requirements</h3>
-    <p>The system requirement decomposes into individual, testable SW requirements:</p>
-
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code># SWREQ-001: Addition
-artifact_id: "SWREQ-001"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "approved"
-body:
-  title: "Addition of two numbers"
-  statement: >
-    When the user provides two numerical inputs and selects the
-    addition operation, the calculator shall display the arithmetic
-    sum of the two inputs.
-  verification_method: "test"
-  rationale: "Derived from SYSREQ-001."
-
----
-# SWREQ-002: Subtraction
-artifact_id: "SWREQ-002"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "approved"
-body:
-  title: "Subtraction of two numbers"
-  statement: >
-    When the user provides two numerical inputs and selects the
-    subtraction operation, the calculator shall display the
-    arithmetic difference (left minus right) of the two inputs.
-  verification_method: "test"
-  rationale: "Derived from SYSREQ-001."
-
----
-# SWREQ-003: Multiplication
-artifact_id: "SWREQ-003"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "approved"
-body:
-  title: "Multiplication of two numbers"
-  statement: >
-    When the user provides two numerical inputs and selects the
-    multiplication operation, the calculator shall display the
-    arithmetic product of the two inputs.
-  verification_method: "test"
-  rationale: "Derived from SYSREQ-001."
-
----
-# SWREQ-004: Division
-artifact_id: "SWREQ-004"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "approved"
-body:
-  title: "Division of two numbers"
-  statement: >
-    When the user provides two numerical inputs and selects the
-    division operation, and the divisor is not zero, the calculator
-    shall display the arithmetic quotient (left divided by right)
-    of the two inputs.
-  verification_method: "test"
-  rationale: "Derived from SYSREQ-001."
-
----
-# SWREQ-005: Division by zero handling
-artifact_id: "SWREQ-005"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "approved"
-body:
-  title: "Division by zero error"
-  statement: >
-    When the user selects division and the divisor is zero,
-    the calculator shall display an error message indicating
-    that division by zero is not permitted.
-  verification_method: "test"
-  rationale: "Derived from SYSREQ-001. Error case for division."
-  attributes:
-    derived: true
-
----
-# SWREQ-006: Input validation
-artifact_id: "SWREQ-006"
-artifact_type: "sw-requirement"
-version: "1.0.0"
-status: "approved"
-body:
-  title: "Invalid input handling"
-  statement: >
-    When the user provides input that cannot be parsed as a
-    numerical value, the calculator shall display an error
-    message indicating the input is invalid.
-  verification_method: "test"
-  rationale: "Derived during architecture analysis — input parser needs defined behavior for invalid input."
-  attributes:
-    derived: true</code>
-    </div>
-
-    <h3>Trace Links (so far)</h3>
-    <div class="trace-flow">
-      <span class="artifact-ref">SYSREQ-001</span>
-      <span class="arrow">&rarr; derives &rarr;</span>
-      <span class="artifact-ref">SWREQ-001</span>
-      <span class="artifact-ref">SWREQ-002</span>
-      <span class="artifact-ref">SWREQ-003</span>
-      <span class="artifact-ref">SWREQ-004</span>
-      <span class="artifact-ref">SWREQ-005</span>
-      <span class="artifact-ref">SWREQ-006</span>
-    </div>
-  </section>
-
-  <!-- ===================== E2E: ARCHITECTURE ===================== -->
-  <section id="e2e-architecture" class="content-section">
-    <h2>Calculator: Architecture</h2>
-    <span class="level-indicator left">Left Side &middot; Level 2</span>
-
-    <p>The architecture was already shown in the <a href="#artifact-sw-architecture" onclick="window.showSection && showSection('artifact-sw-architecture')">SW Architecture</a> section. Here&rsquo;s how requirements are allocated to components:</p>
-
-    <h3>Requirement Allocation</h3>
-    <table class="field-table">
-      <thead><tr><th>Requirement</th><th>Component</th><th>Rationale</th></tr></thead>
-      <tbody>
-        <tr><td><code>SWREQ-001</code> (Addition)</td><td><code>arithmetic-engine</code></td><td>Arithmetic logic</td></tr>
-        <tr><td><code>SWREQ-002</code> (Subtraction)</td><td><code>arithmetic-engine</code></td><td>Arithmetic logic</td></tr>
-        <tr><td><code>SWREQ-003</code> (Multiplication)</td><td><code>arithmetic-engine</code></td><td>Arithmetic logic</td></tr>
-        <tr><td><code>SWREQ-004</code> (Division)</td><td><code>arithmetic-engine</code></td><td>Arithmetic logic</td></tr>
-        <tr><td><code>SWREQ-005</code> (Div by zero)</td><td><code>arithmetic-engine</code></td><td>Error handling in arithmetic</td></tr>
-        <tr><td><code>SWREQ-006</code> (Invalid input)</td><td><code>input-parser</code></td><td>Input validation</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Trace Links</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code># trace file for SWREQ-001
-source: "SWREQ-001"
-source_hash: "c4e2a1b7"
-links:
-  - type: "allocated-to"
-    target: "ARCH-001"
-    target_hash: "f1d3b8a2"
-
-# (similar for SWREQ-002 through SWREQ-006)</code>
-    </div>
-  </section>
-
-  <!-- ===================== E2E: DESIGN ===================== -->
-  <section id="e2e-design" class="content-section">
-    <h2>Calculator: Detailed Design</h2>
-    <span class="level-indicator left">Left Side &middot; Level 3</span>
-
-    <p>The arithmetic engine design was shown in <a href="#artifact-detailed-design" onclick="window.showSection && showSection('artifact-detailed-design')">Detailed Design</a>. Here&rsquo;s the input parser design:</p>
-
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code>artifact_id: "DD-002"
-artifact_type: "detailed-design"
-version: "1.0.0"
-status: "draft"
-
-body:
-  title: "Input Parser"
-  description: "Parses string input into validated numerical operands."
-  unit_id: "InputParser"
-  component: "input-parser"
-
-  responsibilities:
-    - "Parse a string into a floating-point number"
-    - "Reject non-numeric input with a descriptive error"
-
-  interfaces:
-    inputs:
-      - name: "raw_input"
-        type: "string"
-        description: "User-provided input string"
-    outputs:
-      - name: "result"
-        type: "union"
-        variants:
-          - name: "success"
-            fields:
-              - { name: "value", type: "float" }
-          - name: "error"
-            fields:
-              - { name: "message", type: "string" }
-
-  behavior:
-    - condition: "raw_input is a valid numeric string"
-      step: "Parse to float and return success"
-    - condition: "raw_input is empty or whitespace-only"
-      step: "Return error 'Input is empty'"
-
-  error_handling:
-    - condition: "raw_input cannot be parsed as a number"
-      behavior: "Return error 'Invalid input: not a number'"
-
-  constraints:
-    - "Must be stateless"
-    - "Must handle leading/trailing whitespace (trim before parse)"</code>
-    </div>
-
-    <h3>Trace Links</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code># DD-001 traces
-source: "DD-001"
-source_hash: "a3f7c2d1"
-links:
-  - type: "derived-from"
-    target: "SWREQ-001"
-    target_hash: "c4e2a1b7"
-  - type: "derived-from"
-    target: "SWREQ-002"
-    target_hash: "d5f3b2c8"
-  - type: "derived-from"
-    target: "SWREQ-003"
-    target_hash: "e6a4c3d9"
-  - type: "derived-from"
-    target: "SWREQ-004"
-    target_hash: "f7b5d4ea"
-  - type: "derived-from"
-    target: "SWREQ-005"
-    target_hash: "08c6e5fb"
-
-# DD-002 traces
-source: "DD-002"
-source_hash: "19d7f6ac"
-links:
-  - type: "derived-from"
-    target: "SWREQ-006"
-    target_hash: "2ae807bd"</code>
-    </div>
-  </section>
-
-  <!-- ===================== E2E: IMPLEMENTATION ===================== -->
-  <section id="e2e-implementation" class="content-section">
-    <h2>Calculator: Implementation</h2>
-    <span class="level-indicator bottom">Bottom &middot; Level 4</span>
-
-    <p>Implementation is real code files. Here&rsquo;s what the code might look like (Java example, but the V-model is language-agnostic):</p>
-
-    <div class="code-block">
-      <span class="lang-label">java</span>
-      <code>public class ArithmeticEngine {
-
-    public Result compute(double left, double right, Operator op) {
-        return switch (op) {
-            case ADD      -> Result.success(left + right, "add");
-            case SUBTRACT -> Result.success(left - right, "subtract");
-            case MULTIPLY -> Result.success(left * right, "multiply");
-            case DIVIDE   -> right == 0
-                ? Result.error("DIVISION_BY_ZERO", "Cannot divide by zero")
-                : Result.success(left / right, "divide");
-        };
-    }
-}</code>
-    </div>
-
-    <div class="code-block">
-      <span class="lang-label">java</span>
-      <code>public class InputParser {
-
-    public ParseResult parse(String rawInput) {
-        if (rawInput == null || rawInput.trim().isEmpty()) {
-            return ParseResult.error("Input is empty");
-        }
-        try {
-            double value = Double.parseDouble(rawInput.trim());
-            return ParseResult.success(value);
-        } catch (NumberFormatException e) {
-            return ParseResult.error("Invalid input: not a number");
-        }
-    }
-}</code>
-    </div>
-
-    <h3>Trace Links</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code># DD-001 implementation trace
-source: "DD-001"
-source_hash: "a3f7c2d1"
-links:
-  - type: "implemented-by"
-    target: "src/main/java/com/example/calc/ArithmeticEngine.java"
-    target_hash: "3bf918ce"
-
-# DD-002 implementation trace
-source: "DD-002"
-source_hash: "19d7f6ac"
-links:
-  - type: "implemented-by"
-    target: "src/main/java/com/example/calc/InputParser.java"
-    target_hash: "4ca029df"</code>
-    </div>
-  </section>
-
-  <!-- ===================== E2E: VERIFICATION ===================== -->
-  <section id="e2e-verification" class="content-section">
-    <h2>Calculator: Verification</h2>
-    <span class="level-indicator right">Right Side &middot; Levels 3–0</span>
-
-    <h3>System Test (Level 0 — verifies System Requirements)</h3>
-    <p>At the top of the right side, we verify that SYSREQ-001 is satisfied at the system level:</p>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code>artifact_id: "SYSTEST-001"
-artifact_type: "system-test-case"
-version: "1.0.0"
-status: "draft"
-
-body:
-  title: "Arithmetic Operations — End-to-End"
-  objective: >
-    Verify that the calculator correctly performs all four arithmetic
-    operations with user-provided inputs and displays the result.
-  verification_method: "test"
-
-  preconditions:
-    - "Calculator application is running"
-    - "No previous calculation state (fresh session)"
-
-  steps:
-    - step_number: 1
-      action: "Enter 2 and 3, select addition"
-      expected_result: "Display shows 5"
-    - step_number: 2
-      action: "Enter 6 and 3, select division"
-      expected_result: "Display shows 2"
-    - step_number: 3
-      action: "Enter 6 and 0, select division"
-      expected_result: "Display shows error message for division by zero"</code>
-    </div>
-
-    <h3>System Test Trace Links</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code># SYSREQ-001 system-level verification
-source: "SYSREQ-001"
-source_hash: "b2c3d4e5"
-links:
-  - type: "verified-by"
-    target: "SYSTEST-001"
-    target_hash: "f1a2b3c4"</code>
-    </div>
-
-    <h3>Unit Tests (Level 3 — verifies Detailed Design)</h3>
-    <div class="code-block">
-      <span class="lang-label">java</span>
-      <code>class ArithmeticEngineTest {
-
-    private final ArithmeticEngine engine = new ArithmeticEngine();
-
-    @Test void addition()       { assertEquals(5.0, engine.compute(2, 3, ADD).value()); }
-    @Test void subtraction()    { assertEquals(-1.0, engine.compute(2, 3, SUBTRACT).value()); }
-    @Test void multiplication() { assertEquals(6.0, engine.compute(2, 3, MULTIPLY).value()); }
-    @Test void division()       { assertEquals(2.0, engine.compute(6, 3, DIVIDE).value()); }
-
-    @Test void divisionByZero() {
-        Result r = engine.compute(6, 0, DIVIDE);
-        assertTrue(r.isError());
-        assertEquals("DIVISION_BY_ZERO", r.errorCode());
-    }
-}</code>
-    </div>
-
-    <h3>Verification Trace Links</h3>
-    <div class="code-block">
-      <span class="lang-label">yaml</span>
-      <code># DD-001 verification
-source: "DD-001"
-source_hash: "a3f7c2d1"
-links:
-  - type: "verified-by"
-    target: "src/test/java/com/example/calc/ArithmeticEngineTest.java"
-    target_hash: "5db13ae0"
-  - type: "results"
-    target: "build/reports/TEST-ArithmeticEngineTest.xml"
-    target_hash: "6ec24bf1"
-    format: "junit-xml"
-  - type: "coverage"
-    target: "build/reports/jacoco/ArithmeticEngine.html"
-    target_hash: "7fd35ca2"
-    format: "jacoco"</code>
-    </div>
-  </section>
-
-  <!-- ===================== E2E: TRACE MATRIX ===================== -->
-  <section id="e2e-trace-matrix" class="content-section">
-    <h2>Calculator: Trace Matrix</h2>
-    <p class="lead">The complete traceability picture — every artifact and every link.</p>
-
+    <h3>Gap Report</h3>
+    <p>First-class deliverable, alongside artifacts.</p>
     <table class="field-table">
       <thead>
-        <tr><th>System Req</th><th>System Test</th><th>SW Req</th><th>Architecture</th><th>Design</th><th>Code</th><th>Unit Test</th></tr>
+        <tr><th>Gap</th><th>Meaning</th><th>Framework response</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td rowspan="5"><code>SYSREQ-001</code></td>
-          <td rowspan="5"><code>SYSTEST-001</code></td>
-          <td><code>SWREQ-001</code></td>
-          <td rowspan="5"><code>ARCH-001</code><br><em>arithmetic-engine</em></td>
-          <td rowspan="5"><code>DD-001</code></td>
-          <td rowspan="5"><code>ArithmeticEngine.java</code></td>
-          <td rowspan="5"><code>ArithmeticEngineTest.java</code></td>
-        </tr>
-        <tr><td><code>SWREQ-002</code></td></tr>
-        <tr><td><code>SWREQ-003</code></td></tr>
-        <tr><td><code>SWREQ-004</code></td></tr>
-        <tr><td><code>SWREQ-005</code></td></tr>
-        <tr>
-          <td><code>SYSREQ-001</code></td>
-          <td><code>SYSTEST-001</code></td>
-          <td><code>SWREQ-006</code></td>
-          <td><code>ARCH-001</code><br><em>input-parser</em></td>
-          <td><code>DD-002</code></td>
-          <td><code>InputParser.java</code></td>
-          <td><code>InputParserTest.java</code></td>
-        </tr>
+        <tr><td>Unintentioned leaf</td><td>Leaf with no discoverable purpose after human review</td><td>Candidate for removal / refactoring</td></tr>
+        <tr><td>Test coverage gap</td><td>DD contract has no linked test</td><td>Backlog item for test writing</td></tr>
+        <tr><td>Ambiguous spec</td><td>Artifact fails Spec Ambiguity Test even after human review</td><td>Refactor code for clarity, or document the gap</td></tr>
+        <tr><td>Lost rationale</td><td>Requirement derivable but rationale absent</td><td><code>recovery_status: unknown</code> &rarr; stakeholder follow-up</td></tr>
+        <tr><td>Structural drift</td><td>Retrofit-derived architecture differs from existing documented architecture</td><td>Flag; reconciliation required</td></tr>
+        <tr><td>ADR without decision record</td><td>Technology visible in code but context lost</td><td>ADR drafted with <code>recovery_status: unknown</code> on context / alternatives</td></tr>
       </tbody>
     </table>
 
-    <h3>What This Tells Us</h3>
-    <ul>
-      <li><strong>No orphans</strong> &mdash; every requirement traces down to code and up to tests</li>
-      <li><strong>No gaps</strong> &mdash; every design has implementation and verification evidence</li>
-      <li><strong>Staleness is detectable</strong> &mdash; if anyone changes <code>ArithmeticEngine.java</code>, the hash check will flag the DD-001 &rarr; implemented-by link as stale</li>
-      <li><strong>Impact analysis is instant</strong> &mdash; if SWREQ-004 (division) changes, we know DD-001, ArithmeticEngine.java, and ArithmeticEngineTest.java are affected</li>
-    </ul>
+    <p>Primary purpose of retrofit: establish an honest floor of documentation from which forward development can proceed. Secondary: surface gaps. A retrofit output with many <code>unknown</code> fields is not a partial failure &mdash; it is the correct outcome when rationale is lost.</p>
   </section>
 
-  <!-- ===================== THREE PILLARS ===================== -->
-  <section id="fw-pillars" class="content-section">
-    <h2>VModelWorkflow: Three Pillars</h2>
-    <p class="lead">VModelWorkflow is built as three independent pillars that can be used standalone or combined. No pillar depends on the others to function.</p>
+  <!-- ===================== UPDATE MODE ===================== -->
+  <section id="update-mode" class="content-section">
+    <h2>Update Mode</h2>
+    <p class="lead">Enter at the highest layer that must change. A change enters at layer N if N is where something genuinely new (not derivable from existing artifacts) gets introduced.</p>
 
-    <div class="card-grid">
-      <div class="card">
-        <h4>Pillar 1: V-Model Compliance</h4>
-        <p>Schemas, templates, and checklists defining what artifacts are needed and what they look like. This is the <strong>definitional</strong> layer.</p>
-        <p><strong>Usable by:</strong> humans, agents, or both.</p>
-        <p><strong>Alone:</strong> A human team gets V-model templates and checklists.</p>
-      </div>
-      <div class="card">
-        <h4>Pillar 2: Traceability</h4>
-        <p>Data model and engine for linking artifacts, validating completeness, and detecting gaps. This is the <strong>relational</strong> layer.</p>
-        <p><strong>Usable by:</strong> humans, CI/CD, agents, anyone.</p>
-        <p><strong>Alone:</strong> Can validate any YAML artifacts regardless of how they were created.</p>
-      </div>
-      <div class="card">
-        <h4>Pillar 3: Agentic Skills</h4>
-        <p>Prompt packages that guide AI agents to produce quality V-model artifacts. Craft skills (standalone) + orchestration (workflow).</p>
-        <p><strong>Usable by:</strong> AI agents.</p>
-        <p><strong>Alone:</strong> Someone can use a single requirement-writing skill outside the framework.</p>
-      </div>
-    </div>
+    <h3>Entry-Layer Decision Table</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>Change source</th><th>Entry layer</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>New stakeholder, outcome, scope expansion</td><td>Product Brief</td></tr>
+        <tr><td>New behavior under an existing outcome</td><td>Requirements (at the scope where it applies)</td></tr>
+        <tr><td>Re-allocation of existing behavior to a different component</td><td>Architecture</td></tr>
+        <tr><td>Technology swap / pattern change</td><td>ADR + Architecture Composition</td></tr>
+        <tr><td>Algorithm or state-machine change</td><td>Detailed Design</td></tr>
+        <tr><td>Bug fix where spec was correct, code was wrong</td><td>Implementation (Build workflow)</td></tr>
+        <tr><td>Bug fix where spec was ambiguous or wrong</td><td>The layer whose spec was wrong</td></tr>
+      </tbody>
+    </table>
 
-    <h3>Combination Modes</h3>
-    <ul>
-      <li><strong>Pillar 1 alone</strong> &mdash; human team with V-model templates</li>
-      <li><strong>Pillar 1 + 2</strong> &mdash; human team with templates + automated completeness checking</li>
-      <li><strong>Pillar 1 + 2 + 3</strong> &mdash; full agentic V-model development</li>
-      <li><strong>Pillar 3 craft skills alone</strong> &mdash; just want a good requirement-writing prompt</li>
-    </ul>
+    <h3>Candidate-Set Propagation</h3>
+    <p>Tooling walks traceability forward from the entry-layer change and produces a <strong>candidate set</strong> of artifacts that may need updates. The change is incomplete until every candidate is either updated or explicitly closed as "no change needed" with a brief reason.</p>
 
-    <h3>Independence Principle</h3>
-    <p>Pillar independence is enforced by design:</p>
-    <ul>
-      <li>Craft skills reference Pillar 1 schemas via <code>schema_ref</code>, but schemas don&rsquo;t know about skills</li>
-      <li>The traceability engine reads artifacts defined by Pillar 1 schemas, but schemas don&rsquo;t know about the engine</li>
-      <li>Artifacts have no <code>trace_up</code>/<code>trace_down</code> fields &mdash; traceability is entirely Pillar 2&rsquo;s concern</li>
-    </ul>
+    <h3>Upward Propagation</h3>
+    <p>If a gap is discovered downstream, the change's entry layer retroactively rises. The impact set recomputes from the higher entry. If a code fix implies the spec was wrong, the spec is the entry &mdash; not the code.</p>
   </section>
 
-  <!-- ===================== DRTDD ===================== -->
-  <section id="fw-drtdd" class="content-section">
-    <h2>DRTDD: Design-Requirement-Test Driven Development</h2>
-    <p class="lead">DRTDD extends TDD by adding design and requirement phases before the test-code loop. Each phase produces traceable artifacts.</p>
+  <!-- ===================== BUILD WORKFLOW ===================== -->
+  <section id="build-workflow" class="content-section">
+    <h2>Build Workflow</h2>
+    <p class="lead">Consumes specifications, produces code + tests. Designed in its own later session; decisions already fixed below.</p>
 
-    <h3>The Flow</h3>
-    <div class="code-block"><code>REQUIRE ──→ DESIGN ──→ TEST (red) ──→ IMPLEMENT (green) ──→ REFACTOR ──→ VERIFY
-   │            │           │              │                │            │
-   ▼            ▼           ▼              ▼                ▼            ▼
- SW Req    Detailed     Test file      Source file      (same files)  Trace links
- artifact   Design      (failing)      (passing)        (cleaner)    updated
-            artifact</code></div>
-
-    <h3>Phase Details</h3>
-    <ol>
-      <li><strong>REQUIRE</strong> &mdash; Write or refine a SW requirement. Gate: human approval.</li>
-      <li><strong>DESIGN</strong> &mdash; Write the detailed design for the unit. Gate: human approval.</li>
-      <li><strong>TEST (red)</strong> &mdash; Derive test cases from the design. Tests must fail (no implementation yet).</li>
-      <li><strong>IMPLEMENT (green)</strong> &mdash; Write the minimum code to make tests pass.</li>
-      <li><strong>REFACTOR</strong> &mdash; Clean up without changing behavior. Tests still pass.</li>
-      <li><strong>VERIFY</strong> &mdash; Update trace links, run coverage, confirm all evidence is fresh.</li>
-    </ol>
-
-    <h3>Why Not Just TDD?</h3>
-    <p>TDD (red-green-refactor) is excellent for implementation but doesn&rsquo;t produce the artifacts needed for V-model compliance. DRTDD wraps TDD in a specification and traceability layer:</p>
+    <h3>Already Decided</h3>
     <ul>
-      <li>You know <em>why</em> you&rsquo;re writing this code (requirement)</li>
-      <li>You know <em>what</em> it should do precisely (design)</li>
-      <li>You have evidence that it <em>does</em> what it should (test + trace)</li>
+      <li><strong>No runtime coupling to Specification.</strong> Artifacts are the sole contract.</li>
+      <li><strong>Build chunks as it sees fit.</strong> Pick-up strategy is Build's call based on its own context budget and decomposition choices.</li>
+      <li><strong>Build-side artifacts add <code>realizes</code> links</strong> to the traceability graph. Spec artifacts stay oblivious to them.</li>
+      <li><strong>Insufficient spec &rarr; escalate.</strong> When Build cannot implement, the change enters the Specification workflow at the appropriate layer. Build does not hunt external channels for intent; if intent is not in the spec, the spec failed the Spec Ambiguity Test and the spec updates.</li>
+      <li><strong>Declarative IaC has no extra DD layer.</strong> Architecture Composition is the intent spec; IaC (terraform / k8s / compose) is the implementation.</li>
     </ul>
+
+    <h3>Open Question</h3>
+    <p>Whether imperative wiring code (DI containers, middleware stacks, event-bus setup) warrants its own Detailed Design, or whether Architecture Composition + integration TestSpec is sufficient. Deferred to the Build workflow design session.</p>
   </section>
 
-  <!-- ===================== SKILLS (STUB) ===================== -->
-  <section id="fw-skills" class="content-section">
-    <h2>Skill System</h2>
-    <div class="stub-banner">
-      <h3>Coming Soon</h3>
-      <p>Documentation for the craft skill and orchestration system. Craft skills teach AI agents <em>how</em> to do one thing well. Orchestration handles <em>when</em> and <em>what</em> to hand off.</p>
-      <p>Key concepts: single responsibility per skill, typed input/output contracts, model-tier variants, deterministic validation, composability via orchestration.</p>
+  <!-- ===================== SKILLS ===================== -->
+  <section id="skills" class="content-section">
+    <h2>Skills Architecture</h2>
+    <p class="lead">Three-layer model: skills (atomic units) &rarr; agents (specialised execution environments) &rarr; orchestration (pipeline control). Skills are built against the Documentation component.</p>
+
+    <h3>The Three Layers</h3>
+    <ul>
+      <li><strong>Skills</strong> &mdash; atomic units. <em>Craft skills</em> (standalone best practices, framework-independent) and <em>framework skills</em> (VModelWorkflow-specific: template formats, traceability link creation, orchestration glue).</li>
+      <li><strong>Agents</strong> &mdash; specialised execution environments. Subagents with isolated contexts, scoped tool access, structured I/O contracts. Compose skills into producer and reviewer roles.</li>
+      <li><strong>Orchestration</strong> &mdash; pipeline control. Research / plan session, task decomposer, pipeline controller. Document-based handoffs via YAML on disk &mdash; any session can crash and restart from the last written artifact.</li>
+    </ul>
+
+    <h3>Skill Design Rules</h3>
+    <ul>
+      <li>Naming: <code>vmodel-skill-*</code> and <code>vmodel-agent-*</code>.</li>
+      <li>Evaluated on the cheapest viable model tier (typically Haiku) with baseline comparison. Skills must prove value at the cheap tier &mdash; otherwise the leverage is illusory.</li>
+      <li>Document-based handoffs for crash-tolerance and auditability.</li>
+    </ul>
+
+    <div class="card">
+      <p><strong>Stale-reference note.</strong> The detailed skills-architecture HTML at <a href="skills-architecture.html">skills-architecture.html</a> is <em>pre-pivot</em> and does not reflect the six-artifact model. It will be rewritten in Phase 5 (<code>BACKLOG §3.5</code>). Until then, treat the detailed page as historical record; this section plus <code>TARGET_ARCHITECTURE §11</code> are authoritative.</p>
     </div>
   </section>
 
-  <!-- ===================== ASSURANCE LEVELS (STUB) ===================== -->
-  <section id="fw-assurance" class="content-section">
-    <h2>Assurance Levels</h2>
-    <div class="stub-banner">
-      <h3>Coming Soon</h3>
-      <p>Assurance level configuration: how rigor scales from Level 1 (highest) to Level 5 (lowest). Coverage targets, verification methods, documentation formality, and review independence per level.</p>
-      <p>Maps to: <span data-term="assurance-level">Assurance Level</span> in each domain (DAL in aviation, ASIL in automotive).</p>
-    </div>
+  <!-- ===================== REFERENCES ===================== -->
+  <section id="references" class="content-section">
+    <h2>References</h2>
+
+    <h3>Planning Documents (authoritative)</h3>
+    <ul>
+      <li><code>docs/plan/TARGET_ARCHITECTURE.md</code> &mdash; stable architectural reference. Six-artifact model, workflows, rigor model, traceability model, tools architecture, open questions.</li>
+      <li><code>docs/plan/BACKLOG.md</code> &mdash; execution plan. Phase state, upcoming work, deferred items.</li>
+      <li><code>docs/plan/PHASE2_AUTHORING_PATTERN.md</code> &mdash; craft-documentation authoring pattern captured during Phase 2.</li>
+      <li><code>CLAUDE.md</code> &mdash; project conventions and working process.</li>
+    </ul>
+
+    <h3>Per-Artifact Craft Pages</h3>
+    <ul>
+      <li><a href="artifacts/product-brief.html">Product Brief</a></li>
+      <li><a href="artifacts/requirements.html">Requirements</a></li>
+      <li><a href="artifacts/architecture.html">Architecture</a></li>
+      <li><a href="artifacts/adr.html">ADR</a></li>
+      <li><a href="artifacts/detailed-design.html">Detailed Design</a></li>
+      <li><a href="artifacts/testspec.html">TestSpec</a></li>
+    </ul>
+
+    <h3>Archive</h3>
+    <p>Pre-pivot design record preserved at <code>archive/pre-pivot-2026-04-18/</code>. Includes: original status session (<code>status.md</code>), concept-map README, pre-pivot artifact HTML pages (superseded by the six post-pivot pages above), and archived domain-translation JSON plugins.</p>
   </section>
 
 </main>
@@ -1895,52 +603,21 @@ links:
 <!-- ============================================================
      SCRIPTS
      ============================================================ -->
-<script src="js/domain.js"></script>
-<script src="js/v-diagram.js"></script>
 <script src="js/app.js"></script>
 <script>
 (function() {
   'use strict';
 
-  // --- Initialize modules ---
-  const domainManager = createDomainManager(document);
   const nav = createNavigation(document);
-  const diagram = createVDiagram();
 
-  // --- Mount V-Diagram ---
-  const diagramMount = document.getElementById('v-diagram-mount');
-  if (diagramMount) {
-    diagramMount.innerHTML = diagram.toSVG({ width: 900, height: 520 });
-  }
-
-  // --- Load domain plugins ---
-  async function loadDomains() {
-    const domainFiles = ['do178c', 'aspice'];
-    for (const id of domainFiles) {
-      try {
-        const resp = await fetch(`domains/${id}.json`);
-        if (resp.ok) {
-          const data = await resp.json();
-          domainManager.registerDomain(data);
-        }
-      } catch (e) {
-        console.warn(`Could not load domain plugin: ${id}`, e);
-      }
-    }
-  }
-
-  // --- Navigation ---
-  // Make showSection available globally for onclick handlers in HTML
   window.showSection = function(sectionId) {
     nav.showSection(sectionId);
     history.replaceState(null, '', '#' + sectionId);
   };
 
-  // Sidebar link clicks
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', function(e) {
       const href = this.getAttribute('href') || '';
-      // Let external links (non-hash) navigate normally
       if (href && !href.startsWith('#')) return;
       e.preventDefault();
       const section = this.getAttribute('data-section');
@@ -1948,52 +625,16 @@ links:
     });
   });
 
-  // V-diagram node clicks
-  document.addEventListener('click', function(e) {
-    const node = e.target.closest('.v-node');
-    if (node) {
-      const section = node.getAttribute('data-section');
-      if (section) window.showSection(section);
-    }
-  });
-
-  // V-diagram trace line hover
-  document.addEventListener('mouseover', function(e) {
-    if (e.target.classList && e.target.classList.contains('trace-line')) {
-      e.target.classList.add('highlighted');
-    }
-  });
-  document.addEventListener('mouseout', function(e) {
-    if (e.target.classList && e.target.classList.contains('trace-line')) {
-      e.target.classList.remove('highlighted');
-    }
-  });
-
-  // Hash-based routing
   function navigateFromHash() {
     const hash = window.location.hash.replace('#', '');
     if (hash) {
       nav.showSection(hash);
     } else {
-      nav.showSection('v-model-overview');
+      nav.showSection('overview');
     }
   }
   window.addEventListener('hashchange', navigateFromHash);
-
-  // --- Domain switcher ---
-  const domainSelect = document.getElementById('domain-select');
-  if (domainSelect) {
-    domainSelect.addEventListener('change', function() {
-      domainManager.switchDomain(this.value);
-      domainManager.applyToDOM();
-    });
-  }
-
-  // --- Boot ---
-  loadDomains().then(() => {
-    navigateFromHash();
-  });
-
+  navigateFromHash();
 })();
 </script>
 

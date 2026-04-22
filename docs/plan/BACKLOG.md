@@ -8,15 +8,19 @@ Execution plan for the VModelWorkflow framework following the 2026-04-18 pivot. 
 
 - **Pivot committed 2026-04-18.** Pre-pivot design record preserved at `archive/pre-pivot-2026-04-18/`.
 - **Phase 0** — archival — **DONE** (commit `69330f3`, 2026-04-18).
-- **Phase 1** — foundation rewrite (this document + `TARGET_ARCHITECTURE.md` + `CLAUDE.md`) — **IN PROGRESS** (this commit).
-- Phases 2–7 — pending.
+- **Phase 1** — foundation rewrite (this document + `TARGET_ARCHITECTURE.md` + `CLAUDE.md`) — **DONE**.
+- **Phase 2** — per-artifact documentation + cleanup — **DONE** (2026-04-22). Six artifact pages authored under the 5-section structure, landing-page rewrite against TARGET_ARCHITECTURE, domain-plugin machinery unwired, pre-pivot artifact pages archived. See §3.2.
+- Phases 3–7 — pending.
 
 **Preserved and operational:**
-- Lower V documentation (`docs/guide/artifacts/source-code.html`, `unit-test.html`, `detailed-design.html`) — pre-pivot outputs; content mined as reference, pages replaced in Phase 2.
 - Craft skills `develop-code` (Haiku eval 91%, +13% over baseline), `derive-test-cases` (100%, +3%), `vmodel-skill-review-code` (95.8%, +25%).
 - C2–C4 detailed-design skills (develop-dd, retrofit-dd, review-dd) — paused; superseded by Phase 5 structure.
 - 20 research documents in `research/` (system-level, implementation, detailed-design, pillar3) — reusable **as secondary substrate with an explicit safety-bias caveat** (authored pre-pivot with ASPICE/DO-178C framing; extract craft, discard framing).
-- Domain translation layer (`docs/guide/domains/`) — **deferred.** JSON files to be archived to `archive/pre-pivot-2026-04-18/domains/` as a Phase 2 task (see §3.2); plugin mechanism parked for post-Phase 2 revisit (see `TARGET_ARCHITECTURE §14`, §15).
+
+**Archived during Phase 2:**
+- Pre-pivot artifact HTML pages (`completeness-analysis`, `conops`, `stakeholder-needs`, `system-requirements`, `source-code`, `unit-test`) — moved to `archive/pre-pivot-2026-04-18/docs-guide-artifacts/`; superseded by the six post-pivot pages.
+- Domain translation layer — `docs/guide/domains/*.json` archived to `archive/pre-pivot-2026-04-18/domains/`; `js/domain.js` deleted; CSS and page wiring stripped. Plugin mechanism parked for post-Phase 2 revisit (see `TARGET_ARCHITECTURE §14`, §15).
+- `PHASE2_AUTHORING_PATTERN.md` — moved to `archive/phase2/` after Phase 2 completion. Historical reference for the authoring conventions established while pages were being written.
 
 ---
 
@@ -48,53 +52,34 @@ Architectural rationale — including the full Q8–Q15 and NQ-B/C/D/E decisions
 
 **Dependencies:** None (first commit after Phase 0).
 
-### 3.2 Phase 2 — Per-artifact Documentation
+### 3.2 Phase 2 — Per-artifact Documentation — DONE (2026-04-22)
 
-**Goal:** Rewrite `docs/guide/artifacts/*.html` for the six artifact types under the new **5-section structure** (V-model context, best practices, anti-patterns, examples, Quality Bar). **Whole document per artifact** — no first-pass slicing; all five sections authored together. **No length target.** Governing principle: *information density over length — every paragraph earns its existence.*
+**Goal:** Rewrite `docs/guide/artifacts/*.html` for the six artifact types under the **5-section structure** (V-model context, best practices, anti-patterns, examples, Quality Bar). Whole document per artifact; no length target; information density over length.
 
-**Authoring mode — per-artifact fresh session:**
+**Artifact pages** — all six authored under the 5-section structure:
 
-1. **Explore substrate.** Engineering-codex first. Existing research and HTML with the caveats below.
-2. **Propose structure + gaps.** Back to the user in the main session: section outline, key claims, open questions.
-3. **Write HTML.** Fresh session with approved structure.
-4. **Review + iterate.** User reviews; refine until accepted.
+- [x] **ADR** — 2026-04-19 (commit `8b4fea2`). Pattern-setter; established voice, section ordering, example style.
+- [x] **Detailed Design** — 2026-04-19 (commit `8328d33`). Compression exercise against the largest pre-pivot page; pre-pivot Section 8 "Test Strategy" removed.
+- [x] **Product Brief** — 2026-04-19. Consolidates pre-pivot `stakeholder-needs` + `conops` + `completeness-analysis` into one ~6.5k-word page. NFR Discovery Checklist (10 canonical dimensions) and Mermaid Onion Model introduced.
+- [x] **Requirements** — 2026-04-20. Eight Best-Practice subsections; seven worked examples in one session-management domain. Generalist-gap audit formalised as authoring step.
+- [x] **Architecture** — 2026-04-20. Greenfield page; nine Best-Practice subsections including dedicated Composition-patterns catalog; four Mermaid diagrams. `TARGET_ARCHITECTURE` §5.1 + §6 + §8.4 + §15 amended pre-authoring after industry-practice challenge to the wiring-as-leaf-sibling rule.
+- [x] **TestSpec** — 2026-04-21. Greenfield replacement for pre-pivot `unit-test.html`. Nine Best-Practice subsections with per-layer weight table; four §1 bridge cards; three Mermaid diagrams; empirical LLM testing data carried on page per "docs are superset of skills" rule; 13 anti-patterns.
 
-**Inputs (substrate discipline):**
-- **Engineering codex (`/home/stefanus/repos/engineering-codex/`) — primary.** Software-first, already synthesized and cited. Check here before researching elsewhere.
-- **`research/` — secondary, with explicit safety-bias caveat.** Authored pre-pivot with ASPICE/DO-178C framing; extract craft insights, discard safety-specific framing.
-- **Existing `docs/guide/artifacts/*.html` — pre-pivot outputs, reference only.** Not substrate. Treated as sources of prior phrasing and examples we may reuse, never as inputs to the new structure.
-- `TARGET_ARCHITECTURE.md` — artifact shape per type (§5.3), Quality Bar dimensions (§6).
+**Cross-cutting tasks** — all complete as of 2026-04-22:
 
-**Artifact order** (pattern-setter first, then hardest compression, then upper V):
+- [x] **Domain translation plugin machinery removed** — `js/domain.js` and `js/v-diagram.js` deleted; domain-switcher UI, `.domain-switcher` and `[data-term]` CSS, per-page translation hooks stripped.
+- [x] **Domain JSON files archived** — `docs/guide/domains/*.json` moved to `archive/pre-pivot-2026-04-18/domains/`; domains directory removed.
+- [x] **Pre-pivot artifact pages archived** — `completeness-analysis.html`, `conops.html`, `stakeholder-needs.html`, `system-requirements.html`, `source-code.html`, `unit-test.html` moved to `archive/pre-pivot-2026-04-18/docs-guide-artifacts/`. Pre-pivot validation script moved alongside.
+- [x] **Landing page rewrite** — `docs/guide/index.html` rewritten against `TARGET_ARCHITECTURE`: Introduction, Core Principles, Artifact Model, Per-Artifact Craft links, Workflows, Further Reading. E2E walkthrough, Three Pillars, DRTDD, Assurance Levels, domain vocabulary, and pre-pivot traceability sections removed along with stale inline artifact stubs.
+- [x] **Post-pivot artifact quality review** — light-edit pass against mid-senior audience fit, voice discipline, and TARGET alignment. Hard rule violations (HALT reference, DO-178C standards-defensive citation, residual `js/domain.js` script tag) removed. Voice trims and density trims applied across all six pages. `TARGET_ARCHITECTURE` reconciled: `affects` → `affected_scopes`; TestSpec `type` enum expanded from 5 to 11 values to match the craft page.
 
-- [x] **ADR** — pattern-setter. Lightest refresh (pre-pivot page already closest). Authored first to establish voice, section ordering, abstraction level, example style for the rest. *(Done 2026-04-19, commit `8b4fea2`.)*
-- [x] *After ADR is accepted:* write `docs/plan/PHASE2_AUTHORING_PATTERN.md` capturing chosen voice, section ordering, abstraction level, example style — loaded as context by subsequent fresh sessions so they don't re-invent. *(Done 2026-04-19, commit `8b4fea2`; updated after each subsequent artifact.)*
-- [x] **Detailed Design** — compression exercise. Existing page is the largest; whole-document rewrite under the 5-section structure; remove old Section 8 Test Strategy; reference TestSpec via traceability. *(Done 2026-04-19, commit `8328d33`.)*
-- [x] **Product Brief** — consolidates pre-pivot `stakeholder-needs.html` + `conops.html` + `completeness-analysis.html` into one page under the 5-section structure. *(Done 2026-04-19.)*
-- [ ] **Requirements** — new page: EARS craft, rationale discipline, measurable QAs, interface contracts.
-- [ ] **Architecture** — new page: decomposition, interfaces, **Composition section** (mandatory per `TARGET_ARCHITECTURE §5.3`).
-- [ ] **TestSpec** — new page: derivation strategies, per-layer emphasis, coverage targets, mandatory-non-empty `verifies`.
+**Deliverables (all produced):**
+- Six `docs/guide/artifacts/*.html` pages under the 5-section structure.
+- Rewritten `docs/guide/index.html`.
+- Pre-pivot artifact pages, domain plugin JSON, and domain plugin runtime archived.
+- `PHASE2_AUTHORING_PATTERN.md` — written during the phase and archived to `archive/phase2/` on Phase 2 completion.
 
-**Cross-cutting tasks:**
-
-- [ ] **Remove domain translation plugin machinery from `docs/guide/`** — unwind `js/domain.js` wiring, domain selector UI, any per-page translation hooks. Phase 2 content is authored in direct software-engineering English.
-- [ ] **Archive domain JSON files** — move `docs/guide/domains/*.json` to `archive/pre-pivot-2026-04-18/domains/`.
-- [ ] **Fix navigation** — `docs/guide/index.html` must link to all six artifact pages; validate linkage.
-- [ ] **Strip pre-pivot framing** — remove "V-model for industry product" voice, safety-tier scaling, HW/SW split, and standards-directive tone from any surviving surrounding pages encountered while working.
-
-**Deliverables:**
-- Six authored `docs/guide/artifacts/*.html` pages under the 5-section structure.
-- `docs/plan/PHASE2_AUTHORING_PATTERN.md` (written after artifact 1).
-- Updated `docs/guide/index.html` navigation.
-- Domain plugin runtime removed; domain JSON archived.
-
-**Success criteria:**
-- All six artifact pages authored under the 5-section structure, information-dense (no length target — density is the bar).
-- Navigation links all pages.
-- No residual domain-plugin wiring in `docs/guide/`.
-- `PHASE2_AUTHORING_PATTERN.md` exists and is actually followed by pages 2–6.
-
-**Dependencies:** Phase 1.
+**Dependencies:** Phase 1. **Blocks:** Phase 3 (schemas + Quality Bar YAML derive from these HTML pages).
 
 ### 3.3 Phase 3 — Schemas
 
@@ -311,4 +296,4 @@ Phase 0 (done) → Phase 1 (this commit) → Phase 2 (docs)
 
 ---
 
-*Last updated: 2026-04-19 (Phase 1).*
+*Last updated: 2026-04-22 (Phase 2 complete).*

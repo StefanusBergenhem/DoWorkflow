@@ -234,7 +234,7 @@ governing_adrs: [optional]
 id: TC-<num>
 title: <one line>
 suite: <optional tag>
-type: functional | boundary | error | performance | security
+type: functional | boundary | error | fault-injection | property | state-transition | contract | performance | security | accessibility | error-guessing
 verifies: [IDs from this layer's spec — MANDATORY non-empty]
 preconditions: <state assumed true>
 inputs: <stimuli>
@@ -338,7 +338,7 @@ A concrete Yes/No checklist grouped by concern, subject to the **Spec Ambiguity 
 | `governing_adrs` | Artifact subject to ADR | Any spec artifact | List of ADR IDs |
 | `supersedes` / `superseded_by` | ADR lineage | ADR | ADR |
 | `scope_tags` | ADR's primary scopes | ADR | Scope list |
-| `affects` | ADR's downstream consequence scopes | ADR | Scope list (optional) |
+| `affected_scopes` | ADR's downstream consequence scopes | ADR | Scope list (optional) |
 
 **Reverse relationships** (`realized_by`, `verified_by`, `derives`) are **computed** by tooling, not stored.
 
@@ -643,12 +643,12 @@ The primary value: an honest floor of documentation for forward development, plu
 
 The pre-pivot design positioned generic V-model terminology internally with a **translation plugin system** (`docs/guide/domains/*.json`) mapping to standards-specific vocabulary (DO-178C, ASPICE, ISO 26262, IEC 62304, …) at runtime.
 
-**Current status:** the plugin mechanism is parked for the duration of Phase 2.
+**Current status (as of 2026-04-22):** the plugin mechanism is removed and the JSON files are archived. Phase 2 content is authored in direct software-engineering English across the landing page and the six artifact pages.
 
 1. **Phase 2 content is authored in direct software-engineering English.** No generic/standards translation layer is applied to the text.
-2. **Rationale for deferral.** Running the plugin machinery while simultaneously establishing voice, depth, and rigor in new content creates drift risk: the generic surface and the standards-specific rendering can diverge in both directions. Separating the concerns — get the content right first, translation later — protects Phase 2 quality.
-3. **Reintroduction horizon.** The mechanism (or a simpler successor — e.g., manual domain-specific page variants) may be reintroduced post-Phase 2 when content is stable. See §15.
-4. **Archival.** The existing `docs/guide/domains/*.json` files are to be moved to `archive/pre-pivot-2026-04-18/domains/` as a Phase 2 task, together with removal of the plugin runtime wiring in `docs/guide/`. This is not done by Phase 1.
+2. **Rationale for removal.** Running the plugin machinery while simultaneously establishing voice, depth, and rigor in new content creates drift risk: the generic surface and the standards-specific rendering can diverge in both directions. Separating the concerns — get the content right first, translation later — protected Phase 2 quality.
+3. **Archival status.** `docs/guide/domains/*.json` has been moved to `archive/pre-pivot-2026-04-18/domains/`. `js/domain.js`, the `.domain-switcher` CSS, and all `data-term` hooks have been removed from the live `docs/guide/`.
+4. **Reintroduction horizon.** The mechanism (or a simpler successor — e.g., manual domain-specific page variants) may be reintroduced when a concrete domain-translation need surfaces. See §15.
 
 ---
 

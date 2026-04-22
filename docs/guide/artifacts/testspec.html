@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TestSpec &mdash; VModelWorkflow Guide</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>VModelWorkflow</h1>
+    <div class="subtitle">Spec-Driven Development Guide</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-group-label">Navigation</span>
+      <a class="nav-link" href="../index.html">Back to Main Guide</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">TestSpec</span>
+      <a class="nav-link" href="#ts-context">1. V-Model Context</a>
+      <a class="nav-link" href="#ts-best-practices">2. Best Practices</a>
+      <a class="nav-link" href="#ts-anti-patterns">3. Anti-Patterns</a>
+      <a class="nav-link" href="#ts-examples">4. Examples</a>
+      <a class="nav-link" href="#ts-quality-bar">5. Quality Bar</a>
+      <a class="nav-link" href="#ts-references">References</a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-group-label">Related Artifacts</span>
+      <a class="nav-link" href="product-brief.html">Product Brief</a>
+      <a class="nav-link" href="requirements.html">Requirements</a>
+      <a class="nav-link" href="architecture.html">Architecture</a>
+      <a class="nav-link" href="adr.html">ADR</a>
+      <a class="nav-link" href="detailed-design.html">Detailed Design</a>
+    </div>
+  </nav>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-content" style="margin-left: var(--sidebar-width); padding: var(--space-3xl) var(--space-2xl); max-width: calc(var(--content-max) + var(--space-2xl) * 2 + var(--sidebar-width));">
+
+  <!-- ===================== SECTION 1: V-MODEL CONTEXT ===================== -->
+  <section id="ts-context">
+    <div class="level-indicator right">Every-Scope Artifact</div>
+    <h2>1. V-Model Context</h2>
+    <p class="lead">A TestSpec states how a scope is verified: which behaviours, interfaces, flows, and error conditions are under test; which derivation strategies the cases were drawn from; which spec elements each case verifies; what coverage bar the test code must clear. One TestSpec per scope &mdash; root, branch, leaf. Same envelope at every layer; different weight. At root it specifies end-to-end scenarios against Product Brief outcomes and root Requirements; at a branch it specifies integration behaviour against that branch's Architecture; at a leaf it specifies unit verification against the leaf's Detailed Design. The TestSpec is the <em>derivation-discipline</em> layer between spec and test code: it is not a replacement for the test code and it is not a duplicate of it.</p>
+
+    <h3>Position on the V</h3>
+    <p>TestSpec is the only artifact in the framework that lives on the right-hand <em>ascent</em> of the V. Every other spec artifact describes design intent as the V descends; TestSpec describes verification intent as the V ascends. Each TestSpec sits directly opposite the spec artifact it verifies: root TestSpec ↔ Product Brief + root Requirements; branch TestSpec ↔ that branch's Architecture; leaf TestSpec ↔ that leaf's Detailed Design. The horizontal connection is strict &mdash; a leaf TestSpec does not derive its cases from root Requirements, and a root TestSpec does not derive its cases from leaf Detailed Designs. Each layer tests its own layer. Upward traceability is built from each TestSpec's <code>verifies</code> links, not from tests reaching across layers.</p>
+
+    <p>The core rule that falls out of this positioning: <strong>tests derive from the layer's spec artifact, never from the code below.</strong> A TestSpec written by reading the implementation and enumerating what the code already does is a tautology in artifact form &mdash; it will always pass and will never find a bug. It also destroys the V. If tests derive from code, the code is the de-facto specification and the spec above it is documentation theatre. Every failure mode the framework is designed to catch &mdash; AI happy-path bias, retrofit fabrication, silent requirement drift &mdash; is a direct consequence of derivation source confusion. The rule is simple to state, hard to hold under pressure, and non-negotiable.</p>
+
+    <h3>The scope tree and where TestSpec sits</h3>
+    <p>Every scope carries a TestSpec. Root, every branch, every leaf. The three-layer decomposition of test craft (unit / integration / system / end-to-end) maps one-to-one onto the scope tree:</p>
+
+    <div class="mermaid">
+flowchart TD
+    PB["Product Brief<br/><i>(root only)</i>"]
+    REQ_R["Requirements<br/>(root)"]
+    ARCH_R["Architecture<br/>(root)"]
+    TS_R["<b>TestSpec (root)</b><br/>system / e2e"]
+
+    REQ_B["Requirements<br/>(branch)"]
+    ARCH_B["Architecture<br/>(branch)"]
+    TS_B["<b>TestSpec (branch)</b><br/>integration"]
+
+    DD_L["Detailed Design<br/>(leaf)"]
+    TS_L["<b>TestSpec (leaf)</b><br/>unit"]
+
+    PB -- "outcomes, scenarios" --> TS_R
+    REQ_R -- "functional, quality" --> TS_R
+    ARCH_R -. "composition, interfaces" .-> TS_R
+
+    REQ_B -- "functional, quality" --> TS_B
+    ARCH_B -- "composition, interfaces" --> TS_B
+
+    DD_L -- "contracts, behaviour, errors" --> TS_L
+
+    classDef spec fill:#f5f5f5,stroke:#aaa,stroke-width:1px
+    classDef ts fill:#eef,stroke:#557,stroke-width:2px
+    class PB,REQ_R,ARCH_R,REQ_B,ARCH_B,DD_L spec
+    class TS_R,TS_B,TS_L ts
+    </div>
+
+    <p>Root TestSpec draws primarily from Product Brief outcomes and root Requirements; root Architecture is a secondary input (composition-level invariants show up in end-to-end scenarios). Branch TestSpec draws primarily from that branch's Architecture (decomposition, interfaces, composition); the branch Requirements are the upstream anchor via <code>verifies</code> chains. Leaf TestSpec draws exclusively from the leaf's Detailed Design. Crossing these lanes &mdash; e.g., deriving unit cases from root Requirements, or system scenarios from leaf DDs &mdash; is a structural error and makes the test suite unreviewable.</p>
+
+    <h3>Inputs and outputs</h3>
+    <p>A TestSpec consumes two kinds of inputs and produces three. <strong>Inputs:</strong> the layer's own spec artifact (Product Brief + Requirements at root; Architecture at branch; Detailed Design at leaf), and the derivation strategies applied (see &sect;2.3). <strong>Outputs:</strong> a flat list of test cases each with a non-empty <code>verifies</code> link; a coverage matrix mapping every spec element to at least one case; and a declared coverage bar (structural and mutation-score) that the test code is expected to hit. The TestSpec is not the test code. Test code lives in the project's source tree; the TestSpec lives in <code>/specs/</code> alongside the other spec artifacts and is authored before the test code is written.</p>
+
+    <h3>&ldquo;Tests as spec&rdquo; vs TestSpec</h3>
+    <div class="card">
+      <p>A mature TDD practitioner will push back on the idea of a separate TestSpec artifact. &ldquo;The tests <em>are</em> the specification,&rdquo; they will say &mdash; well-named JUnit methods, Arrange-Act-Assert structure, specific assertions, the test suite as executable documentation (Beck, Meszaros, Adzic). They are not wrong about the test code. They are wrong about the conclusion.</p>
+      <p>A TestSpec is <strong>not a test-case catalogue duplicating what the code already expresses</strong>. It is the <em>derivation-discipline layer</em>. It records <em>which</em> equivalence classes were picked, <em>which</em> boundary values were chosen, <em>which</em> error cases were included, <em>why</em> those and not others. That information is not in the test code. The test code shows what the author thought to test; the TestSpec shows what the layer's spec said <em>needed</em> to be tested. Without a TestSpec you lose four distinct review leverage points:</p>
+      <ul>
+        <li><strong>Derivation choices are invisible.</strong> &ldquo;We have seven tests that pass&rdquo; is not the same claim as &ldquo;every equivalence class, every boundary, every error path named in the DD is covered.&rdquo; The second claim requires a TestSpec to compare tests against.</li>
+        <li><strong>AI target disappears.</strong> An LLM writing tests without a TestSpec either mirrors the DD prose (derivation implicit) or mirrors the code (the canonical failure mode). Empirically, LLM test suites routinely hit 100% line coverage with 4% mutation score (see &sect;2.7). A TestSpec pins the derivation so the AI has something concrete to aim at and a human can review the aim.</li>
+        <li><strong>Traceability anchor collapses.</strong> Requirements and Detailed-Design elements need to trace <em>to</em> test artifacts; test artifacts need stable IDs at case granularity. JUnit method names are not stable artifact IDs.</li>
+        <li><strong>Completeness gate fails.</strong> The Quality Bar rule &ldquo;every spec element has at least one verifying test&rdquo; cannot be enforced without a TestSpec element to enforce against.</li>
+      </ul>
+      <p>The framework's resolution matches the TDD intuition exactly where it is right: at leaf scope, the TestSpec is <em>thin by design</em>. A leaf TestSpec case might be one line &mdash; <code>TC-006 &ndash; rejects negative idle_ttl_seconds, verifies DD-expiry.error.negative_idle_seconds</code> &mdash; and the assertion detail lives in the test code. Double-bookkeeping is actively prevented. At branch and root scope the TestSpec carries more, because the test code carries less of the load (fixtures, test doubles, scenarios, environments are not self-documenting the way a well-named JUnit method is). Per-layer weight matches the per-layer self-documentation density of the test code itself.</p>
+    </div>
+
+    <h3>BDD, Gherkin, Given-When-Then</h3>
+    <div class="card">
+      <p>Most software engineers encounter test-case specification first through <strong>Given-When-Then</strong> &mdash; the Gherkin syntax from Cucumber and SpecFlow, the BDD tradition popularised by Dan North and Liz Keogh. A Gherkin scenario and a TestSpec case are substantively the same object expressed differently:</p>
+      <ul>
+        <li>Gherkin <code>Given</code> &harr; TestSpec <code>preconditions</code></li>
+        <li>Gherkin <code>When</code> &harr; TestSpec <code>inputs</code> + <code>steps</code></li>
+        <li>Gherkin <code>Then</code> &harr; TestSpec <code>expected</code></li>
+        <li>Gherkin feature file &harr; TestSpec artifact</li>
+        <li>Gherkin scenario ID (tag) &harr; TestSpec case <code>id</code> + <code>verifies</code></li>
+      </ul>
+      <p>The differences matter at the edges. Gherkin is optimised for stakeholder-readable acceptance scenarios; its vocabulary is deliberately loose (&ldquo;a customer with three items in their cart&rdquo;) and its tooling ties scenarios to executable step definitions. A TestSpec is a spec artifact first and an executable input second; its vocabulary is precise (enumerated equivalence classes, named boundary values, specified error types). Gherkin works naturally at root scope where scenarios map to Product Brief outcomes; below that it gets verbose. TestSpec uses one shape at every layer and lets per-layer weight differ. A team that already writes Gherkin acceptance tests is not expected to discard them &mdash; the root-scope TestSpec can cite feature-file scenarios as its steps, with Gherkin tags acting as the case IDs. What the framework requires is that the derivation discipline, <code>verifies</code> links, and coverage matrix exist around the scenarios, which Gherkin alone does not provide.</p>
+    </div>
+
+    <h3>TDD, ATDD, and DRTDD</h3>
+    <div class="card">
+      <p><strong>TDD</strong> (Test-Driven Development, Beck) is code-level red-green-refactor: write a failing test, write the minimum code to pass, refactor. TDD operates inside a leaf; it produces unit tests and unit code in lockstep. The leaf TestSpec is what TDD's tests derive <em>from</em> &mdash; the DD names the contracts, the TestSpec derives the cases, the engineer writes the failing test first. TDD without a TestSpec is TDD-as-you-remember-it: the cases are whatever the engineer thought to type. TDD with a TestSpec is TDD-with-a-review-gate.</p>
+      <p><strong>ATDD</strong> (Acceptance Test-Driven Development; also Specification by Example, Adzic 2011) applies the same discipline at the acceptance layer: write the acceptance test first, from the requirement, in stakeholder-readable form. ATDD is the practice that TestSpec formalises at root and branch scope: system-level cases written from Product Brief outcomes and Requirements before any code exists. ATDD + Gherkin + a discipline of <code>verifies</code> links is functionally a root-scope TestSpec.</p>
+      <p><strong>DRTDD</strong> (Design-Requirement-Test Driven Development) is the framework's umbrella extension of TDD: <code>REQUIRE → DESIGN → TEST(red) → IMPLEMENT(green) → REFACTOR → VERIFY</code>. Each phase produces traceable artifacts; human gates separate phases; the TestSpec is the artifact at the TEST(red) phase. DRTDD is TDD with upstream design explicit and downstream verification tracked. A project that runs DRTDD end-to-end produces a TestSpec per scope as a byproduct of normal work.</p>
+    </div>
+
+    <h3>Test pyramid, honeycomb, trophy</h3>
+    <div class="card">
+      <p>&ldquo;How many of each test level should a project have?&rdquo; has three answers in the industry and no consensus. The TestSpec artifact is agnostic about the shape &mdash; it specifies per-layer derivation, not per-layer quantity. The three shapes you will encounter:</p>
+
+      <div class="mermaid">
+flowchart LR
+    subgraph PYR["Pyramid (Cohn, 2009)"]
+        direction TB
+        PY1["e2e — few<br/>slow, fragile"]
+        PY2["integration — fewer"]
+        PY3["unit — many<br/>fast, focused"]
+        PY1 --- PY2 --- PY3
+    end
+    subgraph HC["Honeycomb (Schaffer, 2018)"]
+        direction TB
+        HC1["e2e — few"]
+        HC2["<b>integration — many</b><br/>the real bar"]
+        HC3["unit — some"]
+        HC1 --- HC2 --- HC3
+    end
+    subgraph TR["Trophy (Dodds, 2018)"]
+        direction TB
+        TR1["e2e — some"]
+        TR2["<b>integration — many</b>"]
+        TR3["unit — some"]
+        TR4["static analysis — many"]
+        TR1 --- TR2 --- TR3 --- TR4
+    end
+      </div>
+
+      <p><strong>Pyramid</strong> (Cohn) &mdash; many fast unit tests, fewer integration, very few e2e. Fits codebases where units are rich in domain logic and integration surface is small.</p>
+      <p><strong>Honeycomb</strong> (Schaffer, Spotify) &mdash; many integration tests, fewer unit, few e2e. In service-oriented architectures, most behaviour lives at component boundaries; integration tests of component contracts catch the real defect population.</p>
+      <p><strong>Trophy</strong> (Dodds) &mdash; many static checks, many integration, some unit, some e2e. Targets front-end codebases where type systems and lint catch a surprising fraction of classical unit-test bugs.</p>
+      <p>The framework takes no position on which shape is right for a project. It does require that whatever shape is chosen, every scope's TestSpec derives cases <em>from the layer's own spec artifact</em>, and every spec element has at least one verifying case. The framework's shape discipline is horizontal (same envelope, different weight per layer); the industry's shape debate is vertical (how much of each layer). They are orthogonal concerns.</p>
+    </div>
+
+    <h3>This page teaches craft that holds across domains</h3>
+    <p>Examples throughout this page use a web-service domain (a session-management service, implementable in Java / Spring Boot but written so the patterns are language-agnostic). This is a choice of shared vocabulary, not a scope limitation. Derivation strategies, coverage bars, test-double strategies, the envelope shape, and the Quality Bar are invariant across domains. What changes is the vocabulary: &ldquo;integration test&rdquo; at a branch scope is a Spring Boot <code>@SpringBootTest</code> in a web service, a hardware-in-the-loop test on a microcontroller, a cross-page navigation test on a mobile app, a pipeline-stage test on a batch ETL, a contract test between two gRPC services in a platform. The per-layer weight discipline (thin at leaf, heavier at root) holds everywhere.</p>
+
+    <h3>What a TestSpec is not</h3>
+    <ul>
+      <li><strong>Not a test code file.</strong> A TestSpec is a spec artifact. The test code is a separate output that satisfies the TestSpec. They do not have the same shape, do not have the same file type, and are not maintained together in the same place.</li>
+      <li><strong>Not a test-case catalogue duplicating the test code.</strong> A TestSpec records derivation discipline, not every assertion the test code makes. At leaf scope a TestSpec case is often one line; the JUnit method is allowed to be the specificity.</li>
+      <li><strong>Not a coverage report.</strong> Coverage is measured against running test code, retroactively. The TestSpec declares the coverage <em>bar</em> the test code must clear; it does not report what the code did.</li>
+      <li><strong>Not a QA plan or a test strategy document.</strong> A test strategy document answers &ldquo;how does this organisation do testing?&rdquo; (tooling choices, environments, release gates). A TestSpec answers &ldquo;what cases verify <em>this scope</em>?&rdquo; The test strategy is pre-pivot test-planning ceremony; the TestSpec is the per-scope derivation artifact.</li>
+      <li><strong>Not a Gherkin feature file alone.</strong> Gherkin scenarios can live <em>inside</em> a root TestSpec's case <code>steps</code>, but a feature file on its own lacks the derivation matrix, <code>verifies</code> links, and per-case strategy tags that the TestSpec requires.</li>
+    </ul>
+
+    <h3>Retrofit posture</h3>
+    <p>A TestSpec retrofitted from existing code is a <em>mixed-evidence</em> document. Cases observed in the existing test suite can be lifted with <code>recovery_status: reconstructed</code> and explicit source (test file path and method name); the coverage matrix is built by mapping existing tests against DD / Architecture / Requirements elements; gaps are recorded as <code>unknown</code> coverage-matrix entries that drive the gap report. The hard rule: <strong>a test case's <code>verifies</code> field is not retrofittable by AI inference</strong>. A retrofit tool can propose a link (&ldquo;this test name mentions `expiry`, the DD has `compute_expiry`&rdquo;) but the assertion that the test actually verifies that element is a human call &mdash; retrofit output must mark proposed links as <code>unknown</code> until a human confirms. Fabricating <code>verifies</code> links is the sharpest TestSpec retrofit anti-pattern and the skill layer refuses to emit it. An adjacent hazard: <em>test-as-requirement inversion</em> &mdash; a retrofit tool reads the existing tests, generates a synthetic TestSpec that matches them exactly, and then &ldquo;verifies&rdquo; the tests against the synthesised spec. That is not a retrofit; that is a loop that asserts existing behaviour is correct because it exists. The retrofit skill must break the loop by deriving TestSpec cases from the DD / Architecture / Requirements independently, then flagging existing tests that do not map as gaps or over-reach.</p>
+
+    <h3>Why the framework treats this layer as non-negotiable</h3>
+    <p>The TestSpec is where the V closes. Without it, the left-hand descent &mdash; Product Brief, Requirements, Architecture, Detailed Design &mdash; is design intent with no verified claim that the code satisfies any of it. Code coverage reports show that tests <em>executed</em> lines, not that tests <em>verified</em> intent. The TestSpec is the only artifact that answers, per layer: did we test what this layer's spec said needed testing? It is the last place before deployment where a human can review the verification discipline rather than the verification output. The Spec Ambiguity Test has its sharpest bite here: a TestSpec where a reviewer cannot tell whether every equivalence class, every boundary, every error path was considered &mdash; or whether the author stopped when they ran out of ideas &mdash; is a TestSpec that fails the meta-gate regardless of how many cases it lists.</p>
+  </section>
+
+  <!-- ===================== SECTION 2: BEST PRACTICES ===================== -->
+  <section id="ts-best-practices">
+    <h2>2. Best Practices</h2>
+    <p class="lead">Nine disciplines. Pre-code specification discipline first, because everything downstream depends on the test artifact existing before the code does. Per-layer emphasis next, because the same envelope carries three different weights and getting the weight wrong produces either double-bookkeeping at leaf or under-specification at root. Then the derivation toolbox and the traceability discipline, the case-quality rules, the test-double strategy, coverage (structural and mutation), the integration-and-system section that carries the content unique to those layers, and finally the envelope shape &mdash; the YAML a TestSpec actually renders to.</p>
+
+    <h3>Frontmatter and shape</h3>
+    <p>A TestSpec is a single Markdown file per scope, colocated with the other spec artifacts at that scope: <code>/specs/testspec.md</code> (root), <code>/specs/{branch}/testspec.md</code>, <code>/specs/{branch}/{leaf}/testspec.md</code>. YAML front-matter identifies the artifact; the body holds a brief overview, a coverage matrix, and a flat list of test-case entries. Canonical front-matter:</p>
+
+    <pre><code>---
+id: TS-session-store-expiry-calculator
+scope: session-store/expiry-calculator
+parent_scope: session-store
+level: unit                           # unit | integration | system
+verifies: [DD-session-store-expiry-calculator]
+derived_from: DD-session-store-expiry-calculator
+governing_adrs: []
+recovery_status: reconstructed        # omit on greenfield
+---</code></pre>
+
+    <p>The mandatory fields are <code>id</code>, <code>scope</code>, <code>level</code>, <code>verifies</code>, and <code>derived_from</code>. <code>verifies</code> is mandatory non-empty at the TestSpec level and at every case. At root scope <code>scope</code> is <code>null</code> and <code>parent_scope</code> is <code>null</code>; at a branch <code>scope</code> is the branch path; at a leaf <code>scope</code> is the full leaf path and <code>parent_scope</code> is the containing branch. The <code>level</code> field is scope-derived (root &rarr; system; non-leaf non-root &rarr; integration; leaf &rarr; unit) and is carried explicitly so downstream tooling does not have to re-derive it.</p>
+
+    <h3 id="ts-bp-1">2.1 &nbsp; Pre-code specification discipline</h3>
+    <p>A TestSpec is authored <em>before</em> the test code is written, and <em>before</em> the implementation code is written. This is the non-negotiable ordering. The reasons compound across the V.</p>
+
+    <p><strong>It forces the spec above to be testable.</strong> If a Detailed Design says &ldquo;the expiry calculator returns the correct expiry for any session,&rdquo; the TestSpec author will find it cannot derive cases because &ldquo;correct&rdquo; is not specified. The TestSpec work exposes the ambiguity before any code locks it in. This is the same discipline TDD claims at the code level &mdash; testability is a design quality gate &mdash; promoted one layer up to the spec.</p>
+
+    <p><strong>It breaks the code-to-test loop.</strong> If the implementation exists first, the path of least resistance for an engineer (and the guaranteed path for an AI) is to read the implementation and enumerate cases that match what the code already does. The resulting test suite passes and verifies nothing &mdash; the &ldquo;tautological tests&rdquo; failure mode named empirically by Yang et al. (2024) and by Meta's ACH deployment (Foster et al., 2025). Authoring the TestSpec first removes the code from the derivation path entirely.</p>
+
+    <p><strong>It makes AI authoring reviewable.</strong> An AI given a DD and asked to produce a TestSpec has a constrained task: enumerate equivalence classes, boundaries, and errors from the DD, and declare the derivation. The output is short, structured, and human-reviewable before a line of test code is written. An AI given a DD and asked to &ldquo;write tests&rdquo; has no such constraint: it will produce plausible-looking JUnit that hits high line coverage and low mutation score, and the review requires reading dozens of test methods and reasoning about what was not tested. The TestSpec is the layer where human-to-AI review leverage is highest.</p>
+
+    <p><strong>It anchors traceability before tests exist.</strong> The <code>verifies</code> link is declared on the TestSpec case; the test code inherits it by reference. If the TestSpec is authored after the code, traceability becomes an archaeology task: for every JUnit method, work out which DD element it was trying to verify. Authored-first TestSpecs have traceability by construction.</p>
+
+    <p>Exception: a pure-retrofit pass on an existing codebase. In that case the code exists and there is no &ldquo;before.&rdquo; The retrofit flow derives the TestSpec from the DD / Architecture / Requirements independently, then maps the existing test suite against it, then emits gaps. The code is still not the derivation source &mdash; the spec is &mdash; and the resulting TestSpec is a specification of what <em>should</em> be verified, independent of what the existing tests happen to cover.</p>
+
+    <h3 id="ts-bp-2">2.2 &nbsp; Per-layer emphasis</h3>
+    <p>One envelope, three weights. The same YAML shape renders a one-line leaf case and a multi-paragraph root scenario. The distinction is not structural &mdash; the structural fields (<code>id</code>, <code>title</code>, <code>type</code>, <code>verifies</code>, <code>preconditions</code>, <code>inputs</code>, <code>steps</code>, <code>expected</code>) exist at every layer. The distinction is in which fields carry detail and which are one-liners or omitted.</p>
+
+    <table class="field-table">
+      <thead>
+        <tr><th>Scope</th><th>Level</th><th>Derivation source</th><th>Field weight</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Leaf</td>
+          <td>unit</td>
+          <td>Detailed Design of this leaf</td>
+          <td><code>inputs</code> + <code>expected</code> carry the case; <code>steps</code> usually trivial or omitted; <code>preconditions</code> typically one line. Case is often one line; the test code carries the specificity.</td>
+        </tr>
+        <tr>
+          <td>Branch</td>
+          <td>integration</td>
+          <td>Architecture of this branch</td>
+          <td><code>preconditions</code> grows: fixtures, test containers, test doubles, seed data. <code>steps</code> is usually explicit (sequence of cross-child interactions). <code>expected</code> names observable cross-child state, not just return values.</td>
+        </tr>
+        <tr>
+          <td>Root</td>
+          <td>system / e2e</td>
+          <td>Product Brief outcomes + root Requirements</td>
+          <td>Full scenario weight. <code>preconditions</code> names environment, tenants, test data, feature flags. <code>steps</code> is an ordered narrative mapping to user journeys or operational flows. <code>expected</code> names outcomes in the Product Brief's vocabulary (not internal state).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Leaf: thin by design, not thin by laziness.</strong> The discipline is that the TestSpec's <em>derivation strategy</em> per case is declared (the <code>type</code> field: <code>functional</code>, <code>boundary</code>, <code>error</code>, &hellip;), and the <code>verifies</code> link names the DD element under test. The case title plus the <code>type</code> plus the <code>verifies</code> link is usually enough at leaf. The JUnit method name mirrors the TestSpec case title; the AAA block carries the assertion detail; double-bookkeeping is prevented. The TestSpec at leaf is the <em>derivation-discipline layer</em>: which classes were partitioned, which boundaries were named, which errors were enumerated. That is not in the test code and cannot be inferred from it.</p>
+
+    <p><strong>Branch: double the weight, more than double the value.</strong> At a branch, most of the testing apparatus lives in the preconditions &mdash; a test-container with Postgres, a fake upstream, seed data, an auth token with a specific role. The test code cannot self-document this; the precondition block has to. The <code>verifies</code> link at branch scope references Architecture interface entries, composition-level invariants, and allocated requirements. A branch TestSpec case of the form <em>&ldquo;TC-005: cleanup-worker and session-api do not race on expired entries, verifies ARCH-session-store.composition.cleanup-api-coordination&rdquo;</em> is the review gate: it states the composition invariant being tested and names the Architecture element under test. Without the link, a reader has no way to tell whether the case verifies a composition decision or an accident of the current wiring.</p>
+
+    <p><strong>Root: written in the Product Brief's vocabulary.</strong> A root-scope TestSpec case is readable by a product owner. Its <code>preconditions</code> names environment and persona. Its <code>steps</code> reads as a user journey or an operational scenario. Its <code>expected</code> is phrased as the Product Brief phrased the outcome &mdash; &ldquo;session TTL enforced across devices,&rdquo; not &ldquo;Redis TTL key expires.&rdquo; Root scope is where <em>acceptance</em> happens; the TestSpec is where the acceptance shape is authored. A root TestSpec that reads as a list of API smoke tests has failed the layer; Product Brief outcomes are not API smoke tests.</p>
+
+    <p><strong>Quantitative ratios vary; the weight rule is invariant.</strong> The industry debate over pyramid / honeycomb / trophy (see &sect;1) is about how many tests of each level a project should have. The per-layer weight rule is about how much the TestSpec <em>case</em> carries at each level. A honeycomb-shaped project has many integration cases and few unit cases; each integration case still carries more envelope weight than each unit case. The weight rule does not constrain the quantity ratio.</p>
+
+    <h3 id="ts-bp-3">2.3 &nbsp; Derivation strategies</h3>
+    <p>The toolbox. Eight strategies, applied in combination. A well-derived TestSpec cites at least one strategy per case via the <code>type</code> field, and the coverage matrix at the top of the TestSpec names which strategies were used overall. The strategies are not ranked &mdash; each targets a different failure mode, and stopping at one of them is the characteristic error.</p>
+
+    <p><strong>1. Requirement-based testing (RBT).</strong> One case per behaviour rule named in the spec. If the DD says &ldquo;the expiry calculator returns the minimum of the idle expiry and the absolute TTL,&rdquo; RBT produces at least one case where idle is smaller, one where absolute is smaller, and one where they are equal. If the Architecture says &ldquo;the cart publishes a <code>PriceChanged</code> event when the pricing component updates,&rdquo; RBT produces at least one case that asserts the event is published with the expected shape. RBT is the spine of every TestSpec; the other strategies fill in what RBT alone would miss.</p>
+
+    <p><strong>2. Equivalence class partitioning (ECP).</strong> Partition the input space into classes such that any input from a class should produce &ldquo;the same kind of&rdquo; output. Test one representative per class. For the expiry calculator taking an <code>idle_ttl_seconds</code> parameter: one class for <em>positive</em>, one for <em>zero</em> (if the spec accepts it), one for <em>negative</em> (the error class). For a string input: one class for <em>ASCII</em>, one for <em>Unicode BMP</em>, one for <em>Unicode supplementary plane</em>, one for <em>empty</em>, one for <em>null</em>. The discipline is to <em>enumerate the classes</em> at TestSpec time, not to pick examples ad-hoc.</p>
+
+    <p><strong>3. Boundary value analysis (BVA).</strong> At every input-space boundary, test on the boundary, one below, one above. For <code>idle_ttl_seconds &isin; [1, 86400]</code>: tests at <code>1</code>, <code>0</code>, <code>86400</code>, <code>86401</code>. BVA catches off-by-one errors, inclusive-vs-exclusive confusion, and silently-different behaviour at transition points. Every numeric range, every array-index bound, every TTL, every retry-count has a boundary. ECP tells you <em>which</em> classes to test; BVA tells you <em>where in each class</em> the bugs hide. Applied together they are empirically the highest-yield pair in test case derivation (cited in multiple safety standards and empirical fault-detection studies).</p>
+
+    <p><strong>4. Decision tables.</strong> When behaviour is governed by a combination of conditions &mdash; &ldquo;if the session is expired <em>and</em> the user has the refresh-token cookie <em>and</em> the cookie is still valid, reissue; otherwise fail&rdquo; &mdash; a decision table enumerates the condition combinations and the expected outcome per combination. The table is a direct test-case source: each row is a case. For N binary conditions a full table has 2<sup>N</sup> rows, often prunable with don't-care markers. Decision tables also enable modified condition/decision coverage (MC/DC) derivation: for N conditions, N+1 cases are sufficient to exercise each condition's independent effect. Use a decision table whenever the DD or Architecture has nested conditionals or a compound predicate; do not test compound predicates with ad-hoc ECP alone, because the combinations are where the bugs hide.</p>
+
+    <p><strong>5. State-transition testing.</strong> For any unit with persistent state &mdash; a session, a connection, a circuit breaker, a workflow &mdash; the DD names the states and the transitions between them. State-transition testing generates: <em>state coverage</em> (every state reached), <em>transition coverage</em> (every named transition exercised), <em>round-trip coverage</em> (loops back to starting state tested), and <em>sneak-path testing</em> (unspecified transitions attempted, verifying the unit rejects them). A session state machine with states <code>ACTIVE / IDLE / EXPIRED / REVOKED</code> and transitions <code>activate, touch, expire, revoke</code> needs cases for every valid transition, at least one sneak-path case (e.g., <code>touch</code> from <code>REVOKED</code> should reject), and a loop case if one exists.</p>
+
+    <p><strong>6. Error paths and fault injection.</strong> Every error condition the DD or Architecture names gets a case. Additionally, common implicit fault classes get cases regardless of whether the spec names them: invalid-input variants of every parameter, null / absent / malformed variants, timeout from every external dependency, partial failure from every cross-component interaction, clock skew, resource exhaustion. Fault injection differs from error-path testing in where the fault originates: error-path tests drive invalid input into the unit; fault injection replaces a dependency with a failing fake and checks the unit's response. Both belong in the TestSpec; the <code>type</code> field distinguishes them (<code>error</code> vs <code>fault-injection</code>).</p>
+
+    <p><strong>7. Property-based testing.</strong> When a unit has an invariant that should hold for <em>any</em> input in a domain, property-based testing (QuickCheck, Hypothesis, fast-check, jqwik) generates random inputs from the domain and asserts the invariant holds. For the expiry calculator: <em>for any valid inputs, the returned expiry is &geq; now and &leq; now + absolute_ttl</em>. A single property-based test covers an input range that ECP+BVA would hit only at representative points. Property-based testing earns its keep when: (a) the invariant is easy to state, (b) the input domain is large, (c) the output is easy to check algorithmically. It does not replace RBT+ECP+BVA &mdash; random generation misses rare edge cases those enumerate explicitly &mdash; but it catches the &ldquo;I didn't think of that input&rdquo; class of bug that enumeration misses. Declared in a TestSpec case with <code>type: property</code>, a generator spec, and the invariant as the <code>expected</code> predicate.</p>
+
+    <p><strong>8. Error guessing / experience-based.</strong> The lowest-priority strategy and still worth including explicitly. An experienced engineer reading a DD will spot failure modes the other strategies miss: &ldquo;this retry-with-jitter logic will thundering-herd under partial failure,&rdquo; &ldquo;this ID generator will collide under high concurrency within the same millisecond.&rdquo; Error guessing captures those as explicit cases. It is the least systematic strategy and the easiest to miss on retrofit (the hunches are in the original author's head, not in the artifacts). Its value is as a complement, not a substitute. A TestSpec case derived from error guessing should declare <code>type: error-guessing</code> and carry a note pointing at the hypothesised failure mode, so a reviewer can evaluate whether the guess is well-founded.</p>
+
+    <p><strong>Stopping criterion.</strong> Coverage is complete when the coverage matrix maps every spec element to at least one case, every applicable strategy has been applied (RBT always; ECP+BVA for any input range; decision tables for any compound predicate; state-transition for any stateful unit; error paths for every named error; fault injection for every dependency), and the Spec Ambiguity Test meta-gate passes (a reviewer reading only the TestSpec can tell whether coverage is adequate). Stopping when the clock runs out is the characteristic failure.</p>
+
+    <h3 id="ts-bp-4">2.4 &nbsp; Traceability and <code>verifies</code></h3>
+    <p>The <code>verifies</code> field is mandatory non-empty on every TestSpec case. This is the anti-orphan rule: a test case without a traceable intent is either misplaced (verifying something that is not in the scope's spec) or testing unspecified behaviour (which means either the spec is incomplete or the case is pinning an implementation accident). Both are defects. The tooling refuses to accept a TestSpec case with an empty <code>verifies</code> list.</p>
+
+    <p><strong>What <code>verifies</code> points at.</strong> A stable artifact ID at the layer's spec: a Requirement ID (<code>REQ-042</code>), an Architecture child or interface (<code>ARCH-cart.children.pricing</code>, <code>ARCH-cart.interfaces.price-changed</code>), a Detailed Design element (<code>DD-expiry.behavior.compute_expiry</code>, <code>DD-expiry.error.negative_idle_seconds</code>, <code>DD-expiry.invariants.2</code>). A Product Brief outcome (<code>PB.outcomes.secure-session-lifecycle</code>) at root scope. Never a commit SHA, never a test file path, never a Jira ticket &mdash; those are ephemeral. The framework's traceability model (TARGET_ARCHITECTURE &sect;7) specifies artifact-level default granularity with field-level allowed specifically for <code>verifies</code>, which is why a case can point at a specific invariant or error field rather than just the DD.</p>
+
+    <p><strong>Granularity at leaf.</strong> At leaf scope, <code>verifies</code> should resolve to a specific DD field, not the whole DD. A case pointing at <code>DD-expiry</code> is less reviewable than a case pointing at <code>DD-expiry.behavior.compute_expiry</code>. If a DD has ten behaviour rules and twenty cases all verify the whole DD, the coverage matrix cannot distinguish well-covered rules from uncovered ones.</p>
+
+    <p><strong>Granularity at branch.</strong> At branch scope, <code>verifies</code> references Architecture interface contracts (<code>ARCH-{branch}.interfaces.{name}</code>), composition invariants (<code>ARCH-{branch}.composition.{name}</code>), and allocated requirements (<code>REQ-{branch}-{n}</code>). Multiple targets are common at branch scope because integration tests often exercise several interfaces in one scenario. The list may be long; it must still be specific.</p>
+
+    <p><strong>Granularity at root.</strong> At root scope, <code>verifies</code> references root Requirements and Product Brief outcomes. An end-to-end case typically verifies multiple Requirements and one outcome. The test assertion at root scope is often qualitative (&ldquo;user is still logged in&rdquo;) and the <code>expected</code> block carries the stakeholder-readable form; <code>verifies</code> still points at structural IDs.</p>
+
+    <p><strong>Coverage matrix.</strong> Every TestSpec opens with a coverage matrix: every spec element in scope listed on the left, every verifying case ID on the right, the derivation strategy for each link. The matrix is not decorative &mdash; the Quality Bar check for completeness compares the matrix against the spec artifact above. Spec elements with no verifying case appear as rows with an empty right side; those are gaps by definition and must be closed or explicitly accepted (with a recorded reason). Tooling generates the matrix from <code>verifies</code> links; authors maintain it by writing cases with real links.</p>
+
+    <div class="mermaid">
+flowchart LR
+    REQ["REQ-002<br/>logout invalidates session"]
+    DD["DD-expiry.behavior.compute_expiry"]
+    ARCH["ARCH-session-store.interfaces.session-api"]
+
+    TC_ROOT["TC-root-004<br/>logout on one device<br/>invalidates across devices"]
+    TC_BRANCH["TC-branch-003<br/>session-api DELETE<br/>removes session in store"]
+    TC_LEAF["TC-leaf-001<br/>compute_expiry<br/>at exact TTL"]
+
+    TC_ROOT -- "verifies" --> REQ
+    TC_BRANCH -- "verifies" --> ARCH
+    TC_LEAF -- "verifies" --> DD
+
+    classDef spec fill:#f5f5f5,stroke:#aaa
+    classDef tc fill:#eef,stroke:#557
+    class REQ,DD,ARCH spec
+    class TC_ROOT,TC_BRANCH,TC_LEAF tc
+    </div>
+
+    <p>The chain does not skip layers. A leaf test case does not <code>verifies</code> a root Requirement; it <code>verifies</code> a DD element. The Requirement is reached by walking up the derivation chain through <code>derived_from</code> links (DD &rarr; branch Architecture &rarr; branch Requirement &rarr; root Requirement). Queries like &ldquo;which test cases ultimately verify REQ-002?&rdquo; are answered by graph traversal, not by cramming every Requirement into every leaf case's <code>verifies</code> field.</p>
+
+    <h3 id="ts-bp-5">2.5 &nbsp; Case quality: F.I.R.S.T., AAA, assertion specificity</h3>
+    <p>The TestSpec declares the case; the test code implements it. The case-quality disciplines below are properties of the test code, declared as expectations in the TestSpec so the test-authoring step (human or AI) has a concrete bar to hit.</p>
+
+    <p><strong>F.I.R.S.T.</strong> (Robert C. Martin). Tests are <em>Fast</em> (milliseconds for unit, seconds for integration, minutes at most for e2e), <em>Independent</em> (no test depends on another's state or order), <em>Repeatable</em> (deterministic &mdash; inject clocks, seed random, control external sources), <em>Self-validating</em> (a single boolean pass/fail from the test runner, not a log line a human inspects), <em>Timely</em> (authored close in time to the code, ideally before it). Declared on the TestSpec as default expectations at each level, with exceptions explicit. A test that pauses for 30 seconds to &ldquo;wait for cache to warm&rdquo; violates <em>Fast</em> and <em>Repeatable</em> and is a Quality Bar failure regardless of whether it technically passes.</p>
+
+    <p><strong>Arrange-Act-Assert (AAA), aka Given-When-Then.</strong> Every test has three visually separated blocks: <em>Arrange</em> (set up inputs, state, dependencies); <em>Act</em> (call the unit under test <em>exactly once</em>); <em>Assert</em> (verify outcome matches expected). The one-Act rule is load-bearing: a test that calls the unit twice is testing two behaviours, and when it fails, diagnosing which call failed requires re-reading the test. Parameterised tests are fine (JUnit 5 <code>@ParameterizedTest</code>, pytest <code>@pytest.mark.parametrize</code>) &mdash; they run the same AAA block with different data. Gherkin's Given-When-Then is AAA under a different name and is directly equivalent.</p>
+
+    <p><strong>Assertion specificity.</strong> Every test asserts a specific expected value, not a vague property. <code>assertEquals(expected, actual)</code> with an enumerated expected, not <code>assertNotNull(actual)</code>. <code>assertEquals("2026-04-21T12:30:00Z", result.expires_at)</code>, not <code>assertTrue(result.expires_at.isAfter(now))</code>. Vague assertions pass for incorrect implementations &mdash; a function that always returns the current time plus one second satisfies <code>isAfter(now)</code> for every input. The TestSpec case's <code>expected</code> block must name the specific value; if it cannot (because the spec does not specify the value), the spec has a gap that the TestSpec surfaces. Empirical: weak-assertion tests are the second-largest failure mode in LLM-generated test suites (Yang et al., 2024); the fix is on the author side, not the tool side.</p>
+
+    <p><strong>One logical concept per test.</strong> Multiple assertions on the same outcome are fine (assert the session's <code>id</code>, then <code>expires_at</code>, then <code>principal</code> on the same returned object). Multiple assertions on unrelated outcomes are not &mdash; a test that asserts both &ldquo;expiry is computed correctly&rdquo; and &ldquo;the logger emitted a debug line&rdquo; is testing two behaviours, and when it fails, the failure message is ambiguous. The TestSpec case's <code>expected</code> block scopes the outcome under test; a case that needs two <code>expected</code> blocks is two cases.</p>
+
+    <p><strong>Test naming.</strong> Test names describe the scenario, not the method being tested. <code>rejects_negative_idle_ttl_seconds</code> over <code>testComputeExpiry</code>. The JUnit method name mirrors the TestSpec case <code>title</code>. At read time, the list of test method names in a file should read as an informal spec of the unit's behaviour. This is where TDD's &ldquo;tests as living documentation&rdquo; claim actually earns itself &mdash; in the test code. The TestSpec is not trying to replace it; the TestSpec is the layer above.</p>
+
+    <h3 id="ts-bp-6">2.6 &nbsp; Test doubles strategy</h3>
+    <p>A <em>test double</em> is any object substituted for a real collaborator in a test. Gerard Meszaros's canonical taxonomy names five types, ranked by how much they do:</p>
+    <ul>
+      <li><strong>Dummy</strong> &mdash; filler, never exercised. Used to satisfy a parameter list.</li>
+      <li><strong>Stub</strong> &mdash; returns canned answers. Used to supply inputs from an indirect source.</li>
+      <li><strong>Spy</strong> &mdash; records calls for later inspection. Used when the interaction itself is observable behaviour.</li>
+      <li><strong>Mock</strong> &mdash; pre-programmed with expectations; fails if the expected calls do not occur. Used for interaction-based verification.</li>
+      <li><strong>Fake</strong> &mdash; working but simplified implementation (in-memory database, fake HTTP client). Used when a real collaborator is too heavy for fast tests.</li>
+    </ul>
+
+    <p><strong>Preference order: real &gt; fake &gt; stub &gt; mock.</strong> Prefer the real collaborator whenever it is deterministic, fast, and cheap to set up. When it is not, prefer a fake (Google's canonical preference; Martin Fowler's &ldquo;Mocks Aren't Stubs&rdquo; endorses the same hierarchy). Prefer a stub to a mock whenever the test can verify outcome (state) rather than interaction (calls made). Mocks are a last resort, used only when the interaction itself is the observable behaviour &mdash; &ldquo;the notification was sent&rdquo; is an interaction; &ldquo;the discount was applied&rdquo; is a state.</p>
+
+    <p><strong>Don't mock what you don't own.</strong> Freeman and Pryce's rule (<em>Growing Object-Oriented Software, Guided by Tests</em>, 2009). If a third-party API is hard to test against, wrap it in an adapter your code owns, then mock the adapter. Mocking the third-party's interface directly couples your tests to the third-party's API shape, which changes out from under you.</p>
+
+    <p><strong>Contract-test every fake.</strong> A fake is a liability if it drifts from the real implementation. The discipline: the fake and the real share a contract-test suite &mdash; the same test cases run against both. Whenever the real's behaviour changes, the contract-test suite catches the fake's drift. Applies across the boundary: if your service uses a fake Redis in tests, run the same contract tests against the real Redis in CI at a lower frequency. Contract-tested fakes are the highest-leverage form of test double; uncontracted fakes are a delayed bug.</p>
+
+    <p><strong>Over-mocking is a design smell.</strong> If a unit requires more than two or three test doubles to test, the unit is doing too much or is wired too tightly to its collaborators. The TestSpec case signals this: if the <code>preconditions</code> block names five doubles, the authoring skill surfaces the coupling as a design issue back to the author rather than writing the test. Fixing the coupling in the DD produces a simpler unit with a simpler TestSpec; mocking through the coupling produces tests that pass in isolation and break in production (&ldquo;all my mocks agreed; production disagreed&rdquo; is the canonical symptom).</p>
+
+    <p><strong>Per-layer usage.</strong> Heaviest at leaf (unit tests use doubles for anything beyond the unit itself); bounded at branch (integration tests use real instances of the children being integrated, doubles only for out-of-scope dependencies like external services); minimal at root (system tests run against production-like environments with real instances of everything, doubles only where a real third-party would be unsafe to exercise &mdash; a payment gateway's test mode qualifies; a real payment gateway does not).</p>
+
+    <h3 id="ts-bp-7">2.7 &nbsp; Coverage: structural and mutation</h3>
+    <p>Coverage measures the test code against the production code, retroactively. The TestSpec declares the coverage <em>bar</em>: the minimum percentages the test code must clear. Two independent dimensions matter, and measuring only the first is the single largest silent-failure mode in software testing.</p>
+
+    <p><strong>Structural coverage</strong> is the familiar metric set: <em>statement</em> coverage (every line executed), <em>branch</em> coverage (every branch taken both ways), <em>decision</em> coverage (every boolean outcome reached), <em>modified condition/decision coverage</em> (MC/DC &mdash; every condition independently exercised within every decision). They form a strict hierarchy: MC/DC subsumes decision, decision subsumes branch, branch subsumes statement. Tools like JaCoCo, Istanbul, Coverage.py report them; CI systems enforce thresholds. Structural coverage is <em>necessary but insufficient</em>: it answers &ldquo;did my tests execute the code?&rdquo; &mdash; which is a lower bar than &ldquo;did my tests verify the code is correct?&rdquo; It is also not a derivation method: writing tests to hit a coverage number produces tests that execute the code they were written against, without verifying anything else. A TestSpec declares a structural coverage bar (branch coverage &geq; 85%, say) as a floor; hitting it does not mean the tests are good.</p>
+
+    <p><strong>Mutation coverage</strong> closes the gap. A <em>mutation</em> is a small, systematic change to the production code: flip a conditional, change an arithmetic operator, remove a statement, replace a boolean literal. The mutation testing tool runs the full test suite against each mutated version; if the tests still pass, the mutation <em>survived</em> &mdash; the tests did not detect the change. The <em>mutation score</em> is the fraction of mutations killed. A mutation score close to 100% means the test suite is precise; a low mutation score with high line coverage means the tests execute code without verifying its behaviour. PIT (Pitest) for JVM, Stryker for JavaScript/TypeScript, mutmut for Python are the canonical tools. Meta's ACH industrial deployment (Foster et al., FSE 2025) ran mutation-guided test generation across 10,795 classes with 73% engineer acceptance; MutGen (the same programme's mutation-guided LLM approach) achieved 89.5% mutation score against a naive-LLM baseline of ~4% on the same targets.</p>
+
+    <p><strong>Why this is load-bearing.</strong> Yang et al. (ASE 2024) evaluated five LLMs on unit-test generation: <em>34&ndash;62% of generated tests were syntactically invalid</em> (did not compile or threw at load time). Among the tests that did compile, <em>tautological tests</em> were the dominant failure mode: the test recomputed the expected value using the same logic the implementation uses, asserted equality, and passed vacuously. The canonical pathology: a test suite hits <strong>100% line coverage with a 4% mutation score</strong>. The code was executed; nothing was verified. GitHub Copilot in an uncontrolled setting: 7.55% passing tests; with prompt engineering (context about the spec), 45.28%. Diffblue and similar specialist tools: &sim;100% compilation but lower mutation scores than human-authored tests. The empirical consensus across the 2023&ndash;2026 literature is that <em>coverage alone is a misleading metric for AI-generated tests</em> and mutation testing is the viable complement.</p>
+
+    <p><strong>Thresholds.</strong> The TestSpec declares both a structural coverage bar and a mutation-score bar. Defensible defaults: branch coverage &geq; 85%, mutation score &geq; 60% as the minimum-viable floor, 80%+ as the target. These numbers are load-bearing per the empirical literature above; they are not institutional preference. A project that declares only a line-coverage bar is declaring it is comfortable shipping tautological tests. A project that declares a mutation-score bar and enforces it in CI has the only technical defence against the coverage-mutation gap. Declare bars per layer: leaf TestSpecs usually carry the highest bars (the test code is cheapest and the mutation testing is most tractable); integration and system TestSpecs often carry lower structural bars because the test surface is wider.</p>
+
+    <p><strong>Adoption.</strong> Mutation testing is CPU-intensive (each mutation runs the suite; a codebase with 10k mutations is 10k test runs). Standard patterns: run mutation testing nightly rather than per-commit; run it only on changed files per PR; run it on a sampled subset per commit with the full sweep nightly. The TestSpec bar does not mandate the CI frequency; it mandates the floor the mutation score must clear when measured. A nightly mutation run below the declared bar is a failing build the next morning.</p>
+
+    <h3 id="ts-bp-8">2.8 &nbsp; Integration and system testing specifics</h3>
+    <p>Branch and root TestSpecs carry disciplines that leaf TestSpecs do not encounter. Four families: contract testing between components, test-environment specification, end-to-end scenario authoring, and the specialised test categories (performance, security, accessibility) that live in the same envelope with some extra fields.</p>
+
+    <p><strong>Contract testing.</strong> When a branch decomposes into children that talk across an interface, the interface is a contract. Integration tests verify the contract from both sides: the provider honours its advertised postconditions, the consumer obeys its stated preconditions. In a distributed system where producers and consumers evolve independently, <em>consumer-driven contract testing</em> (Pact, Spring Cloud Contract, schemathesis against OpenAPI) is the mechanism that keeps them honest: consumers declare the subset of the provider's contract they actually depend on; the provider runs the consumer-supplied contract tests against its implementation; the contract is violated when either side drifts. In the TestSpec, a contract test is an integration-level case with <code>type: contract</code>, <code>verifies</code> pointing at the Architecture interface entry, and <code>preconditions</code> naming the contract artifact (Pact file, OpenAPI spec version, Avro schema) under test. A branch TestSpec that omits contract tests between its children will admit interface drift silently.</p>
+
+    <p><strong>Test environment specification.</strong> Integration and system tests run against <em>environments</em>: composed infrastructure that stands in for some or all of production. The TestSpec at branch and root scope names the environments its cases require. Canonical forms: <em>in-process</em> (all children loaded in one JVM / process; fastest, least faithful), <em>test-containers</em> (real infrastructure in containers, spun up per-test-run; medium speed, high faithfulness for data stores and queues), <em>shared staging</em> (long-lived environment shared across test runs; slow, highest faithfulness for deployments), <em>production-like preview</em> (ephemeral environment per PR; slowest, closest to production). The TestSpec's <code>preconditions</code> block names the required environment and its essential shape (Postgres 15 with schema X loaded, Redis 7 with AOF enabled, three service instances behind a load balancer). A case that runs in the wrong environment is not the case it claims to be.</p>
+
+    <p><strong>End-to-end scenario authoring.</strong> At root scope, cases are narratives: a user does X, then Y, then Z; the system's state at the end satisfies the Product Brief outcome. The authoring discipline is to keep the narrative at the stakeholder level &mdash; the <code>steps</code> block describes what a user does, not which API endpoints the test harness calls; the <code>expected</code> names outcomes in the Product Brief's vocabulary. When a scenario has multiple stakeholder actors (admin, customer, system), the case names them explicitly in <code>preconditions</code>. Production-like data matters: a root-scope case running against an empty database is testing plumbing; the same case running against a realistic data volume is testing the system. The TestSpec at root scope declares the data shape required.</p>
+
+    <p><strong>Performance testing.</strong> Same envelope; the <code>type</code> field is <code>performance</code>, and the <code>expected</code> block names thresholds (p99 latency &leq; 200ms at 1000 req/s; throughput &geq; 5000 writes/s; memory steady-state &leq; 2GB over a 1-hour soak). <code>preconditions</code> names the load profile and duration. Performance tests at branch scope target internal interfaces (the cart service's <code>addItem</code> path); at root scope target user-facing flows (login-to-first-page latency). Declared in the TestSpec with the same <code>verifies</code> discipline &mdash; pointing at a Requirements quality attribute or a Product Brief outcome. A performance test with no <code>verifies</code> link is a benchmark, not a verification.</p>
+
+    <p><strong>Security testing.</strong> Same envelope; <code>type</code> is <code>security</code> and the cases derive from a threat model (STRIDE, or an organisation-specific model) applied to the scope. Examples: authentication bypass attempts on each externally visible endpoint; authorisation boundary tests for each role; input fuzzing for injection classes (SQL, LDAP, command, XSS); session fixation and CSRF; rate-limit enforcement. Static analysis (SAST) and dynamic scanning (DAST) are tool-level complements; they live outside the TestSpec per se, but a TestSpec can reference their thresholds (<code>preconditions: DAST clean on OWASP-top-10 classes</code>). Security tests are derivable from a threat-model artifact; if the project has one, cases <code>verifies</code> its threat IDs. If the project does not have one, the Requirements quality attributes cover the floor and the TestSpec can only verify what is named.</p>
+
+    <p><strong>Accessibility testing.</strong> Same envelope; <code>type</code> is <code>accessibility</code>; derivation is from WCAG criteria or an equivalent internal standard. Cases verify keyboard-only navigation, screen-reader label completeness, focus management, colour-contrast ratios, ARIA landmark correctness. Automated tools (axe-core, pa11y, Lighthouse) cover a subset; the rest requires human verification, which a TestSpec can describe as an accessibility review case with a checklist rather than an automated assertion. Like security, accessibility tests derive from Requirements quality attributes; they are not a separate artifact family.</p>
+
+    <p><strong>Closing gaps left by leaf-level test doubles.</strong> The discipline: whatever a leaf test double elided (&ldquo;the unit test used a fake database, so database-real behaviour is not verified here&rdquo;) must be picked up in a branch or root case against the real thing. The TestSpec records this as an explicit trace &mdash; a leaf TestSpec note (&ldquo;DB interactions verified at branch TestSpec case TC-branch-007&rdquo;) and the branch case with <code>verifies</code> back to the same DD element. Closing the loop is how test doubles stay safe to use: a double is a promise that the real thing is verified somewhere else, and the TestSpec records where.</p>
+
+    <h3 id="ts-bp-9">2.9 &nbsp; TestSpec envelope and case shape</h3>
+    <p>The canonical envelope &mdash; this is what a TestSpec file actually contains when rendered. Top-level YAML frontmatter, a short overview in prose, the coverage matrix, and a flat list of cases. Cases are flat, not nested; the <code>suite</code> tag groups them for display without changing the traversal.</p>
+
+    <pre><code>---
+id: TS-{scope}
+scope: {scope-path}                      # null at root
+parent_scope: {parent-scope-path}        # null at root
+level: system | integration | unit
+verifies: [list of spec artifact IDs]    # layer's own spec
+derived_from: {spec artifact}            # the layer's own spec
+governing_adrs: [optional]
+recovery_status: {verified | reconstructed | unknown}   # omit on greenfield
+---
+
+# TestSpec &mdash; {scope} ({level})
+
+Brief overview: what this TestSpec covers, how it fits into the verification pipeline.
+
+## Coverage matrix
+
+| Spec element                     | Test cases               | Strategy    |
+|----------------------------------|--------------------------|-------------|
+| DD.behavior.compute_expiry       | TC-001, TC-002           | req-based   |
+| DD.behavior.idle_window_boundary | TC-003, TC-004           | boundary    |
+| DD.error.negative_idle_seconds   | TC-005                   | error       |
+
+## Coverage bars
+
+structural: { branch: ">= 85%" }
+mutation:   { score:  ">= 80%" }
+
+## Cases
+
+- id: TC-001
+  title: {one line describing the scenario, not the method}
+  suite: {optional tag}
+  type: functional | boundary | error | fault-injection | property | state-transition | contract | performance | security | accessibility | error-guessing
+  verifies: [IDs from this layer's spec, MANDATORY non-empty]
+  preconditions: {state assumed true before act}
+  inputs: {stimuli}
+  steps: {ordered actions; omit if trivial}
+  expected: {pass criteria; specific value(s)}
+  notes: {optional}
+</code></pre>
+
+    <p>Fields carry different weight at different layers (see &sect;2.2). At leaf scope, <code>steps</code> is usually omitted and <code>inputs</code> + <code>expected</code> carry the case. At branch, <code>preconditions</code> and <code>steps</code> grow. At root, <code>preconditions</code>, <code>steps</code>, and <code>expected</code> are all narratives. The envelope is invariant; the weight varies.</p>
+
+    <p>Where the framework reserves future growth: <code>fixtures</code> (reusable precondition blocks declared once per TestSpec and referenced by name), <code>data</code> (named datasets referenced from <code>inputs</code>), <code>expected_range</code> (for property-based tests where the expected is an invariant predicate rather than a value). These are not required in Phase 2; schemas will canonicalise them in Phase 3.</p>
+  </section>
+
+  <!-- ===================== SECTION 3: ANTI-PATTERNS ===================== -->
+  <section id="ts-anti-patterns">
+    <h2>3. Anti-Patterns</h2>
+    <p class="lead">Thirteen named failure modes. Each is a specific tell the authoring or review skill looks for. The numbering is stable across revisions; skills cite them by number.</p>
+
+    <ol>
+      <li><strong>Code-to-test derivation.</strong> TestSpec cases enumerated by reading the implementation and describing what it does. The tell: case <code>expected</code> values match the implementation's output exactly even where the spec is silent; cases exist for behaviour the DD does not mention. The tests always pass; no bug can be found by this suite. Fix: derive from the spec, not the code.</li>
+      <li><strong>Tautological tests.</strong> The test recomputes the expected value using the same logic as the implementation, then asserts equality. The tell: the test body looks like a copy-paste of the production function with <code>assertEquals</code> around it. Empirically the dominant failure mode in LLM-generated test suites (Yang 2024). Fix: hard-code expected values from the spec; never compute them in the test.</li>
+      <li><strong>Test-as-requirement inversion.</strong> Retrofit tool reads the existing tests, synthesises a TestSpec that matches them, then claims the tests verify the spec. The loop asserts existing behaviour is correct because it exists. The tell: every existing test has a perfect <code>verifies</code> target; no gaps surface; every behaviour in the synthetic spec is test-mirrored. Fix: retrofit derives TestSpec from DD / Architecture / Requirements independently, then maps existing tests against it, surfacing mismatches as gaps or over-reach.</li>
+      <li><strong>Happy-path bias.</strong> Cases cover the primary behaviour and a few obvious errors. Boundaries, fault injection, concurrency, resource exhaustion, unusual input encodings, and long-running behaviour are missing. The tell: the error-path-to-happy-path case ratio is below 1:2. Empirically systematic in AI-generated suites and common in human ones under time pressure. Fix: apply ECP+BVA+error-paths+fault-injection explicitly; measure the ratio during review.</li>
+      <li><strong>Weak assertions.</strong> <code>assertNotNull</code>, <code>assertTrue(true)</code>, <code>instanceof</code>, &ldquo;does not throw&rdquo; as the sole assertion. Passes for any implementation that returns a non-null same-type object, including a wrong one. The tell: search for <code>assertNotNull</code> with no other assertion on the same object; count the fraction of cases whose <code>expected</code> is qualitative rather than an enumerated value. Fix: every case asserts a specific expected value named in the TestSpec's <code>expected</code> block.</li>
+      <li><strong>Over-mocking.</strong> A leaf case's <code>preconditions</code> names four or more doubles; the resulting test is a puppet show in which the mocks agree with the mocks. The tell: any unit that requires more than two or three doubles to test; any <code>verify()</code>-heavy test suite at the leaf layer. Fix: revisit the DD for coupling; prefer fakes over mocks; move interaction verification to branch scope where real collaborators live.</li>
+      <li><strong>Mystery guest / hidden fixtures.</strong> Cases depend on data or state whose shape is not visible in the TestSpec &mdash; a database fixture referenced by name with no schema, a file in <code>test/resources/</code> referenced but not described. The tell: a reviewer cannot understand the <code>expected</code> without loading the external fixture. Fix: data and fixtures named with their essential shape inline or in a referenced <code>data</code> block within the TestSpec.</li>
+      <li><strong>Ice-cream-cone coverage.</strong> Many e2e tests, few unit tests. Tests are slow, flaky, expensive to maintain; defects land in production because the ones that should have been caught by fast unit tests were never written. The tell: leaf TestSpecs thin or absent; root TestSpec covers half of what unit tests should cover. Fix: push verification to the lowest layer that can reach it; a behaviour verifiable in a unit test does not belong in an e2e test.</li>
+      <li><strong>Coverage-as-quality-metric.</strong> The CI pipeline enforces a line-coverage threshold; the TestSpec declares no mutation bar. The test suite clears the line threshold with tautological tests and ships. The tell: the TestSpec's coverage bars name only structural metrics; no mutation threshold exists. Empirically 100% line / 4% mutation is a reachable state and catastrophic. Fix: declare and enforce a mutation-score bar in parallel with structural.</li>
+      <li><strong>Unbounded negative tests.</strong> A case asserts &ldquo;the function never errors&rdquo; or &ldquo;the session never leaks.&rdquo; Unbounded negatives are infinite in input space and cannot be verified. The tell: <code>expected</code> contains <em>never</em>, <em>always</em>, or <em>for all</em> without a bounded domain. Fix: bound the negative &mdash; &ldquo;for inputs in this enumerated class, the function does not error&rdquo; &mdash; so the test becomes finite and exhaustive over its class, not over the universe.</li>
+      <li><strong>Flaky tests left in place.</strong> A test that passes most of the time and fails intermittently without a real bug. The team learns to rerun failed tests; the signal is lost; real regressions land unnoticed. Google data: 84% of pass-to-fail transitions are flaky, not regressions. The tell: any case that cannot be run independently and repeatably. Fix: delete (Kent Beck's prescription) or fix the determinism root cause (inject clocks, seed random, isolate shared state, bound async with explicit waits, never real-network from unit tests).</li>
+      <li><strong>Orphan tests (<code>verifies</code> empty or unresolvable).</strong> Cases exist without a traceable intent, or <code>verifies</code> points at an ID that no longer exists. The tell: traceability validator reports cases with empty or broken <code>verifies</code>. Either the case is testing unspecified behaviour (which means the spec is incomplete or the case is pinning an implementation accident) or the referenced spec element was renamed / removed and the case was not updated. Fix: every case has a non-empty <code>verifies</code> resolving to a live ID; tooling enforces at submit.</li>
+      <li><strong>Fabricated retrofit intent.</strong> In a retrofit TestSpec, a case's <code>title</code> or <code>notes</code> claims the test was written to verify X, where X was inferred by an AI from the test name or body. The tell: every existing test has a plausible-sounding stated intent; retrofit output exhibits no <code>unknown</code> or unmapped cases. Hard rule violation: test intent is human-only in retrofit; AI proposals carry <code>recovery_status: unknown</code> until a human confirms. Fix: the retrofit skill refuses to emit stated intent on human-only fields; reviewer must supply or mark unknown.</li>
+    </ol>
+  </section>
+
+  <!-- ===================== SECTION 4: EXAMPLES ===================== -->
+  <section id="ts-examples">
+    <h2>4. Examples</h2>
+    <p class="lead">One domain: a session-management service. Seven sub-examples walk the scope tree: root-scope TestSpec (system / e2e), branch-scope TestSpec (integration), leaf-scope TestSpec (unit), a coverage matrix, a decision-table derivation, and two contrast examples &mdash; code-to-test vs spec-to-test, and fabricated-retrofit vs honest-retrofit. The domain is web-service-shaped by choice of vocabulary; the patterns apply across domains (&sect;1).</p>
+
+    <h3>The scope tree for these examples</h3>
+    <pre><code>/specs/
+  product_brief.md              # session-service (root)
+  requirements.md               # root
+  architecture.md               # root
+  testspec.md                   # TS (root &mdash; system/e2e)
+  /adrs/
+    adr-004-redis-session-store.md
+  /session-store/               # branch
+    requirements.md
+    architecture.md
+    testspec.md                 # TS-session-store (integration)
+    /expiry-calculator/         # leaf
+      detailed_design.md
+      testspec.md               # TS-session-store-expiry-calculator (unit)
+    /session-api/               # leaf
+      detailed_design.md
+      testspec.md               # TS-session-store-session-api (unit)</code></pre>
+
+    <h3>4.1 &nbsp; Leaf TestSpec (unit) &mdash; <code>expiry-calculator</code></h3>
+    <p>The DD specifies a pure function: given <code>last_touched</code>, <code>now</code>, <code>idle_ttl_seconds</code>, <code>absolute_ttl_seconds</code>, <code>created_at</code>, return a <code>SessionExpiry</code> with <code>expires_at</code> (the earlier of idle-based and absolute-based) and <code>is_expired</code> (whether <code>now &gt;= expires_at</code>). Errors on negative TTLs. The leaf TestSpec is thin by design.</p>
+
+    <pre><code>---
+id: TS-session-store-expiry-calculator
+scope: session-store/expiry-calculator
+parent_scope: session-store
+level: unit
+verifies: [DD-session-store-expiry-calculator]
+derived_from: DD-session-store-expiry-calculator
+governing_adrs: []
+---
+
+# TestSpec &mdash; expiry-calculator (unit)
+
+Unit verification of the pure expiry-calculator function. Leaf scope; derivation is from the DD.
+
+## Coverage matrix
+
+| DD element                                     | Test cases                       | Strategy    |
+|------------------------------------------------|----------------------------------|-------------|
+| behavior.compute_expiry                        | TC-001, TC-002                   | req-based   |
+| behavior.earliest_of_idle_and_absolute         | TC-001, TC-002                   | req-based   |
+| behavior.idle_window_boundary                  | TC-003, TC-004                   | boundary    |
+| behavior.absolute_ttl_boundary                 | TC-005                           | boundary    |
+| error.negative_idle_seconds                    | TC-006                           | error       |
+| error.negative_absolute_seconds                | TC-007                           | error       |
+| invariant.expires_at_monotonic_in_last_touched | TC-008                           | property    |
+
+## Coverage bars
+
+structural: { branch: ">= 90%" }
+mutation:   { score:  ">= 85%" }
+
+## Cases
+
+- id: TC-001
+  title: idle-based expiry when idle_ttl is earlier than absolute_ttl
+  type: functional
+  verifies: [DD-session-store-expiry-calculator.behavior.earliest_of_idle_and_absolute]
+  inputs:
+    now: "2026-04-21T12:00:00Z"
+    last_touched: "2026-04-21T11:45:00Z"
+    idle_ttl_seconds: 1800        # 30 min from last_touched &rarr; 12:15
+    absolute_ttl_seconds: 86400   # 24 h from created_at &rarr; much later
+    created_at: "2026-04-21T10:00:00Z"
+  expected:
+    expires_at: "2026-04-21T12:15:00Z"
+    is_expired: false
+
+- id: TC-003
+  title: is_expired true exactly at idle expiry boundary (inclusive)
+  type: boundary
+  verifies: [DD-session-store-expiry-calculator.behavior.idle_window_boundary]
+  inputs:
+    now: "2026-04-21T12:15:00Z"
+    last_touched: "2026-04-21T11:45:00Z"
+    idle_ttl_seconds: 1800
+    absolute_ttl_seconds: 86400
+    created_at: "2026-04-21T10:00:00Z"
+  expected:
+    is_expired: true       # boundary is inclusive per DD
+
+- id: TC-004
+  title: is_expired false one second before idle expiry boundary
+  type: boundary
+  verifies: [DD-session-store-expiry-calculator.behavior.idle_window_boundary]
+  inputs:
+    now: "2026-04-21T12:14:59Z"
+    last_touched: "2026-04-21T11:45:00Z"
+    idle_ttl_seconds: 1800
+    absolute_ttl_seconds: 86400
+    created_at: "2026-04-21T10:00:00Z"
+  expected:
+    is_expired: false
+
+- id: TC-006
+  title: rejects negative idle_ttl_seconds
+  type: error
+  verifies: [DD-session-store-expiry-calculator.error.negative_idle_seconds]
+  inputs: { idle_ttl_seconds: -1, &hellip; }
+  expected: { raises: InvalidConfigurationError, message_contains: "idle_ttl_seconds" }
+
+- id: TC-008
+  title: expires_at is monotonic non-decreasing as last_touched advances
+  type: property
+  verifies: [DD-session-store-expiry-calculator.invariant.expires_at_monotonic_in_last_touched]
+  inputs:
+    generator: last_touched_pair
+      &mdash; last_touched_a: any valid Instant in [created_at, created_at + absolute_ttl]
+      &mdash; last_touched_b: any valid Instant with last_touched_b &gt;= last_touched_a
+    fixed:
+      idle_ttl_seconds: 1800
+      absolute_ttl_seconds: 86400
+      created_at: "2026-04-21T10:00:00Z"
+  expected:
+    invariant: compute_expiry(&hellip;, last_touched_b, &hellip;).expires_at &gt;= compute_expiry(&hellip;, last_touched_a, &hellip;).expires_at
+</code></pre>
+
+    <p>Case bodies are short; the DD carries the behaviour, the TestSpec carries the derivation discipline, the JUnit method will carry the assertion syntax. TC-001 is the happy path from RBT; TC-003 and TC-004 are boundary pairs; TC-006 is error; TC-008 is a property expressing a DD invariant that ECP+BVA alone would not reach.</p>
+
+    <h3>4.2 &nbsp; Branch TestSpec (integration) &mdash; <code>session-store</code></h3>
+    <p>The branch Architecture composes <code>session-api</code>, <code>session-persistence</code> (Redis-backed), and <code>cleanup-worker</code>. The branch TestSpec verifies the interfaces between them and the composition-level invariants that hold across children.</p>
+
+    <pre><code>---
+id: TS-session-store
+scope: session-store
+parent_scope: null
+level: integration
+verifies:
+  - ARCH-session-store
+  - ARCH-session-store.interfaces.session-api
+  - ARCH-session-store.composition.cleanup-api-coordination
+  - REQ-session-store-002
+derived_from: ARCH-session-store
+governing_adrs: [ADR-004]
+---
+
+# TestSpec &mdash; session-store (integration)
+
+Integration verification of session-store's three children and their composition invariants.
+
+## Coverage bars
+
+structural: { branch: ">= 80%" }
+mutation:   { score:  ">= 70%" }
+
+## Cases
+
+- id: TC-001
+  title: store_and_retrieve returns identical session shape
+  suite: session-api
+  type: functional
+  verifies: [ARCH-session-store.interfaces.session-api]
+  preconditions:
+    - redis-test-container healthy on port $TC_REDIS_PORT
+    - session-store service connected to $TC_REDIS_PORT
+    - no sessions in store
+  inputs:
+    session: { id: "S-42", principal: "alice", created_at: "2026-04-21T10:00:00Z", ttl_seconds: 1800 }
+  steps:
+    - POST /sessions with {session}
+    - GET /sessions/S-42
+  expected:
+    - POST returns 201 with Location: /sessions/S-42
+    - GET returns 200 with body deep-equal to {session}
+
+- id: TC-002
+  title: concurrent last_touched updates preserve max timestamp
+  suite: session-api
+  type: functional
+  verifies: [ARCH-session-store.composition.concurrency-invariants]
+  preconditions:
+    - session S-42 exists with last_touched = 2026-04-21T11:00:00Z
+  steps:
+    - 32 concurrent workers POST /sessions/S-42/touch with timestamps 11:00:01Z .. 11:00:32Z (random order)
+  expected:
+    - all 32 POSTs return 200
+    - final GET /sessions/S-42 reports last_touched = 2026-04-21T11:00:32Z (max of the 32)
+    - no intermediate timestamp is observable
+
+- id: TC-005
+  title: cleanup-worker and session-api do not race on expired entries
+  suite: cleanup
+  type: functional
+  verifies: [ARCH-session-store.composition.cleanup-api-coordination]
+  preconditions:
+    - session S-99 exists with last_touched = now - 3601s, idle_ttl = 3600s
+  steps:
+    - trigger cleanup-worker batch
+    - concurrently GET /sessions/S-99 (50 calls over 200ms)
+  expected:
+    - GET returns 404 or 200 with is_expired=true
+    - GET never returns 200 with is_expired=false after first cleanup observation
+
+- id: TC-contract-001
+  title: session-api honours Pact contract v3 from checkout-service consumer
+  suite: contracts
+  type: contract
+  verifies: [ARCH-session-store.interfaces.session-api]
+  preconditions:
+    - pact file checkout-service/session-api/v3.json loaded
+  steps:
+    - replay all Pact interactions against session-api provider
+  expected:
+    - every Pact interaction's response matches the provider state
+</code></pre>
+
+    <p>Branch cases carry <code>preconditions</code> (environment, state) and <code>steps</code> (ordered multi-action scenarios). TC-002 verifies a composition invariant (&ldquo;concurrent updates preserve max&rdquo;) that no leaf case can reach. TC-contract-001 is a consumer-driven contract case, integrating with an external consumer's Pact contract.</p>
+
+    <h3>4.3 &nbsp; Root TestSpec (system / e2e) &mdash; <code>session-service</code></h3>
+    <p>Root cases are scenarios written in the Product Brief's vocabulary. <code>verifies</code> references root Requirements and Product Brief outcomes.</p>
+
+    <pre><code>---
+id: TS
+scope: null
+parent_scope: null
+level: system
+verifies:
+  - REQ-001     # sessions expire after 30 minutes idle
+  - REQ-002     # logout invalidates session immediately on all devices
+  - REQ-003     # concurrent session limit is 5 per principal
+  - PB.outcomes.secure-session-lifecycle
+derived_from: [requirements.md, product_brief.md]
+governing_adrs: []
+---
+
+# TestSpec &mdash; session-service (root, system / e2e)
+
+## Coverage bars
+
+structural: { branch: ">= 70%" }
+mutation:   { not applicable at this layer }
+
+## Cases
+
+- id: TC-001
+  title: user logs in on two devices, both usable, same session
+  suite: login-lifecycle
+  type: functional
+  verifies: [PB.outcomes.secure-session-lifecycle, REQ-001]
+  preconditions:
+    - staging env deployed
+    - test user "alice" provisioned, no active sessions
+  inputs:
+    credentials: { username: "alice", password: $ALICE_PASSWORD }
+  steps:
+    - client-A: POST /login, receives session token T
+    - client-A: GET /me with bearer T, expects alice's profile
+    - client-B (different User-Agent): GET /me with bearer T
+  expected:
+    - POST /login &rarr; 200, token T issued
+    - both GET /me &rarr; 200 with principal "alice" and same session_id
+    - session TTL visible at GET /sessions/me equals 30 min idle
+
+- id: TC-004
+  title: logout on one device invalidates session on all devices within 2s
+  suite: logout-flow
+  type: functional
+  verifies: [REQ-002, PB.outcomes.secure-session-lifecycle]
+  preconditions:
+    - TC-001 has run; token T is active on clients A and B
+  steps:
+    - client-A: POST /logout with bearer T
+    - wait up to 2s
+    - client-B: GET /me with bearer T
+  expected:
+    - /logout returns 204
+    - /me from client-B returns 401 within the 2s window
+    - the 2s is the eventual-consistency budget named in ARCH Composition
+
+- id: TC-008
+  title: idle session on all devices expires reliably at the 30m boundary
+  suite: expiry-enforcement
+  type: boundary
+  verifies: [REQ-001, PB.outcomes.secure-session-lifecycle]
+  preconditions:
+    - test user "bob" logged in on client-A and client-B at T0
+    - both idle (no requests) from T0
+  steps:
+    - at T0 + 29m 59s: client-A GET /me &rarr; expect 200
+    - at T0 + 30m 01s: client-A GET /me &rarr; expect 401
+    - at T0 + 30m 02s: client-B GET /me &rarr; expect 401
+  expected: as stated in steps
+</code></pre>
+
+    <p>Root cases read as user journeys; <code>expected</code> is phrased in the Product Brief's language (&ldquo;session is still usable,&rdquo; &ldquo;expires reliably&rdquo;); TTL / environment / 2s-budget values come from the root Requirements and root Architecture. Mutation score is marked <em>not applicable</em> because the mutation-testing-tool scope is the production code binary, and at system scope many mutations are in code paths the e2e tests legitimately do not exercise &mdash; the branch and leaf layers carry the mutation bar.</p>
+
+    <h3>4.4 &nbsp; Coverage matrix example (<code>session-store</code> branch)</h3>
+    <p>The matrix is rebuilt by tooling from <code>verifies</code> links. What authors maintain is the spec-element column and a review of which elements are uncovered. Rendered:</p>
+
+    <pre><code>| ARCH-session-store element                             | Verifying cases        | Gaps |
+|--------------------------------------------------------|------------------------|------|
+| .interfaces.session-api (POST /sessions)               | TC-001                 | &mdash;    |
+| .interfaces.session-api (GET /sessions/{id})           | TC-001                 | &mdash;    |
+| .interfaces.session-api (POST /sessions/{id}/touch)    | TC-002                 | &mdash;    |
+| .interfaces.session-api (DELETE /sessions/{id})        | &lt;NONE&gt;                 | GAP  |
+| .interfaces.cleanup-api                                | TC-005                 | &mdash;    |
+| .composition.concurrency-invariants                    | TC-002                 | &mdash;    |
+| .composition.cleanup-api-coordination                  | TC-005                 | &mdash;    |
+| .decomposition.children.session-persistence (Redis)    | TC-001, TC-002, TC-005 | &mdash;    |
+| .decomposition.children.cleanup-worker                 | TC-005                 | &mdash;    |</code></pre>
+
+    <p>The <code>DELETE /sessions/{id}</code> interface has no verifying case &mdash; a gap. The Quality Bar blocks the branch TestSpec until the gap is closed or explicitly accepted with a recorded reason.</p>
+
+    <h3>4.5 &nbsp; Decision-table derivation walkthrough</h3>
+    <p>From the DD for session creation: <em>accept if credentials valid AND principal not rate-limited AND principal has fewer than 5 active sessions; otherwise reject with a specific error code</em>. Three conditions, three independent predicates, compound output. Decision table:</p>
+
+    <pre><code>| Rule | credentials_valid | not_rate_limited | under_5_sessions | Outcome                               |
+|------|-------------------|------------------|------------------|---------------------------------------|
+| R1   | T                 | T                | T                | accept, 201 &mdash; issue session token       |
+| R2   | T                 | T                | F                | reject, 429 &mdash; too many concurrent       |
+| R3   | T                 | F                | &mdash;                | reject, 429 &mdash; rate limited (don't-care)|
+| R4   | F                 | &mdash;                | &mdash;                | reject, 401 &mdash; invalid credentials       |</code></pre>
+
+    <p>Each row is a test case. R3 and R4 use don't-care markers because their outcome does not depend on the suppressed conditions. The full 2<sup>3</sup>=8 combinations prune to 4 essential cases. Derived TestSpec cases:</p>
+
+    <pre><code>- id: TC-login-R1
+  title: valid credentials, not rate-limited, under session cap &rarr; 201
+  type: functional
+  verifies: [ARCH-auth.interfaces.login]
+  inputs: { credentials_valid: true, rate_bucket_remaining: 10, active_sessions: 2 }
+  expected: { status: 201, token_issued: true }
+
+- id: TC-login-R2
+  title: valid credentials but at session cap &rarr; 429
+  type: functional
+  verifies: [ARCH-auth.interfaces.login, REQ-003]
+  inputs: { credentials_valid: true, rate_bucket_remaining: 10, active_sessions: 5 }
+  expected: { status: 429, error_code: "session_cap_exceeded" }
+
+- id: TC-login-R3
+  title: rate-limited overrides session-cap check
+  type: functional
+  verifies: [ARCH-auth.interfaces.login]
+  inputs: { credentials_valid: true, rate_bucket_remaining: 0, active_sessions: 3 }
+  expected: { status: 429, error_code: "rate_limited" }
+
+- id: TC-login-R4
+  title: invalid credentials short-circuit both downstream checks
+  type: functional
+  verifies: [ARCH-auth.interfaces.login]
+  inputs: { credentials_valid: false, &hellip; }
+  expected: { status: 401, error_code: "invalid_credentials" }</code></pre>
+
+    <p>Four cases, derived mechanically from the decision table, covering every rule independently. MC/DC coverage for the three conditions falls out of the same four cases. Ad-hoc ECP alone would likely miss the R3-over-R2 precedence (&ldquo;rate-limited takes priority over session-cap&rdquo;) because nothing forces the author to enumerate combinations.</p>
+
+    <h3>4.6 &nbsp; Bad vs good &mdash; code-to-test vs spec-to-test</h3>
+    <p>Two versions of a leaf case for the expiry calculator. The DD says &ldquo;<code>compute_expiry</code> returns the earlier of <code>last_touched + idle_ttl_seconds</code> and <code>created_at + absolute_ttl_seconds</code>.&rdquo;</p>
+
+    <p><strong>Bad &mdash; code-to-test:</strong></p>
+    <pre><code>- id: TC-101
+  title: compute_expiry returns correct result
+  type: functional
+  verifies: [DD-session-store-expiry-calculator]
+  inputs:
+    last_touched: "2026-04-21T11:45:00Z"
+    idle_ttl_seconds: 1800
+    created_at: "2026-04-21T10:00:00Z"
+    absolute_ttl_seconds: 86400
+  expected:
+    expires_at: "&lt;whatever the implementation returns&gt;"   &larr; computed from code, not spec
+    is_expired: "&lt;whatever the implementation says&gt;"       &larr; same
+  notes: "Derived by running the implementation with these inputs and recording the output."
+</code></pre>
+
+    <p><strong>Good &mdash; spec-to-test:</strong></p>
+    <pre><code>- id: TC-001
+  title: idle-based expiry when idle_ttl is earlier than absolute_ttl
+  type: functional
+  verifies: [DD-session-store-expiry-calculator.behavior.earliest_of_idle_and_absolute]
+  inputs:
+    last_touched: "2026-04-21T11:45:00Z"
+    idle_ttl_seconds: 1800
+    created_at: "2026-04-21T10:00:00Z"
+    absolute_ttl_seconds: 86400
+  expected:
+    expires_at: "2026-04-21T12:15:00Z"   &larr; derived from DD: last_touched + 1800s
+    is_expired: false                     &larr; now (12:00) is before expires_at
+  notes: "Derived from DD. idle_ttl yields 12:15; absolute_ttl yields next day; DD says earlier wins."
+</code></pre>
+
+    <p>The bad version is vague about what the expected value depends on; its <code>verifies</code> points at the whole DD rather than a specific behaviour rule; its notes admit the provenance is the implementation. The test will always pass because the expected equals what the code produces, whatever the code is. The good version derives the expected from the DD's stated rule, cites the specific rule, and will fail if the implementation gets the &ldquo;earlier of the two&rdquo; logic wrong in any direction. Both cases superficially look like tests. Only one verifies anything.</p>
+
+    <h3>4.7 &nbsp; Bad vs good &mdash; fabricated retrofit vs honest retrofit</h3>
+    <p>A retrofit pass on an existing Java test in a legacy codebase. The original JUnit method:</p>
+
+    <pre><code>@Test
+void testExpiry() {
+    Session s = new Session("S-42", "alice", clock.instant());
+    s.touch();
+    clock.advance(Duration.ofMinutes(31));
+    assertTrue(s.isExpired(clock.instant()));
+}</code></pre>
+
+    <p><strong>Bad &mdash; fabricated retrofit:</strong></p>
+    <pre><code>- id: TC-legacy-001
+  title: session expires after 30 minutes of inactivity per REQ-001
+  type: functional
+  verifies: [REQ-001, DD-session-store-expiry-calculator.behavior.idle_window_boundary]   &larr; inferred
+  recovery_status: verified                                                                 &larr; illegal on human-only intent
+  notes: "This test verifies the 30-minute idle expiry requirement."                      &larr; AI inference
+</code></pre>
+
+    <p><strong>Good &mdash; honest retrofit:</strong></p>
+    <pre><code>- id: TC-legacy-001
+  title: session isExpired true after advance(31m) from touch (observed)
+  type: functional
+  verifies:
+    - candidate: DD-session-store-expiry-calculator.behavior.idle_window_boundary
+      recovery_status: unknown
+      note: "Test name 'testExpiry' and the 31m advance suggest this targets the 30m idle rule, but no comment, design doc, or commit message confirms intent. Human review required."
+  recovery_status: reconstructed     &larr; observed structure is reconstructed
+  observed_source:
+    file: src/test/java/&hellip;/SessionTest.java
+    method: testExpiry
+    sha: abc123
+  notes: "Retrofit proposal. Do not mark verified until a human confirms the intent."</code></pre>
+
+    <p>The bad version reads smoother because an AI invented the stated intent. The honest version refuses to fabricate: the observed structure carries <code>recovery_status: reconstructed</code>; the proposed <code>verifies</code> link carries its own <code>recovery_status: unknown</code>; the intent claim is absent from the <code>title</code> (which describes only observed behaviour) and explicitly flagged for human review in the notes. The skill layer emits only the honest shape. The reviewer has an explicit decision to make; the tool did not make it for them.</p>
+  </section>
+
+  <!-- ===================== SECTION 5: QUALITY BAR ===================== -->
+  <section id="ts-quality-bar">
+    <h2>5. Quality Bar</h2>
+    <p class="lead">Yes/No checklist, grouped by concern. A TestSpec passes when every applicable item is answered Yes. Two cards carry a visual accent: <strong>Coverage-mutation independence</strong> (where measuring only structural coverage is the single-largest silent-failure mode in software testing) and the <strong>Spec Ambiguity Test</strong> (the meta-gate overriding everything above).</p>
+
+    <div class="card">
+      <h3>Derivation discipline</h3>
+      <ul>
+        <li>Is the derivation source named explicitly in <code>derived_from</code> and does it match the layer (PB+Req at root; Architecture at branch; DD at leaf)?</li>
+        <li>Was the TestSpec authored before the test code and before the implementation code (or, in retrofit, independently of the existing tests)?</li>
+        <li>Does every case declare a <code>type</code> from the derivation-strategy vocabulary (functional / boundary / error / fault-injection / state-transition / property / contract / performance / security / accessibility / error-guessing)?</li>
+        <li>Has every applicable strategy been applied: RBT always; ECP+BVA for every input range; decision tables for every compound predicate; state-transition for every stateful unit; error paths for every named error; fault injection for every dependency?</li>
+        <li>Is the error-path-to-happy-path case ratio &geq; 1:2?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Case shape</h3>
+      <ul>
+        <li>Does every case have a non-empty <code>verifies</code> resolving to live spec IDs at this layer?</li>
+        <li>Is every case's <code>expected</code> a specific value or a bounded invariant, not a qualitative non-negative assertion?</li>
+        <li>Does every case carry a title that describes the scenario rather than the method under test?</li>
+        <li>Is every case independent, repeatable, and deterministic (F.I.R.S.T.), with clocks and random seeds named where relevant?</li>
+        <li>Is the one-Act-per-test discipline declared and the <code>steps</code> block respecting it (at layers where <code>steps</code> is present)?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Per-layer weight</h3>
+      <ul>
+        <li>At leaf: are cases thin (title + type + verifies + inputs + expected, with <code>steps</code> usually omitted)?</li>
+        <li>At branch: do <code>preconditions</code> name fixtures, doubles, and environment, and does <code>steps</code> enumerate the cross-child interactions?</li>
+        <li>At root: do cases read as user journeys, with <code>expected</code> phrased in the Product Brief's vocabulary rather than internal API terms?</li>
+        <li>Are integration/system cases that close leaf-level test-double gaps explicitly traced (leaf case notes the closer case; closer case <code>verifies</code> back)?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Traceability and completeness</h3>
+      <ul>
+        <li>Is every spec element at this layer covered by at least one case in the coverage matrix?</li>
+        <li>Are uncovered elements recorded as gaps, not hidden?</li>
+        <li>Does <code>verifies</code> granularity match the layer (field-level at leaf and branch; Requirement / outcome level at root)?</li>
+        <li>Has the traceability validator returned zero orphan cases and zero unresolved references?</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--accent-trace);">
+      <h3>Coverage-mutation independence &mdash; load-bearing</h3>
+      <ul>
+        <li>Does the TestSpec declare a structural coverage bar (branch &geq; 85% is a defensible default) enforced in CI?</li>
+        <li>Does the TestSpec declare a mutation-score bar (60% minimum viable / 80% target) enforced in CI at a named frequency?</li>
+        <li>Is the mutation-testing tool named (PIT, Stryker, mutmut, &hellip;) with its scope (files / modules / per-PR subset)?</li>
+        <li>Have weak-assertion and tautological-test audits been run (e.g., grep for assert-only-not-null; ratio of hard-coded expected values vs computed ones)?</li>
+        <li>Is it understood and documented that 100% line coverage with a 4% mutation score is an achievable state that ships no verification?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Test-double discipline</h3>
+      <ul>
+        <li>Does every test double in a leaf case's <code>preconditions</code> have a named type (dummy / stub / spy / mock / fake) and a reason?</li>
+        <li>Does every fake have a contract-test suite declared against the real implementation, run at a named frequency?</li>
+        <li>Is no leaf case using more than two doubles (or, if more, has the coupling been flagged as a design issue)?</li>
+        <li>Is interaction verification (mocks, spies) reserved for cases where the interaction itself is the observable behaviour?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Integration and system specifics</h3>
+      <ul>
+        <li>At branch scope: does every child-to-child interface have at least one contract or integration case?</li>
+        <li>At branch / root scope: does every case name the environment shape its <code>preconditions</code> require?</li>
+        <li>Are specialised cases (performance, security, accessibility) present where the Requirements quality attributes call for them?</li>
+        <li>Do specialised cases declare thresholds, derivation source (threat model, WCAG, SLO budget), and verification method?</li>
+        <li>Is contract-testing active where the scope has external consumers (Pact / OpenAPI / Avro), and are contract versions pinned in <code>preconditions</code>?</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Retrofit discipline</h3>
+      <ul>
+        <li>In retrofit, are TestSpec cases derived from the DD / Architecture / Requirements first, and existing tests mapped against the result afterwards?</li>
+        <li>Are proposed <code>verifies</code> links for observed tests marked <code>recovery_status: unknown</code> until a human confirms?</li>
+        <li>Is stated intent (title, notes) limited to observed behaviour when the original intent is not recoverable?</li>
+        <li>Is the gap report populated (uncovered spec elements, tests not mapping to any element, observed-but-suspect cases)?</li>
+      </ul>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--accent-trace);">
+      <h3>Spec Ambiguity Test &mdash; meta-gate</h3>
+      <ul>
+        <li>Could a junior engineer or mid-tier AI, reading only this TestSpec (plus the layer's spec artifact and governing ADRs), write test code that implements every case as specified, and &mdash; crucially &mdash; would a reviewer reading only the TestSpec be able to tell whether <em>every</em> equivalence class, <em>every</em> boundary, <em>every</em> error path was considered, without having to read the implementation or the test code?</li>
+      </ul>
+      <p>If the answer is No, the TestSpec under-specifies its derivation or misses applicable strategies. Revise before accepting. This test overrides every box above: a TestSpec that passes structural checks but fails this one has not done the job TestSpec exists to do.</p>
+    </div>
+  </section>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <section id="ts-references">
+    <h2>References</h2>
+    <p style="color: var(--fg-muted); font-size: 0.9em;">Primary backing from the engineering-codex (<code>/home/stefanus/repos/engineering-codex/</code>) and named primary sources. Load-bearing claims on this page &mdash; the coverage-mutation gap, LLM-generated test empirical data, the derivation-strategies toolbox &mdash; are anchored in the cited material.</p>
+    <ul>
+      <li><code>wiki/concepts/concept-v-model-test-derivation.md</code> &mdash; Derivation-source rule: tests derive from design / requirements, never from code. Foundation for &sect;1 and &sect;2.1.</li>
+      <li><code>wiki/concepts/concept-unit-test-design.md</code> &mdash; Behaviour testing, FIRST properties, AAA, test pyramid. Primary sources: Beck, <em>Test-Driven Development: By Example</em> (Addison-Wesley, 2003); Martin, <em>Clean Code</em>, ch. 9 (Prentice Hall, 2008); Meszaros, <em>xUnit Test Patterns</em> (Addison-Wesley, 2007). Cited throughout &sect;2.5.</li>
+      <li><code>wiki/concepts/concept-test-epistemology.md</code> &mdash; Three framings (verification / specification / falsification); specification-first discipline for AI-generated tests. Cited in &sect;2.1.</li>
+      <li><code>wiki/concepts/concept-test-doubles.md</code> &mdash; Meszaros five-type taxonomy; classical-vs-mockist debate; contract-test verified fakes. Primary sources: Meszaros 2007; Fowler, <em>Mocks Aren't Stubs</em> (martinfowler.com, 2007); Freeman &amp; Pryce, <em>Growing Object-Oriented Software, Guided by Tests</em> (Addison-Wesley, 2009). Cited throughout &sect;2.6.</li>
+      <li><code>wiki/concepts/concept-test-smells.md</code> &mdash; Fragile / obscure / eager / mystery-guest / flaky; empirical cost data (Google 84% pass-to-fail flake rate; Atlassian 150k dev-hours/year). Primary source: van Deursen et al., <em>Refactoring Test Code</em> (XP 2001). Cited in &sect;3.</li>
+      <li><code>wiki/concepts/concept-ai-test-generation.md</code> &mdash; Empirical AI test-generation data: 34&ndash;62% LLM tests syntactically invalid; 100%-line / 4%-mutation gap; MutGen 89.5% mutation score; Meta ACH 10,795 classes / 73% engineer acceptance; Copilot 7.55%/45.28% without/with context. Primary sources: Yang et al., <em>An Empirical Study on LLM-based Unit Test Generation</em> (ASE 2024); Foster et al., <em>Mutation-Guided LLM Test Generation at Meta Scale</em> (FSE 2025); Yang et al., <em>A Systematic Literature Review on Requirements-Based Test Generation</em> (267-paper survey, 2025). Cited in &sect;2.7 and &sect;3.</li>
+      <li><code>wiki/concepts/concept-mutation-testing.md</code> &mdash; Mutation testing as the viable complement to structural coverage; tooling (PIT, Stryker, mutmut); threshold defaults (60% minimum / 80% target). Cited in &sect;2.7.</li>
+      <li><code>wiki/concepts/concept-behavioral-specification.md</code> &mdash; Decision tables as direct test-case sources; Harel statecharts; cause-effect graphing (Myers, 1979); MC/DC derivation. Cited in &sect;2.3.</li>
+      <li><code>wiki/concepts/concept-design-by-contract.md</code> &mdash; Precondition / postcondition / invariant mapped to test setup / assertion / invariant check. Primary sources: Hoare, <em>An Axiomatic Basis for Computer Programming</em>, CACM 12(10), 1969; Meyer, <em>Object-Oriented Software Construction</em> (Prentice Hall, 1988 / 1997); Liskov &amp; Wing, <em>A Behavioral Notion of Subtyping</em>, TOPLAS 16(6), 1994. Referenced in &sect;2.3 and &sect;2.4.</li>
+      <li><code>wiki/concepts/concept-ears.md</code> &mdash; EARS template mapping to test strategies (ubiquitous &rarr; invariant; event-driven &rarr; stimulus-response; state-driven &rarr; mode test; optional feature &rarr; configuration; unwanted behaviour &rarr; fault injection). Referenced in &sect;2.3 and as a bridge in &sect;1.</li>
+      <li><code>wiki/patterns/pat-characterization-testing.md</code> &mdash; Feathers characterisation testing; AI-contamination hazard of aspirational test names; adjacency to retrofit. Primary source: Feathers, <em>Working Effectively with Legacy Code</em> (Prentice Hall, 2004). Cited in &sect;1 retrofit posture.</li>
+      <li>Cohn, Mike. <em>Succeeding with Agile</em> (Addison-Wesley, 2009). Test pyramid. Cited in &sect;1.</li>
+      <li>Dodds, Kent C. <em>The Testing Trophy and Testing Classifications</em> (kentcdodds.com, 2018). Trophy shape. Cited in &sect;1.</li>
+      <li>Schaffer, Andr&eacute;. <em>Testing of Microservices</em> (Spotify Engineering, 2018). Honeycomb shape. Cited in &sect;1.</li>
+      <li>North, Dan. <em>Introducing BDD</em> (dannorth.net, 2006). BDD origins; Given-When-Then. Cited in &sect;1.</li>
+      <li>Adzic, Gojko. <em>Specification by Example</em> (Manning, 2011). ATDD / living documentation. Cited in &sect;1 and &sect;2.1.</li>
+      <li>Fowler, Martin. <em>Consumer-Driven Contracts: A Service Evolution Pattern</em> (martinfowler.com, 2006); Pact Foundation, <em>Pact Specification</em> (pact.io). Contract testing. Cited in &sect;2.8.</li>
+      <li>PIT (Pitest) mutation testing for JVM (<a href="https://pitest.org/">pitest.org</a>); Stryker Mutator for JavaScript / TypeScript (<a href="https://stryker-mutator.io/">stryker-mutator.io</a>); mutmut for Python. Cited in &sect;2.7.</li>
+      <li>WCAG 2.2 (<a href="https://www.w3.org/TR/WCAG22/">w3.org/TR/WCAG22</a>); axe-core, pa11y. Accessibility testing references. Cited in &sect;2.8.</li>
+      <li>OWASP Top Ten (<a href="https://owasp.org/www-project-top-ten/">owasp.org</a>); STRIDE threat-modelling taxonomy (Howard &amp; LeBlanc, <em>Writing Secure Code</em>, Microsoft Press, 2002). Security testing. Cited in &sect;2.8.</li>
+      <li>Osherove, Roy. <em>The Art of Unit Testing</em> (Manning, 2nd ed., 2013). Test naming conventions. Cited in &sect;2.5.</li>
+    </ul>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+<script src="../js/app.js"></script>
+</body>
+</html>

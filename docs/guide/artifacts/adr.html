@@ -36,6 +36,7 @@
     <div class="nav-group">
       <span class="nav-group-label">Related Artifacts</span>
       <a class="nav-link" href="requirements.html">Requirements</a>
+      <a class="nav-link" href="architecture.html">Architecture</a>
       <a class="nav-link" href="detailed-design.html">Detailed Design</a>
     </div>
   </nav>
@@ -57,8 +58,7 @@
 
     <h3>Why the framework treats ADRs as first-class</h3>
     <p>Code, tests, and state documentation together describe what the system <em>is</em>. They do not distinguish <em>essential</em> constraints &mdash; the ones a change must respect &mdash; from <em>accidental</em> ones, which just happened to be how someone typed it. Every line of code looks equally load-bearing without a record of which constraints carry weight and why.</p>
-    <p>Rationale is the artifact that draws that line. When it is captured at decision time, a future reader (human or agent) can tell a hard requirement from an incidental choice, safely refactor the accidental parts, and negotiate the essential parts with eyes open. When rationale is missing, every refactor looks risky and every review is reduced to checking that code matches tests. Tests without rationale cannot explain themselves: a passing assertion may encode a specification, a customer accommodation from 2019, or a hardware quirk, and all three look identical in the test file.</p>
-    <p>This argument is <em>essential-vs-accidental constraint distinguishability</em>. It is the reason ADRs sit in the artifact set.</p>
+    <p>Rationale is the artifact that draws that line &mdash; the essential-vs-accidental constraint distinguishability that the rest of the artifact set depends on. When it is captured at decision time, a future reader (human or agent) can tell a hard requirement from an incidental choice, safely refactor the accidental parts, and negotiate the essential parts with eyes open. When rationale is missing, every refactor looks risky and every review is reduced to checking that code matches tests. Tests without rationale cannot explain themselves: a passing assertion may encode a specification, a customer accommodation from 2019, or a hardware quirk, and all three look identical in the test file.</p>
 
     <div class="card">
       <h3>The threshold for authoring an ADR</h3>
@@ -75,7 +75,6 @@
     <ul>
       <li><strong>Not a design document.</strong> The ADR captures a decision; the Architecture or Detailed Design captures the structure that implements it.</li>
       <li><strong>Not a meeting record.</strong> Discussion is summarised to the decision and the reasons that survive it. Transcripts do not belong.</li>
-      <li><strong>Not a justification for a foregone conclusion.</strong> If only one option was ever considered, there was no decision &mdash; there is a note for the design, not an ADR.</li>
       <li><strong>Not a retrofit invention.</strong> When rationale for a pre-existing decision is lost, the framework records that it is lost, not a plausible-sounding story.</li>
     </ul>
 
@@ -484,7 +483,6 @@ any migration is attempted. Owner: @ops-lead.
 
 </main>
 
-<script src="../js/domain.js"></script>
 <script src="../js/app.js"></script>
 </body>
 </html>

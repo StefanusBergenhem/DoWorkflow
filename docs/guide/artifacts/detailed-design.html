@@ -88,20 +88,6 @@
     <h3>2.1 Document the why, not the what</h3>
     <p>The first discipline of a DD is knowing what belongs in it and what does not. The test is whether the information is recoverable from the code. If a skilled reader could derive a fact by reading the code alone, that fact does not belong in the DD; putting it there creates two places for one fact, which will drift.</p>
 
-    <table class="field-table">
-      <thead>
-        <tr><th>Document this (code cannot provide)</th><th>Do not document this (code already shows)</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Why this algorithm was chosen over alternatives</td><td>The step-by-step implementation logic</td></tr>
-        <tr><td>What external constraint forced this data structure</td><td>Variable names and their types</td></tr>
-        <tr><td>Valid state space of parameters (ranges, invariants)</td><td>Control flow that is clear from structure</td></tr>
-        <tr><td>What happens when preconditions are violated</td><td>Language-specific syntax</td></tr>
-        <tr><td>Expected performance envelope and why it matters</td><td>Information the type system already captures</td></tr>
-        <tr><td>What the leaf hides and why that boundary was drawn</td><td>What the code does line by line</td></tr>
-      </tbody>
-    </table>
-
     <h3>Two rules that both apply</h3>
     <p>A DD must satisfy two rules simultaneously. They look contradictory but operate at different levels.</p>
     <p><strong>Rule 1 &mdash; Do not duplicate the code.</strong> The DD must not paraphrase implementation logic. If a skilled developer could derive a fact from the code, that fact is not in the DD.</p>
@@ -328,7 +314,7 @@ Null inputs are rejected with IllegalArgumentException.</code></div>
     <h3>Interface and contract</h3>
     <ol>
       <li><strong>Undefined-range precondition.</strong> A parameter has no stated valid range, and the caller has no way to know which values are in contract. Tell: the contract mentions the parameter's type but not the set of values it accepts.</li>
-      <li><strong>Implicit unit.</strong> A numeric parameter carries no stated unit of measure. Tell: a <code>double altitude</code>, a <code>long duration</code>, a <code>float temperature</code> with no unit named nearby. The Mars Climate Orbiter burned because of this one.</li>
+      <li><strong>Implicit unit.</strong> A numeric parameter carries no stated unit of measure. Tell: a <code>double altitude</code>, a <code>long duration</code>, a <code>float temperature</code> with no unit named nearby.</li>
       <li><strong>Implementation-leaking interface.</strong> The public contract names a concrete collection type, exposes internal structure, or commits to a specific storage layout. Tell: the interface changes when a refactor changes the internal representation.</li>
       <li><strong>Silent null return.</strong> A function can return <code>null</code> (or the equivalent) and the contract does not say so. Tell: the return type is nullable in the language but the contract does not mention the null case, leaving each caller to guess.</li>
       <li><strong>Algorithmic postcondition.</strong> The postcondition describes the steps the implementation takes rather than the property of the result. Tell: the postcondition begins "shall iterate&hellip;" or "shall compute&hellip;" instead of "the returned value shall satisfy&hellip;."</li>
@@ -490,9 +476,8 @@ configuration; no other leaf reads config files directly.
   warnings/errors; no exception is thrown during normal loading. Paths
   that exceed the size cap raise IllegalArgumentException.
 
-### ConfigRegistry.getString(key: String, default: String?): String
-### ConfigRegistry.getInt(key: String, default: Int?): Int
-[&hellip; other typed getters; same shape &hellip;]
+### ConfigRegistry.getString / getInt / getBoolean / &hellip;
+[&hellip; same shape, typed per value &hellip;]
 
 ## Data Structures
 

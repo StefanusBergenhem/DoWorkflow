@@ -191,38 +191,6 @@ body {
   color: var(--fg-muted);
 }
 
-/* Domain switcher */
-.domain-switcher {
-  padding: var(--space-md) var(--space-lg);
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-.domain-switcher label {
-  display: block;
-  font-size: var(--size-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--fg-muted);
-  margin-bottom: var(--space-xs);
-}
-
-.domain-switcher select {
-  width: 100%;
-  padding: 6px 10px;
-  background: var(--bg-sidebar-hover);
-  color: var(--fg-sidebar-active);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 4px;
-  font-family: var(--font-body);
-  font-size: var(--size-sm);
-  cursor: pointer;
-  outline: none;
-}
-
-.domain-switcher select:focus {
-  border-color: var(--accent-left);
-}
-
 /* --- Main Content --- */
 .main-content {
   margin-left: var(--sidebar-width);
@@ -307,18 +275,6 @@ a {
 
 a:hover {
   border-bottom-color: var(--fg-link);
-}
-
-/* Domain-translated terms */
-[data-term] {
-  font-weight: 500;
-  border-bottom: 1px dotted var(--accent-trace);
-  cursor: help;
-  transition: background 0.15s;
-}
-
-[data-term]:hover {
-  background: rgba(124, 58, 237, 0.08);
 }
 
 /* --- Code Blocks --- */
