@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vmodelworkflow.dev/schemas/artifacts/envelope/v1",
+  "title": "V-Model artifact envelope",
+  "description": "Universal front-matter shape common to all six V-Model artifact types (Product Brief, Requirements, Architecture, ADR, Detailed Design, TestSpec). Per-artifact schemas extend this envelope via allOf, add type-specific fields (scope, parent_scope, derived_from, governing_adrs, scope_tags, affected_scopes, …), and tighten constraints on id. Validating front-matter against the envelope alone answers 'is this a recognisable V-Model artifact?'; validating against the per-artifact schema answers 'is it a well-formed instance of its type?'.",
+
+  "type": "object",
+
+  "required": ["id", "title", "artifact_type", "status", "date", "version"],
+
+  "properties": {
+
+    "id": {
+      "description": "Stable artifact identifier. Per-artifact schemas tighten to a type-specific pattern — PB for Product Brief, REQ-{scope}-{seq} for Requirements, ARCH-{scope} for Architecture, DD-{scope}-{name} for Detailed Design, TS-{scope} for TestSpec, ADR-{seq}-{slug} for ADR. IDs are stable across file renames; traceability links reference IDs, not paths.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/artifact_id"
+    },
+
+    "title": {
+      "description": "Human-readable one-line title. Appears as the document header.",
+      "type": "string",
+      "minLength": 1
+    },
+
+    "artifact_type": {
+      "description": "Type discriminator. Redundant with filename convention (product_brief.md, requirements.md, …) but required so an artifact identifies itself without filesystem context.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/artifact_type"
+    },
+
+    "status": {
+      "description": "Lifecycle state. Universal across all artifact types.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/lifecycle_status"
+    },
+
+    "date": {
+      "description": "Date the artifact was last materially modified.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/iso_date"
+    },
+
+    "version": {
+      "description": "Monotonic integer version of this artifact. Bumped on material revisions.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/version"
+    },
+
+    "recovery_status": {
+      "description": "Retrofit provenance. Absent on greenfield artifacts. Scalar form applies to the whole artifact; object form targets named fields. The no-fabrication rule is enforced per-artifact, not here.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/recovery_status"
+    },
+
+    "supersedes": {
+      "description": "Artifact ID that this artifact replaces. Used when a differently-named artifact takes over from a predecessor (common for ADRs; rare elsewhere). Routine revisions bump the version field instead of issuing a superseding artifact.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/artifact_id_ref"
+    },
+
+    "superseded_by": {
+      "description": "Artifact ID that replaces this artifact. Set when status transitions to superseded.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/artifact_id_ref"
+    }
+  },
+
+  "additionalProperties": true
+}

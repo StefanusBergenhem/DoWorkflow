@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1",
+  "title": "V-Model artifact — shared definitions",
+  "description": "Reusable $defs referenced by envelope.schema.json and every per-artifact schema. Single source of truth for scope-path regex, artifact-type discriminator, lifecycle status, ISO date shape, version numbers, retrofit recovery status, and loose artifact-ID stubs. Per-artifact schemas tighten id / status further.",
+
+  "$defs": {
+
+    "kebab_segment": {
+      "description": "One kebab-case segment: lowercase letters / digits, single hyphens separating runs.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+
+    "scope_path": {
+      "description": "Slash-separated kebab-case segments naming a scope in the tree. Empty string denotes the root scope.",
+      "type": "string",
+      "pattern": "^$|^[a-z0-9]+(-[a-z0-9]+)*(/[a-z0-9]+(-[a-z0-9]+)*)*$"
+    },
+
+    "artifact_type": {
+      "description": "Discriminator for the six V-Model artifact types.",
+      "type": "string",
+      "enum": [
+        "product-brief",
+        "requirements",
+        "architecture",
+        "adr",
+        "detailed-design",
+        "test-spec"
+      ]
+    },
+
+    "lifecycle_status": {
+      "description": "Universal lifecycle for every artifact. draft = being written or under review, not yet in force. active = current in-force version. superseded = replaced by a newer artifact (see supersedes / superseded_by links).",
+      "type": "string",
+      "enum": ["draft", "active", "superseded"]
+    },
+
+    "iso_date": {
+      "description": "Last-modified date in ISO 8601 (YYYY-MM-DD). No time component.",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "format": "date"
+    },
+
+    "version": {
+      "description": "Monotonic integer version. Bumped on material revisions. Git carries the history; this field is a stable ordinal that can be referenced from tests, reviews, and traceability.",
+      "type": "integer",
+      "minimum": 1
+    },
+
+    "recovery_status_scalar": {
+      "description": "Retrofit provenance for a whole artifact or a single field.",
+      "type": "string",
+      "enum": ["verified", "reconstructed", "unknown"]
+    },
+
+    "recovery_status_map": {
+      "description": "Per-field / per-section recovery status. Keys name fields or sections within the artifact.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/recovery_status_scalar" },
+      "minProperties": 1
+    },
+
+    "recovery_status": {
+      "description": "Retrofit provenance marker. Scalar form applies the status to the whole artifact; object form targets named fields or sections. Per-artifact schemas may tighten further — notably the no-fabrication rule bans 'reconstructed' on human-only fields.",
+      "oneOf": [
+        { "$ref": "#/$defs/recovery_status_scalar" },
+        { "$ref": "#/$defs/recovery_status_map" }
+      ]
+    },
+
+    "artifact_id": {
+      "description": "Generic artifact ID stub. Per-artifact schemas constrain this with the type-specific pattern (PB; REQ-*; ARCH-*; DD-*; TS-*; ADR-*).",
+      "type": "string",
+      "minLength": 1
+    },
+
+    "artifact_id_ref": {
+      "description": "Reference to another artifact by ID. Same shape as artifact_id; context distinguishes authoring from referencing.",
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
