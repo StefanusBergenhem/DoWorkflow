@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vmodelworkflow.dev/schemas/artifacts/product-brief/v1",
+  "title": "Product Brief front-matter",
+  "description": "Front-matter shape for a Product Brief, the root-scope anchor artifact of a system. One per system, lives at /specs/product_brief.md. Composes the universal envelope and adds three tightenings: id is fixed to the literal 'PB'; artifact_type is fixed to 'product-brief'; a one-sentence 'summary' field is mandatory. recovery_status is narrowed to reject the 'reconstructed' value — the Product Brief is human-only throughout (stakeholders, problem, outcomes, operational concept, constraints, non-goals, success criteria are not derivable from code), so the no-fabrication rule bans AI-reconstructed content at both scalar and per-field granularity. This schema validates front-matter YAML only; presence of the seven canonical body sections (Stakeholders, Problem, Desired Outcomes, Operational Concept, Constraints, Non-Goals, Success Criteria) is enforced separately by a structural checker, not by JSON Schema.",
+
+  "allOf": [
+    { "$ref": "https://vmodelworkflow.dev/schemas/artifacts/envelope/v1" },
+    {
+      "type": "object",
+      "required": ["id", "artifact_type", "summary"],
+      "properties": {
+
+        "id": {
+          "description": "Always the literal 'PB'. Root scope is implicit for the Product Brief — there is exactly one per system and its scope needs no identifier.",
+          "const": "PB"
+        },
+
+        "artifact_type": {
+          "description": "Artifact-type discriminator, fixed for this schema.",
+          "const": "product-brief"
+        },
+
+        "summary": {
+          "description": "One-sentence summary following the shape: '{Product} is a {category} for {audience} that {does what}, so that {outcome}.' The Brief's own forcing function: if a clean one-sentence summary cannot be written, the Brief is not yet ready to author.",
+          "type": "string",
+          "minLength": 1
+        },
+
+        "recovery_status": {
+          "description": "Retrofit provenance. Narrowed from the envelope's default to reject 'reconstructed' — Product Brief content is human-only (stakeholders, problem, outcomes, etc. are not derivable from code), so recovery values are limited to 'verified' (a human has confirmed the field) or 'unknown' (no human source available). The 'reconstructed' value, which means 'inferred from code-derivable evidence', is nonsensical for this artifact.",
+          "$ref": "#/$defs/recovery_status_no_reconstructed"
+        }
+      }
+    }
+  ],
+
+  "$defs": {
+
+    "recovery_status_no_reconstructed": {
+      "description": "Human-only recovery_status: scalar or per-field map, both restricted to 'verified' | 'unknown'. Used by artifacts whose content cannot be honestly reconstructed from code.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["verified", "unknown"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["verified", "unknown"]
+          },
+          "minProperties": 1
+        }
+      ]
+    }
+  }
+}
