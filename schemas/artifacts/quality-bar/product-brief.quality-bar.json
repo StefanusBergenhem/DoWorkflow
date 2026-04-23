@@ -1,0 +1,262 @@
+{
+  "$schema": "https://vmodelworkflow.dev/schemas/artifacts/quality-bar/v1",
+  "artifact_type": "product-brief",
+  "version": 1,
+  "extracted_from": "docs/guide/artifacts/product-brief.html",
+  "extracted_at": "2026-04-23",
+
+  "groups": [
+    {
+      "id": "stakeholder-completeness",
+      "title": "Stakeholder completeness",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-stakeholder-completeness-001",
+          "prompt": "Has the Onion Model been walked once, every slot considered?"
+        },
+        {
+          "id": "QB-PB-stakeholder-completeness-002",
+          "prompt": "For empty slots: is the reason recorded (\"n/a — internal tool, single user\"), not silently blank?"
+        },
+        {
+          "id": "QB-PB-stakeholder-completeness-003",
+          "prompt": "Are negative stakeholders explicitly considered (and either named or recorded as none after review)?"
+        },
+        {
+          "id": "QB-PB-stakeholder-completeness-004",
+          "prompt": "For each named stakeholder: is the source chain recorded (direct vs. surrogate vs. multi-hop)?"
+        },
+        {
+          "id": "QB-PB-stakeholder-completeness-005",
+          "prompt": "For multi-hop surrogate inputs: has a direct interview been triggered before treating their outcomes or constraints as load-bearing?"
+        }
+      ]
+    },
+
+    {
+      "id": "problem-evidence",
+      "title": "Problem evidence",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-problem-evidence-001",
+          "prompt": "Is the Problem stated as a problem in the world, not as a solution?"
+        },
+        {
+          "id": "QB-PB-problem-evidence-002",
+          "prompt": "Has the first problem statement been pushed past at least one \"why\"?"
+        },
+        {
+          "id": "QB-PB-problem-evidence-003",
+          "prompt": "Is concrete evidence cited (data, artifacts, quotes), with sources?"
+        },
+        {
+          "id": "QB-PB-problem-evidence-004",
+          "prompt": "Where evidence is honestly weak, is that admitted in the Brief rather than padded?"
+        }
+      ]
+    },
+
+    {
+      "id": "outcome-specificity",
+      "title": "Outcome specificity",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-outcome-specificity-001",
+          "prompt": "Is there one outcome paragraph per stakeholder group named in § A?",
+          "references": { "sections": ["A"] }
+        },
+        {
+          "id": "QB-PB-outcome-specificity-002",
+          "prompt": "Does each outcome describe a changed state of the world (observable), not a feature or aspiration?"
+        },
+        {
+          "id": "QB-PB-outcome-specificity-003",
+          "prompt": "Could a reviewer picture how to recognise the outcome as having happened?"
+        },
+        {
+          "id": "QB-PB-outcome-specificity-004",
+          "prompt": "Working-backwards check: could the launch announcement be written from these outcomes without invention?"
+        }
+      ]
+    },
+
+    {
+      "id": "operational-concept-coverage",
+      "title": "Operational Concept coverage",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-operational-concept-coverage-001",
+          "prompt": "Are all seven questions answered (mission, environment, scenarios, modes, users / roles, support, performance)?"
+        },
+        {
+          "id": "QB-PB-operational-concept-coverage-002",
+          "prompt": "Are at least three end-to-end scenarios written, naming a stakeholder, a trigger, and a result?"
+        },
+        {
+          "id": "QB-PB-operational-concept-coverage-003",
+          "prompt": "Is mode coverage explicit (normal, degraded, emergency, maintenance, startup, shutdown), with at least a one-line statement per mode the system has?"
+        },
+        {
+          "id": "QB-PB-operational-concept-coverage-004",
+          "prompt": "Is the section free of architecture decisions (no specific technologies, vendors, or patterns asserted as facts)?"
+        }
+      ]
+    },
+
+    {
+      "id": "nfr-and-constraint-capture",
+      "title": "NFR & constraint capture",
+      "kind": "checklist",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-PB-nfr-and-constraint-capture-001",
+          "prompt": "Has the NFR Discovery Checklist been walked once, every dimension answered (target, deferred-with-placeholder, or n/a-with-reason)?"
+        },
+        {
+          "id": "QB-PB-nfr-and-constraint-capture-002",
+          "prompt": "For load-bearing NFRs: is a quality-attribute scenario or quantified target captured rather than a one-line wish?"
+        },
+        {
+          "id": "QB-PB-nfr-and-constraint-capture-003",
+          "prompt": "Are domain-specific NFRs (real-time deadlines, accessibility, internationalisation, etc.) added explicitly when relevant, on top of the floor list?"
+        },
+        {
+          "id": "QB-PB-nfr-and-constraint-capture-004",
+          "prompt": "Have the three under-articulated classes been walked — negative requirements, implicit requirements, interaction requirements?"
+        },
+        {
+          "id": "QB-PB-nfr-and-constraint-capture-005",
+          "prompt": "Are hard constraints (regulatory, contractual, mandated tech, hard dates, budget ceilings) listed with their sources?"
+        }
+      ]
+    },
+
+    {
+      "id": "assumptions-and-unknowns",
+      "title": "Assumptions and unknowns",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-assumptions-and-unknowns-001",
+          "prompt": "Are load-bearing assumptions enumerated, not buried in prose?"
+        },
+        {
+          "id": "QB-PB-assumptions-and-unknowns-002",
+          "prompt": "Does each assumption carry an invalidation trigger (what would make it false)?"
+        },
+        {
+          "id": "QB-PB-assumptions-and-unknowns-003",
+          "prompt": "Are open questions surfaced explicitly with owner and target resolution?"
+        },
+        {
+          "id": "QB-PB-assumptions-and-unknowns-004",
+          "prompt": "Are external dependencies (people, systems, decisions) named with owners?"
+        }
+      ]
+    },
+
+    {
+      "id": "non-goals-discipline",
+      "title": "Non-goals discipline",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-non-goals-discipline-001",
+          "prompt": "Is the Non-Goals section non-empty?"
+        },
+        {
+          "id": "QB-PB-non-goals-discipline-002",
+          "prompt": "Does each non-goal carry a reason in one of the four categories (not now, not us, different product, explicit out-of-scope decision)?"
+        },
+        {
+          "id": "QB-PB-non-goals-discipline-003",
+          "prompt": "Are the most plausible scope-creep candidates (multi-tenancy, internationalisation, real-time, mobile, external API) addressed if not already in scope?"
+        }
+      ]
+    },
+
+    {
+      "id": "success-criteria-measurability",
+      "title": "Success criteria measurability",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-success-criteria-measurability-001",
+          "prompt": "Does every criterion anchor back to a named outcome?"
+        },
+        {
+          "id": "QB-PB-success-criteria-measurability-002",
+          "prompt": "Are criteria measurable (numbers where honest, \"baseline TBD\" where not, never fabricated)?"
+        },
+        {
+          "id": "QB-PB-success-criteria-measurability-003",
+          "prompt": "Is the mix of leading and lagging indicators deliberate?"
+        },
+        {
+          "id": "QB-PB-success-criteria-measurability-004",
+          "prompt": "Are output metrics excluded (no \"ship the v1 dashboard\" in the success criteria)?"
+        },
+        {
+          "id": "QB-PB-success-criteria-measurability-005",
+          "prompt": "Where a single product strategy is intended: is there a North Star, or an honest acknowledgement that the outcomes compete?"
+        }
+      ]
+    },
+
+    {
+      "id": "retrofit-honesty",
+      "title": "Retrofit honesty",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-PB-retrofit-honesty-001",
+          "prompt": "For a retrofit Brief: are human-only fields without a human source set to recovery_status: unknown, never reconstructed?",
+          "references": {
+            "fields": ["recovery_status"],
+            "rules": ["TRV-RETRO-001"]
+          }
+        },
+        {
+          "id": "QB-PB-retrofit-honesty-002",
+          "prompt": "Is the date the retrofit-record date, not a guessed original-Brief date?",
+          "references": { "fields": ["date"] }
+        },
+        {
+          "id": "QB-PB-retrofit-honesty-003",
+          "prompt": "Are observable fields (operational concept, parts of constraints) explicitly tagged as derived from code / operations rather than from human intent?",
+          "references": { "fields": ["recovery_status"] }
+        },
+        {
+          "id": "QB-PB-retrofit-honesty-004",
+          "prompt": "Is stakeholder follow-up queued as a deliverable, with named owners?"
+        }
+      ]
+    },
+
+    {
+      "id": "spec-ambiguity-test",
+      "title": "Spec Ambiguity Test — meta-gate",
+      "kind": "meta_gate",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-PB-spec-ambiguity-test-001",
+          "prompt": "Could a junior engineer or low-mid-tier AI, reading only this Brief, derive defensible root-scope Requirements from it without guessing about stakeholders, outcomes, or NFR targets?"
+        }
+      ]
+    }
+  ]
+}
