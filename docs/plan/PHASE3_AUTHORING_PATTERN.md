@@ -8,7 +8,7 @@ Load this file at the start of every Phase 3 session.
 
 ## 1. Status as of 2026-04-22
 
-**Phase 3 work to date (9 commits):**
+**Phase 3 work to date (11 commits):**
 
 | Commit | Step | What |
 |---|---|---|
@@ -21,21 +21,20 @@ Load this file at the start of every Phase 3 session.
 | `831bf2d` | Handoff-doc update | Log PB / sweep / Requirements commits; lock ADR status override in §2 Lifecycle; refresh recommended next step. |
 | `4a6a4d7` | Envelope status relaxation | Refactor motivated by ADR override need: envelope owns status *shape* (required, non-empty); per-artifact schemas own *vocabulary* (enum). See §2 Vocabulary ownership lock. Touches envelope + PB + Requirements. |
 | `0dcba63` | #8 ADR schema | Third per-artifact schema. Nygard status enum override (`proposed \| accepted \| superseded`); `id` requires mandatory kebab slug; `scope_tags` minItems 1; `supersedes` / `superseded_by` tightened to ADR id pattern; `recovery_status` narrowed on four human-only keys (context, alternatives_considered, rationale, consequences). Archive pre-pivot `adr.schema.yaml`. |
-| _this commit_ | #7 Architecture schema | Fourth per-artifact schema. `id` pattern `ARCH` / `ARCH-{flattened-scope}`; universal lifecycle vocabulary; `governing_adrs` tightened to ADR id pattern; top-level `recovery_status` left broad (Architecture content is code-observable); `$defs/decomposition_child` (required `id`/`purpose`/`responsibilities`/`allocates`; `allocates` tightened to REQ id pattern; no `maxItems` on `responsibilities` — rigor lives in Quality Bar; `rationale` as `string` OR `{status: verified\|unknown, note}`; per-child `recovery_status` scalar) and `$defs/interface` (required `name`/`from`/`to`/`protocol`/`contract`; contract required `operation`/`preconditions`/`postconditions.on_success`; `errors` shape with kebab `code`, 4xx/5xx `http`, `meaning`; empty `quality_attributes` object rejected). No pre-pivot file to archive — `sw-architecture.schema.yaml` archived in `2993385`. |
+| `a392c94` | #7 Architecture schema | Fourth per-artifact schema. `id` pattern `ARCH` / `ARCH-{flattened-scope}`; universal lifecycle vocabulary; `governing_adrs` tightened to ADR id pattern; top-level `recovery_status` left broad (Architecture content is code-observable); `$defs/decomposition_child` (required `id`/`purpose`/`responsibilities`/`allocates`; `allocates` tightened to REQ id pattern; no `maxItems` on `responsibilities` — rigor lives in Quality Bar; `rationale` as `string` OR `{status: verified\|unknown, note}`; per-child `recovery_status` scalar) and `$defs/interface` (required `name`/`from`/`to`/`protocol`/`contract`; contract required `operation`/`preconditions`/`postconditions.on_success`; `errors` shape with kebab `code`, 4xx/5xx `http`, `meaning`; empty `quality_attributes` object rejected). No pre-pivot file to archive — `sw-architecture.schema.yaml` archived in `2993385`. |
+| _this commit_ | #9 Detailed Design schema | Fifth per-artifact schema. `id` pattern `DD-{flattened-scope}-{name}` (no structural scope/name split enforced); universal lifecycle; `parent_architecture` required + tightened to ARCH id pattern; `derived_from` minItems 1; `governing_adrs` tightened to ADR pattern. `recovery_status` scalar broad (DD's dominant content is code-observable); map form narrows `overview` key to `verified\|unknown` (Overview carries intent — human-only under no-fabrication rule), other map keys stay broad. `$defs/public_interface_entry` lifts DbC shape from arch (preconditions / postconditions.on_success\|on_failure / invariants / typed errors) but sub-fields are optional — shape vs completeness split; errors shape lighter than arch's (no http / kebab-code — DD errors describe raise/return, not wire); postcondition split is 2-way (on_success / on_failure — error attribution belongs in the Error Handling matrix, not DbC); `thread_safety` enum of 5 categories including `thread-hostile`. `$defs/data_structure_entry`: required `name` + `fields` (each field required `name` + `type`, optional `invariant`); `ownership` / `lifetime` / `returned_semantics` optional strings. `$defs/error_matrix_row`: 5-col per HTML (`error`/`detection`/`containment`/`recovery`/`caller_receives`); `recovery` closed enum (`fail-fast\|retry\|fallback\|compensate\|propagate`). HTML drift flagged: front-matter example shows `scope_tags` (plural) but TARGET §5.3 specifies singular `scope`+`parent_scope` — schema follows TARGET; HTML sweep deferred to §6. Pre-pivot `detailed-design.schema.yaml` (Layer 1/2/3 model) archived in same commit. |
 
 **Pending tasks (Phase 3 backlog):**
 
 | # | Task | Notes |
 |---|---|---|
 | 3 | Quality Bar YAML container shape | Its own session. Do before #12. |
-| 9 | detailed-design schema | Rewrite; drops pre-pivot Layer 1/2/3 model. Comparable complexity to #7. |
 | 10 | test-spec schema | New; mandatory non-empty `verifies`. |
 | 11 | traceability link-types + validation rules | Parallel-able with per-artifact work; good short-session candidate. |
 | 12 | Extract Quality Bar YAML per artifact | Depends on #3. |
 | 13 | Minimal-example fixtures per artifact | Depends on all schemas. |
 
-**Pre-pivot-tainted schemas still in place (to be archived as their replacements land):**
-- `schemas/artifacts/detailed-design.schema.yaml` (pre-pivot Layer 1/2/3 model) — replaced by task #9.
+**Pre-pivot-tainted schemas still in place:** none. All pre-pivot artifact schemas archived.
 
 ---
 
@@ -247,10 +246,8 @@ EOF
 
 ## 8. Recommended Next Step
 
-**Task #9 — Detailed Design schema.** Comparable complexity to the Architecture schema just landed — public-interface shape is DbC territory (lift the `$defs/interface`-style `preconditions` / `postconditions` / `errors` discipline into the DD's `public_interface` entries), plus data-structure invariants, algorithm pseudocode shape, state-machine references, and Error Handling taxonomy. Pre-pivot `schemas/artifacts/detailed-design.schema.yaml` (Layer 1/2/3 model) must be archived in the same commit. Follow §4 Authoring Rhythm. Status uses the universal lifecycle vocabulary; `id` pattern `DD-{scope}-{name}` per TARGET §5.4; `governing_adrs` tighten to ADR pattern; `derived_from` left broad (DDs derive from parent Architecture and often from sibling DDs / interfaces).
+**Task #10 — TestSpec schema.** Sixth and final per-artifact schema; new artifact with no pre-pivot file to archive. The load-bearing rule is **mandatory non-empty `verifies`** at both the envelope (artifact-level — the TestSpec must verify some upstream spec) and per-case level (every TC must trace to at least one spec element). This is the first cross-artifact mandatory-link constraint encoded inside a schema. `type` enum is the 11-value set per §3 TestSpec (functional | boundary | error | fault-injection | property | state-transition | contract | performance | security | accessibility | error-guessing). Reserved growth fields per HTML: `fixtures`, `data`, `expected_range`. Universal lifecycle; `id` pattern `TS` / `TS-{flattened-scope}`; per-case `id` pattern `TC-TS-{scope}-{seq}` (don't conflate: TS identifies the document, TC identifies a case inside it — same authoring rule as REQS/REQ from the Requirements schema). Per-case `verifies` items reference any spec id (REQ / ARCH / DD / PB); keep broad via `artifact_id_ref`, tightening to a specific pattern would block the legitimate cross-layer case. Follow §4 Authoring Rhythm.
 
-Alternative 1: **Task #10 — TestSpec schema.** New artifact; mandatory non-empty `verifies` at both envelope and per-case level is the load-bearing rule; `type` enum is the 11-value set per PHASE3 §3 TestSpec. Smaller surface than #9 but introduces the first cross-artifact mandatory-link constraint inside a schema (`verifies` non-empty).
+Alternative 1: **Task #11 — traceability link-types + validation rules.** Small, TARGET §7 is well-specified, parallel-able with per-artifact work. Good for a short session or running alongside #10.
 
-Alternative 2: **Task #11 — traceability link-types + validation rules.** Small, TARGET §7 is well-specified, parallel-able with per-artifact work. Good for a short session or running alongside #9 or #10.
-
-Alternative 3: **Task #3 — Quality Bar YAML container shape.** Its own session. Blocks task #12 (per-artifact QB extraction). HTML sections (`docs/guide/artifacts/*.html` §5) are authoritative for content; task is purely the container shape.
+Alternative 2: **Task #3 — Quality Bar YAML container shape.** Its own session. Blocks task #12 (per-artifact QB extraction). HTML sections (`docs/guide/artifacts/*.html` §5) are authoritative for content; task is purely the container shape. Natural to schedule after #10 lands, so that all six per-artifact schemas are in place before the QB extraction design locks.
