@@ -1,0 +1,317 @@
+{
+  "$schema": "https://vmodelworkflow.dev/schemas/artifacts/quality-bar/v1",
+  "artifact_type": "requirements",
+  "version": 1,
+  "extracted_from": "docs/guide/artifacts/requirements.html",
+  "extracted_at": "2026-04-23",
+
+  "groups": [
+    {
+      "id": "vocabulary-discipline",
+      "title": "Vocabulary discipline",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-vocabulary-discipline-001",
+          "prompt": "Is a Glossary section present and non-empty for every non-trivial artifact?"
+        },
+        {
+          "id": "QB-REQS-vocabulary-discipline-002",
+          "prompt": "Is every domain term used in a requirement statement defined in the glossary?"
+        },
+        {
+          "id": "QB-REQS-vocabulary-discipline-003",
+          "prompt": "Is there one word per concept and one concept per word within this scope?"
+        },
+        {
+          "id": "QB-REQS-vocabulary-discipline-004",
+          "prompt": "Are generic-programmer placeholder terms (Manager, Service, Handler, Record) audited out of statements except where they name actual domain concepts?"
+        }
+      ]
+    },
+
+    {
+      "id": "requirement-type-clarity",
+      "title": "Requirement type clarity",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-requirement-type-clarity-001",
+          "prompt": "Is every requirement filed under the correct type section (functional / QA / interface / data / inherited constraint)?"
+        },
+        {
+          "id": "QB-REQS-requirement-type-clarity-002",
+          "prompt": "Are NFRs written in NFR form (not as functional statements with an adjective) and functional requirements in functional form (not as NFRs with a behaviour smuggled in)?"
+        },
+        {
+          "id": "QB-REQS-requirement-type-clarity-003",
+          "prompt": "Has level confusion been audited — does every requirement's scope match this artifact's scope?"
+        }
+      ]
+    },
+
+    {
+      "id": "statement-level-quality",
+      "title": "Statement-level quality",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-statement-level-quality-001",
+          "prompt": "Is every statement atomic (one shall, one behaviour)?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-statement-level-quality-002",
+          "prompt": "Does every statement pass the box test (a tester could write the test from the statement and the glossary alone)?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-statement-level-quality-003",
+          "prompt": "Is every statement solution-free (no named technologies, frameworks, libraries, data structures, or algorithms, except in interface requirements where the protocol is externally imposed)?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-statement-level-quality-004",
+          "prompt": "Is every state-driven requirement paired with its complementary out-of-state behaviour, or is the out-of-state case explicitly out of scope?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-statement-level-quality-005",
+          "prompt": "Is structured language (EARS primary; GWT where scenario-heavy) used consistently rather than mixed within a statement?",
+          "references": { "fields": ["statement"] }
+        }
+      ]
+    },
+
+    {
+      "id": "nfr-measurability-the-five-element-rule",
+      "title": "NFR measurability — the five-element rule",
+      "kind": "checklist",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-REQS-nfr-measurability-the-five-element-rule-001",
+          "prompt": "Does every NFR name the system or subsystem specifically?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-nfr-measurability-the-five-element-rule-002",
+          "prompt": "Does every NFR name the response or behaviour being measured?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-nfr-measurability-the-five-element-rule-003",
+          "prompt": "Does every NFR give a metric with unit?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-nfr-measurability-the-five-element-rule-004",
+          "prompt": "Does every NFR give a target value at the correct statistical level (percentile where applicable, not raw mean)?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-nfr-measurability-the-five-element-rule-005",
+          "prompt": "Does every NFR state the condition under which the measurement is valid (load, environment, operating mode, measurement point)?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-nfr-measurability-the-five-element-rule-006",
+          "prompt": "For tiered NFRs, is the Planguage form (scale, meter, fail, goal, stretch, wish) used rather than a single flat target?",
+          "references": { "fields": ["statement"] }
+        }
+      ]
+    },
+
+    {
+      "id": "interface-contract-completeness",
+      "title": "Interface contract completeness",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-interface-contract-completeness-001",
+          "prompt": "Does every interface requirement specify protocol, message structure, timing, error handling, and startup / initial state?",
+          "references": { "fields": ["statement"] }
+        },
+        {
+          "id": "QB-REQS-interface-contract-completeness-002",
+          "prompt": "Are pre- and post-conditions and invariants stated for each externally-callable operation?",
+          "references": { "fields": ["acceptance"] }
+        },
+        {
+          "id": "QB-REQS-interface-contract-completeness-003",
+          "prompt": "Is a versioning and deprecation policy stated for every versioned interface?"
+        },
+        {
+          "id": "QB-REQS-interface-contract-completeness-004",
+          "prompt": "Are externally-imposed protocols cited by specification (RFC, OIDC version, protocol RFC / draft) rather than by informal name?",
+          "references": { "fields": ["statement"] }
+        }
+      ]
+    },
+
+    {
+      "id": "constraints-discipline",
+      "title": "Constraints discipline",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-constraints-discipline-001",
+          "prompt": "Does every inherited constraint cite its source (ADR, regulation, contract, policy)?",
+          "references": { "fields": ["governing_adrs", "derived_from"] }
+        },
+        {
+          "id": "QB-REQS-constraints-discipline-002",
+          "prompt": "Does every inherited constraint name the cost of relaxing it?"
+        },
+        {
+          "id": "QB-REQS-constraints-discipline-003",
+          "prompt": "Is every constraint categorised (technical / regulatory / organisational / financial / temporal)?"
+        },
+        {
+          "id": "QB-REQS-constraints-discipline-004",
+          "prompt": "For constraints with behavioural consequences at this scope, are derived requirements authored and cross-linked?",
+          "references": { "fields": ["derived_from"] }
+        }
+      ]
+    },
+
+    {
+      "id": "rationale-no-fabrication",
+      "title": "Rationale — no fabrication",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-rationale-no-fabrication-001",
+          "prompt": "Does every requirement carry a rationale field with non-trivial content?",
+          "references": { "fields": ["rationale"] }
+        },
+        {
+          "id": "QB-REQS-rationale-no-fabrication-002",
+          "prompt": "Is rationale captured at decision time (or, for retrofits, explicitly marked recovery_status: unknown where the original reasoning is lost)?",
+          "references": {
+            "fields": ["rationale", "rationale_recovery_status"]
+          }
+        },
+        {
+          "id": "QB-REQS-rationale-no-fabrication-003",
+          "prompt": "Is rationale in retrofit mode marked with verified or unknown only, never reconstructed?",
+          "references": {
+            "fields": ["rationale_recovery_status"],
+            "rules": ["TRV-RETRO-001"]
+          }
+        },
+        {
+          "id": "QB-REQS-rationale-no-fabrication-004",
+          "prompt": "Are rationales audited for circularity (not \"because test T passes\") and for laundering (\"because the current design is right\")?",
+          "references": { "fields": ["rationale"] }
+        }
+      ]
+    },
+
+    {
+      "id": "traceability-completeness",
+      "title": "Traceability completeness",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-traceability-completeness-001",
+          "prompt": "Does every requirement have non-empty derived_from?",
+          "references": {
+            "fields": ["derived_from"],
+            "rules": ["TRV-CYCLE-001"]
+          }
+        },
+        {
+          "id": "QB-REQS-traceability-completeness-002",
+          "prompt": "Does every derived requirement cite the decision (ADR or architectural choice) that introduced it?",
+          "references": { "fields": ["derived_from", "governing_adrs"] }
+        },
+        {
+          "id": "QB-REQS-traceability-completeness-003",
+          "prompt": "Are governing ADRs referenced in the front-matter and reflected in at least one requirement or derived requirement in the body?",
+          "references": { "fields": ["governing_adrs"] }
+        },
+        {
+          "id": "QB-REQS-traceability-completeness-004",
+          "prompt": "Has the artifact been run through the traceability validator and returned zero orphan requirements and zero unresolved references?",
+          "references": {
+            "rules": ["TRV-REF-001", "TRV-COMP-001", "TRV-COMP-003"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "inspection-discipline",
+      "title": "Inspection discipline",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-inspection-discipline-001",
+          "prompt": "Has the artifact been read from at least the designer and tester perspectives before review?"
+        },
+        {
+          "id": "QB-REQS-inspection-discipline-002",
+          "prompt": "Where a stakeholder-facing outcome is at stake, has the user / stakeholder perspective also been read?"
+        },
+        {
+          "id": "QB-REQS-inspection-discipline-003",
+          "prompt": "Is each perspective's review findings logged, so future revisions can check whether a defect class was missed rather than detected-and-resolved?"
+        }
+      ]
+    },
+
+    {
+      "id": "retrofit-honesty",
+      "title": "Retrofit honesty",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-REQS-retrofit-honesty-001",
+          "prompt": "For a retrofit: are behaviour fields marked verified (human-confirmed) or reconstructed (derived from code / tests / schemas)?",
+          "references": { "fields": ["statement_recovery_status"] }
+        },
+        {
+          "id": "QB-REQS-retrofit-honesty-002",
+          "prompt": "Are rationale, open alternatives, and intent fields marked verified or unknown only?",
+          "references": {
+            "fields": ["rationale_recovery_status"],
+            "rules": ["TRV-RETRO-001"]
+          }
+        },
+        {
+          "id": "QB-REQS-retrofit-honesty-003",
+          "prompt": "Does every unknown field have a follow-up owner and action queued?",
+          "references": { "fields": ["follow_up"] }
+        },
+        {
+          "id": "QB-REQS-retrofit-honesty-004",
+          "prompt": "Are derived-from links in a retrofit to observed evidence (file + line; git commit; operational log), not fabricated artifact names?",
+          "references": { "fields": ["derived_from"] }
+        }
+      ]
+    },
+
+    {
+      "id": "spec-ambiguity-test",
+      "title": "Spec Ambiguity Test — meta-gate",
+      "kind": "meta_gate",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-REQS-spec-ambiguity-test-001",
+          "prompt": "Could a junior engineer or mid-tier AI, reading only this Requirements artifact (plus its glossary and governing ADRs), derive a defensible Architecture allocation to children, a Detailed Design for each leaf, and a TestSpec whose cases verify every requirement — without asking clarifying questions?"
+        }
+      ]
+    }
+  ]
+}
