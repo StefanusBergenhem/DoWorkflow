@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vmodelworkflow.dev/schemas/artifacts/quality-bar/v1",
+  "title": "V-Model Quality Bar — per-artifact checklist container",
+  "description": "Validates the shape of <type>.quality-bar.json files. Each file is the machine-readable form of the 5th section (\"Quality Bar\") of the corresponding docs/guide/artifacts/<type>.html page. HTML is authoritative for content; the JSON is an extracted index consumed by authoring skills, review skills, and the Quality Bar runner tool (TARGET_ARCHITECTURE §6, §10). Schema validates container shape only: group structure, item IDs, applies_at scope levels, and optional structured references. Item prompt wording is reviewed against the HTML, not by this schema.",
+
+  "type": "object",
+  "required": ["$schema", "artifact_type", "version", "extracted_from", "extracted_at", "groups"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://vmodelworkflow.dev/schemas/artifacts/quality-bar/v1"
+    },
+    "artifact_type": {
+      "description": "Which of the six canonical spec artifact types this Quality Bar applies to. Matches the filename stem of the HTML source (e.g., \"adr\" for docs/guide/artifacts/adr.html).",
+      "$ref": "#/$defs/artifact_type_enum"
+    },
+    "version": {
+      "description": "Monotonic integer version of the extracted checklist. Bumped when group or item content is revised to match an updated HTML page. Git carries history; no multi-version files on disk.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "extracted_from": {
+      "description": "Relative path to the authoritative HTML page. Extraction provenance — lets a future re-extraction tool find the source without convention assumptions.",
+      "type": "string",
+      "pattern": "^docs/guide/artifacts/[a-z0-9]+(-[a-z0-9]+)*\\.html$"
+    },
+    "extracted_at": {
+      "description": "ISO date (YYYY-MM-DD) of the extraction pass. Lets consumers detect staleness relative to HTML mtime or recent commits.",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/iso_date"
+    },
+    "groups": {
+      "description": "Ordered list of checklist groups. Rendering order matches HTML card order. Exactly one group must have kind = meta_gate (the Spec Ambiguity Test).",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/group" }
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "Exactly one meta_gate group per Quality Bar file (the Spec Ambiguity Test). Enforced via contains + minContains/maxContains on the groups array.",
+      "properties": {
+        "groups": {
+          "contains": {
+            "type": "object",
+            "properties": { "kind": { "const": "meta_gate" } },
+            "required": ["kind"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    }
+  ],
+
+  "$defs": {
+    "artifact_type_enum": {
+      "type": "string",
+      "enum": [
+        "product-brief",
+        "requirements",
+        "architecture",
+        "adr",
+        "detailed-design",
+        "test-spec"
+      ]
+    },
+
+    "artifact_id_prefix_enum": {
+      "description": "Uppercase prefix used inside per-item IDs. Matches the artifact id prefix convention established by the per-artifact schemas (PB, REQS, ARCH, ADR, DD, TS).",
+      "type": "string",
+      "enum": ["PB", "REQS", "ARCH", "ADR", "DD", "TS"]
+    },
+
+    "scope_level_enum": {
+      "description": "Scope level in the scope tree — not a scope path. Used by applies_at to tag items that only apply at a specific depth (e.g., TestSpec \"Per-layer weight\" cases, Architecture \"At root scope:\" sub-items).",
+      "type": "string",
+      "enum": ["root", "branch", "leaf"]
+    },
+
+    "group_kind_enum": {
+      "description": "checklist = ordinary Yes/No group; meta_gate = Spec Ambiguity Test override group. Tools render meta_gate with accent styling and run it after all checklist groups.",
+      "type": "string",
+      "enum": ["checklist", "meta_gate"]
+    },
+
+    "trv_rule_id": {
+      "description": "Traceability validation rule id from schemas/traceability/validation-rules.catalog.json. Referenced by Quality Bar items that overlap with a mechanically-enforced rule (e.g., non-empty verifies).",
+      "type": "string",
+      "pattern": "^TRV-[A-Z]+-[0-9]{3}$"
+    },
+
+    "group": {
+      "type": "object",
+      "required": ["id", "title", "kind", "load_bearing", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "kebab-case slug of the group title. Used inside item IDs. Must be unique within the file.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "title": {
+          "description": "Human-readable group title, verbatim from the HTML <h3>.",
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": { "$ref": "#/$defs/group_kind_enum" },
+        "load_bearing": {
+          "description": "True when the HTML card carries accent styling (a visually highlighted group that fails louder on review). meta_gate groups must be load_bearing; regular groups may or may not be.",
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/item" }
+        }
+      },
+      "allOf": [
+        {
+          "description": "meta_gate groups are always load_bearing.",
+          "if": {
+            "required": ["kind"],
+            "properties": { "kind": { "const": "meta_gate" } }
+          },
+          "then": {
+            "properties": { "load_bearing": { "const": true } }
+          }
+        }
+      ]
+    },
+
+    "item": {
+      "type": "object",
+      "required": ["id", "prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "QB-{ARTIFACT}-{group-slug}-{NNN}. Artifact prefix uppercase from artifact_id_prefix_enum; group slug matches the owning group's id; NNN is 3-digit zero-padded sequence starting at 001, reset per group. IDs are local to the file — not referenced from other artifacts.",
+          "type": "string",
+          "pattern": "^QB-(PB|REQS|ARCH|ADR|DD|TS)-[a-z0-9]+(-[a-z0-9]+)*-[0-9]{3}$"
+        },
+        "prompt": {
+          "description": "The Yes/No review question, plain-text form of the HTML <li>. Passing answer is Yes. Strip any <code> or <em> markup; preserve the substantive wording verbatim.",
+          "type": "string",
+          "minLength": 1
+        },
+        "applies_at": {
+          "description": "Optional. When present, the item only applies at the listed scope level(s). Absence = applies at every layer the artifact type lives at. Used by TestSpec's per-layer weight group and Architecture's root-scope sub-items.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/scope_level_enum" }
+        },
+        "references": {
+          "description": "Optional structured cross-references. Absence = the prompt is purely prose. Only populate when a tool can act on the link — e.g., a field name that a schema validator can cross-check.",
+          "$ref": "#/$defs/references"
+        }
+      }
+    },
+
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "fields": {
+          "description": "Names of schema fields this item targets (e.g., \"scope_tags\", \"recovery_status\"). Cross-checked against the per-artifact schema at tool-load time, not by this schema.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*$"
+          }
+        },
+        "sections": {
+          "description": "Section markers from the source HTML (e.g., \"A\", \"E\", \"Composition\"). Used by authoring skills to anchor prompts to the artifact's section layout.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "rules": {
+          "description": "IDs of overlapping traceability validation rules. Signals that the item is both semantically reviewed here and mechanically checked by the traceability validator — same pattern that validation-rules.catalog.json uses in reverse.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/trv_rule_id" }
+        }
+      }
+    }
+  }
+}

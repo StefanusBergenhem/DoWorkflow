@@ -1,0 +1,194 @@
+{
+  "$schema": "https://vmodelworkflow.dev/schemas/artifacts/quality-bar/v1",
+  "artifact_type": "adr",
+  "version": 1,
+  "extracted_from": "docs/guide/artifacts/adr.html",
+  "extracted_at": "2026-04-23",
+
+  "groups": [
+    {
+      "id": "context-completeness",
+      "title": "Context completeness",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-context-completeness-001",
+          "prompt": "Does the Context describe the specific situation that forced the decision (not a generic statement of the problem domain)?",
+          "references": { "fields": ["context"] }
+        },
+        {
+          "id": "QB-ADR-context-completeness-002",
+          "prompt": "Are the forces at play — constraints, deadlines, dependencies — named?",
+          "references": { "fields": ["context"] }
+        },
+        {
+          "id": "QB-ADR-context-completeness-003",
+          "prompt": "Are the decision drivers explicit, so the rationale can cite them by name?",
+          "references": { "fields": ["context", "rationale"] }
+        }
+      ]
+    },
+
+    {
+      "id": "option-space-integrity",
+      "title": "Option space integrity",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-option-space-integrity-001",
+          "prompt": "Are at least two real alternatives listed? (\"Do nothing\" and straw men do not count.)",
+          "references": { "fields": ["alternatives_considered"] }
+        },
+        {
+          "id": "QB-ADR-option-space-integrity-002",
+          "prompt": "Does each alternative have a concrete, context-specific reason for rejection?",
+          "references": { "fields": ["alternatives_considered"] }
+        },
+        {
+          "id": "QB-ADR-option-space-integrity-003",
+          "prompt": "No single-option smell — would any of the rejected options have produced a materially different design?",
+          "references": { "fields": ["alternatives_considered"] }
+        }
+      ]
+    },
+
+    {
+      "id": "decision-clarity",
+      "title": "Decision clarity",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-decision-clarity-001",
+          "prompt": "Is the Decision stated in active voice, with the chosen option named?",
+          "references": { "fields": ["decision"] }
+        },
+        {
+          "id": "QB-ADR-decision-clarity-002",
+          "prompt": "Does the Rationale cite the drivers from this ADR, by name — not generic praise of the option?",
+          "references": { "fields": ["rationale"] }
+        }
+      ]
+    },
+
+    {
+      "id": "consequences-discipline",
+      "title": "Consequences discipline",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-consequences-discipline-001",
+          "prompt": "Are positive consequences listed?",
+          "references": { "fields": ["consequences"] }
+        },
+        {
+          "id": "QB-ADR-consequences-discipline-002",
+          "prompt": "Are negative consequences listed, non-empty, and concrete?",
+          "references": { "fields": ["consequences"] }
+        },
+        {
+          "id": "QB-ADR-consequences-discipline-003",
+          "prompt": "Is the Reversibility sub-prompt answered — either with a rollback path (reversible) or with a recovery plan and a named sign-off (irreversible)?",
+          "references": { "fields": ["consequences"] }
+        }
+      ]
+    },
+
+    {
+      "id": "linkage",
+      "title": "Linkage",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-linkage-001",
+          "prompt": "Is scope_tags non-empty?",
+          "references": { "fields": ["scope_tags"] }
+        },
+        {
+          "id": "QB-ADR-linkage-002",
+          "prompt": "If this ADR supersedes or is superseded, is the chain intact in both directions?",
+          "references": { "fields": ["supersedes", "superseded_by"] }
+        },
+        {
+          "id": "QB-ADR-linkage-003",
+          "prompt": "If the decision affects scopes beyond scope_tags, is affected_scopes set?",
+          "references": { "fields": ["scope_tags", "affected_scopes"] }
+        }
+      ]
+    },
+
+    {
+      "id": "completeness-rule",
+      "title": "Completeness rule",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-completeness-rule-001",
+          "prompt": "Is every consequence either satisfied by a requirement at the ADR's scope or referenced as a constraint by a child artifact? (No orphan consequences.)",
+          "references": {
+            "fields": ["consequences"],
+            "rules": ["TRV-COMP-007"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "propagation-rule",
+      "title": "Propagation rule",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-propagation-rule-001",
+          "prompt": "For consequences testable at this ADR's layer: has a new requirement been materialised at that layer?"
+        },
+        {
+          "id": "QB-ADR-propagation-rule-002",
+          "prompt": "For consequences that only bound child choices: are the relevant child artifacts linked via governing_adrs?"
+        }
+      ]
+    },
+
+    {
+      "id": "retrofit-honesty",
+      "title": "Retrofit honesty",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ADR-retrofit-honesty-001",
+          "prompt": "If this is a retrofit of a pre-existing decision and the rationale is lost: is recovery_status: unknown set on Context, Alternatives, and Rationale?",
+          "references": {
+            "fields": ["recovery_status", "context", "alternatives_considered", "rationale"]
+          }
+        },
+        {
+          "id": "QB-ADR-retrofit-honesty-002",
+          "prompt": "Are all fields free of AI-fabricated content — no committee-style prose for conversations that did not happen, no tidy rejection reasons invented from the current code?",
+          "references": {
+            "rules": ["TRV-RETRO-001"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "spec-ambiguity-test",
+      "title": "Spec Ambiguity Test — meta-gate",
+      "kind": "meta_gate",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-ADR-spec-ambiguity-test-001",
+          "prompt": "Could a junior engineer or low-mid-tier AI, reading only this ADR, derive the same design from it without guessing?"
+        }
+      ]
+    }
+  ]
+}
