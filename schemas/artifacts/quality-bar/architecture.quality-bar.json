@@ -1,0 +1,302 @@
+{
+  "$schema": "https://vmodelworkflow.dev/schemas/artifacts/quality-bar/v1",
+  "artifact_type": "architecture",
+  "version": 1,
+  "extracted_from": "docs/guide/artifacts/architecture.html",
+  "extracted_at": "2026-04-23",
+
+  "groups": [
+    {
+      "id": "decomposition-and-boundaries",
+      "title": "Decomposition and boundaries",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-decomposition-and-boundaries-001",
+          "prompt": "Is every child's purpose stated in exactly one sentence without conjunctions?",
+          "references": { "fields": ["purpose"] }
+        },
+        {
+          "id": "QB-ARCH-decomposition-and-boundaries-002",
+          "prompt": "Does every child's responsibility list contain at most three items, each scoped at architectural (not implementation) level?",
+          "references": { "fields": ["responsibilities"] }
+        },
+        {
+          "id": "QB-ARCH-decomposition-and-boundaries-003",
+          "prompt": "Is every parent-allocated requirement named in at least one child's allocates? (No requirements orphaned.)",
+          "references": {
+            "fields": ["allocates"],
+            "rules": ["TRV-COMP-001"]
+          }
+        },
+        {
+          "id": "QB-ARCH-decomposition-and-boundaries-004",
+          "prompt": "Does every child allocate at least one requirement? (No components orphaned.)",
+          "references": {
+            "fields": ["allocates"],
+            "rules": ["TRV-COMP-002"]
+          }
+        },
+        {
+          "id": "QB-ARCH-decomposition-and-boundaries-005",
+          "prompt": "Has the one-sentence-responsibility test been walked per child (no hidden ands)?",
+          "references": { "fields": ["responsibilities"] }
+        },
+        {
+          "id": "QB-ARCH-decomposition-and-boundaries-006",
+          "prompt": "Has the depth/cognitive-load/change-blast trio been checked, with a record of which one fired if decomposition was revised?"
+        },
+        {
+          "id": "QB-ARCH-decomposition-and-boundaries-007",
+          "prompt": "Where a bounded-context language fracture exists, is the child boundary drawn at the fracture?"
+        }
+      ]
+    },
+
+    {
+      "id": "interfaces-and-contracts",
+      "title": "Interfaces and contracts",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-interfaces-and-contracts-001",
+          "prompt": "Does every interface entry carry preconditions, postconditions (on success, on precondition failure, on downstream failure), invariants, a typed error enum, and quality attributes?",
+          "references": { "fields": ["preconditions", "postconditions", "invariants", "errors", "quality_attributes"] }
+        },
+        {
+          "id": "QB-ARCH-interfaces-and-contracts-002",
+          "prompt": "Does every externally callable interface state authentication and authorisation requirements?"
+        },
+        {
+          "id": "QB-ARCH-interfaces-and-contracts-003",
+          "prompt": "Is every interface segregated by responsibility (no fat god-interfaces)?"
+        },
+        {
+          "id": "QB-ARCH-interfaces-and-contracts-004",
+          "prompt": "Does every versioned interface name its versioning scheme and deprecation policy?"
+        },
+        {
+          "id": "QB-ARCH-interfaces-and-contracts-005",
+          "prompt": "Is rationale carried on every interface (at least one line tying the choice to a requirement, ADR, or constraint)?",
+          "references": { "fields": ["rationale"] }
+        },
+        {
+          "id": "QB-ARCH-interfaces-and-contracts-006",
+          "prompt": "Are externally-imposed protocols cited by specification (RFC, API spec, standard identifier), not informal name?",
+          "references": { "fields": ["protocol"] }
+        }
+      ]
+    },
+
+    {
+      "id": "composition-completeness",
+      "title": "Composition completeness — load-bearing",
+      "kind": "checklist",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-ARCH-composition-completeness-001",
+          "prompt": "Is the runtime pattern named explicitly (request-response / event-driven / pipeline / hexagonal / …) rather than implied?"
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-002",
+          "prompt": "Does every runtime pattern choice have a rationale (inline or governing_adrs)?",
+          "references": { "fields": ["governing_adrs"] }
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-003",
+          "prompt": "Is the middleware stack ordered and stated (authN / authZ / rate limit / trace / …)?"
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-004",
+          "prompt": "Is the DI / composition-root strategy named?"
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-005",
+          "prompt": "Is the message-bus topology specified where applicable (topics, partition keys, retention, dead-letter, consumer groups)?"
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-006",
+          "prompt": "Does every critical flow (happy path plus one or two failure paths) have a sequence diagram?"
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-007",
+          "prompt": "At root scope: are environments, orchestration target, and runtime-unit boundaries named?",
+          "applies_at": ["root"]
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-008",
+          "prompt": "At root scope: does deployment intent resolve to concrete IaC artifacts (by reference) or explicitly planned ones?",
+          "applies_at": ["root"]
+        },
+        {
+          "id": "QB-ARCH-composition-completeness-009",
+          "prompt": "At root scope: does every runtime-unit boundary have an integration-test target in the branch / root TestSpec?",
+          "applies_at": ["root"]
+        }
+      ]
+    },
+
+    {
+      "id": "quality-attribute-coverage",
+      "title": "Quality-attribute coverage",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-quality-attribute-coverage-001",
+          "prompt": "Does every NFR from the parent Requirements appear as either an Architecture child's allocated requirement or a cross-cutting composition commitment?",
+          "references": { "fields": ["allocates"] }
+        },
+        {
+          "id": "QB-ARCH-quality-attribute-coverage-002",
+          "prompt": "Are latency / throughput / availability budgets allocated to specific interfaces or components, not left at system-wide level?",
+          "references": { "fields": ["quality_attributes"] }
+        },
+        {
+          "id": "QB-ARCH-quality-attribute-coverage-003",
+          "prompt": "Are consistency-model choices (strong / eventual / read-your-writes / bounded staleness) named per data path?"
+        },
+        {
+          "id": "QB-ARCH-quality-attribute-coverage-004",
+          "prompt": "Is the cost model (envelope, cost-per-request target, cost-of-a-9 if availability is a binding concern) stated at root scope?"
+        }
+      ]
+    },
+
+    {
+      "id": "resilience-coverage",
+      "title": "Resilience coverage",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-resilience-coverage-001",
+          "prompt": "Are bulkhead partitions named for shared resources that matter (connection pools, thread pools, external-dependency pools)?"
+        },
+        {
+          "id": "QB-ARCH-resilience-coverage-002",
+          "prompt": "Are circuit breakers placed at cross-service boundaries where caller exhaustion is a real failure mode?"
+        },
+        {
+          "id": "QB-ARCH-resilience-coverage-003",
+          "prompt": "Is retry policy (backoff, jitter, max attempts) specified where retries are safe, with idempotency design where they are not?"
+        },
+        {
+          "id": "QB-ARCH-resilience-coverage-004",
+          "prompt": "Is graceful degradation designed-in (not fallback-in) for non-essential dependencies, with the essential-vs-non-essential split named?"
+        },
+        {
+          "id": "QB-ARCH-resilience-coverage-005",
+          "prompt": "Are failure domains (process / host / AZ / region / provider) named, and is every redundancy claim backed by a named independence property (not assumed)?"
+        }
+      ]
+    },
+
+    {
+      "id": "security-and-observability-at-boundaries",
+      "title": "Security and observability at boundaries",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-security-and-observability-at-boundaries-001",
+          "prompt": "Are trust zones drawn explicitly with named boundary crossings?"
+        },
+        {
+          "id": "QB-ARCH-security-and-observability-at-boundaries-002",
+          "prompt": "Is authn / authz stated per externally callable interface, with the evaluation layer (gateway, middleware, handler) named?"
+        },
+        {
+          "id": "QB-ARCH-security-and-observability-at-boundaries-003",
+          "prompt": "Is secrets flow specified (origin, in-memory-holders, where they must never appear)?"
+        },
+        {
+          "id": "QB-ARCH-security-and-observability-at-boundaries-004",
+          "prompt": "Are telemetry emergence points specified (what is logged, what is metric'd, what is traced; sampling policy; common context fields)?"
+        }
+      ]
+    },
+
+    {
+      "id": "rationale-and-traceability",
+      "title": "Rationale and traceability",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-rationale-and-traceability-001",
+          "prompt": "Does every Decomposition entry, interface entry, and load-bearing composition choice carry a rationale field with non-trivial content?",
+          "references": { "fields": ["rationale"] }
+        },
+        {
+          "id": "QB-ARCH-rationale-and-traceability-002",
+          "prompt": "Are governing ADRs listed in front-matter and referenced at the point in the body where each decision lands?",
+          "references": { "fields": ["governing_adrs"] }
+        },
+        {
+          "id": "QB-ARCH-rationale-and-traceability-003",
+          "prompt": "Has the traceability validator been run and returned zero orphan children, zero unallocated requirements, zero unresolved references?",
+          "references": {
+            "rules": ["TRV-COMP-001", "TRV-COMP-002", "TRV-REF-001"]
+          }
+        },
+        {
+          "id": "QB-ARCH-rationale-and-traceability-004",
+          "prompt": "Are fitness functions named for load-bearing architectural properties (dependency direction, latency budget, module size, security posture)?"
+        }
+      ]
+    },
+
+    {
+      "id": "retrofit-discipline",
+      "title": "Retrofit discipline",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-retrofit-discipline-001",
+          "prompt": "Is observed structure marked recovery_status: reconstructed with evidence (file/line, commit, schema, operational log)?",
+          "references": { "fields": ["recovery_status"] }
+        },
+        {
+          "id": "QB-ARCH-retrofit-discipline-002",
+          "prompt": "Is human-only content (rationale, rejected alternatives, original intent) marked verified or unknown only — never reconstructed?",
+          "references": {
+            "fields": ["recovery_status", "rationale"],
+            "rules": ["TRV-RETRO-001"]
+          }
+        },
+        {
+          "id": "QB-ARCH-retrofit-discipline-003",
+          "prompt": "Is every unknown field paired with a follow-up owner and an action?",
+          "references": { "fields": ["recovery_status"] }
+        },
+        {
+          "id": "QB-ARCH-retrofit-discipline-004",
+          "prompt": "Is laundering audited — does any rationale read as generic principle invocation rather than historical recall?",
+          "references": { "fields": ["rationale"] }
+        },
+        {
+          "id": "QB-ARCH-retrofit-discipline-005",
+          "prompt": "Is the gap report populated (lost rationale, structural drift, missing ADRs, coverage gaps, ambiguous spec)?"
+        }
+      ]
+    },
+
+    {
+      "id": "spec-ambiguity-test",
+      "title": "Spec Ambiguity Test — meta-gate",
+      "kind": "meta_gate",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-ARCH-spec-ambiguity-test-001",
+          "prompt": "Could a junior engineer or mid-tier AI, reading only this Architecture artifact (plus its governing ADRs and parent Requirements), produce defensible Detailed Designs for each leaf, and a TestSpec whose cases verify every interface and every composition-level invariant — without asking clarifying questions?"
+        }
+      ]
+    }
+  ]
+}
