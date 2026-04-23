@@ -1,0 +1,223 @@
+{
+  "$schema": "https://vmodelworkflow.dev/schemas/artifacts/quality-bar/v1",
+  "artifact_type": "detailed-design",
+  "version": 1,
+  "extracted_from": "docs/guide/artifacts/detailed-design.html",
+  "extracted_at": "2026-04-23",
+
+  "groups": [
+    {
+      "id": "structure-and-completeness",
+      "title": "Structure and completeness",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-DD-structure-and-completeness-001",
+          "prompt": "Are all seven sections present, each with either substantive content or an explicit assertion of absence (\"this leaf is stateless\")?"
+        },
+        {
+          "id": "QB-DD-structure-and-completeness-002",
+          "prompt": "Does Metadata include scope_tags, parent_architecture, derived_from, and governing_adrs where applicable?",
+          "references": {
+            "fields": ["scope", "parent_architecture", "derived_from", "governing_adrs"]
+          }
+        },
+        {
+          "id": "QB-DD-structure-and-completeness-003",
+          "prompt": "Does the Overview say what slice of the parent Architecture this leaf realises, at one level of abstraction above the code?",
+          "references": {
+            "fields": ["overview"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "contracts-on-every-public-function",
+      "title": "Contracts on every public function",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-DD-contracts-on-every-public-function-001",
+          "prompt": "Does every public function have preconditions, postconditions, error semantics, nullability, side effects, and thread-safety stated?",
+          "references": {
+            "fields": ["preconditions", "postconditions", "errors", "side_effects", "thread_safety"]
+          }
+        },
+        {
+          "id": "QB-DD-contracts-on-every-public-function-002",
+          "prompt": "Are numeric parameters either typed with a unit-carrying wrapper or have the unit named in the contract?"
+        },
+        {
+          "id": "QB-DD-contracts-on-every-public-function-003",
+          "prompt": "Are postconditions expressed as properties of the result, not as steps taken to produce it?",
+          "references": {
+            "fields": ["postconditions"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "data-and-invariants",
+      "title": "Data and invariants",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-DD-data-and-invariants-001",
+          "prompt": "Does every internal data structure list fields, invariants, ownership, and lifetime?",
+          "references": {
+            "fields": ["ownership", "lifetime"]
+          }
+        },
+        {
+          "id": "QB-DD-data-and-invariants-002",
+          "prompt": "For any mutable state shared across threads or callers: is the locking, happens-before, and per-field ownership stated explicitly?",
+          "references": {
+            "fields": ["thread_safety"]
+          }
+        },
+        {
+          "id": "QB-DD-data-and-invariants-003",
+          "prompt": "For any function that returns a mutable object: is the ownership transfer or sharing contract stated?",
+          "references": {
+            "fields": ["returned_semantics"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "algorithms-state-control-flow",
+      "title": "Algorithms, state, control flow",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-DD-algorithms-state-control-flow-001",
+          "prompt": "Where the algorithm itself is contractual (determinism, worst-case bounds, operational constraint), is it specified and is the reason it is contractual named?",
+          "references": {
+            "fields": ["complexity_notes"]
+          }
+        },
+        {
+          "id": "QB-DD-algorithms-state-control-flow-002",
+          "prompt": "Where it is not contractual, does the DD state the result property and leave the algorithm to the implementer?"
+        },
+        {
+          "id": "QB-DD-algorithms-state-control-flow-003",
+          "prompt": "If a state machine is present: are states, transitions, guards, and undefined-event behaviour named? Does it fit on two pages?"
+        }
+      ]
+    },
+
+    {
+      "id": "error-handling",
+      "title": "Error handling",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-DD-error-handling-001",
+          "prompt": "Does the DD answer all six questions for each error class (what, detection, containment, recovery, end state, caller receives)?",
+          "references": {
+            "fields": ["error", "detection", "containment", "recovery", "caller_receives"]
+          }
+        },
+        {
+          "id": "QB-DD-error-handling-002",
+          "prompt": "Is there an error-handling matrix (or equivalent structure) that each row corresponds to a testable robustness case?",
+          "references": {
+            "rules": ["TRV-COMP-003"]
+          }
+        },
+        {
+          "id": "QB-DD-error-handling-003",
+          "prompt": "For every error class: is the strategy named (fail-fast, retry with bound, fallback, compensate, propagate)?",
+          "references": {
+            "fields": ["recovery"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "rationale-and-traceability",
+      "title": "Rationale and traceability",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-DD-rationale-and-traceability-001",
+          "prompt": "Does every non-obvious decision carry inline rationale (a phrase or sentence naming the forcing constraint)?"
+        },
+        {
+          "id": "QB-DD-rationale-and-traceability-002",
+          "prompt": "Do load-bearing decisions have an ADR linked via governing_adrs?",
+          "references": {
+            "fields": ["governing_adrs"]
+          }
+        },
+        {
+          "id": "QB-DD-rationale-and-traceability-003",
+          "prompt": "Does derived_from point to the requirement or design element this leaf realises?",
+          "references": {
+            "fields": ["derived_from"]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "retrofit-honesty",
+      "title": "Retrofit honesty",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-DD-retrofit-honesty-001",
+          "prompt": "If this DD was recovered from existing code: is recovery_status set correctly per field kind — code-derivable fields verified/reconstructed/unknown, human-only fields only verified/unknown?",
+          "references": {
+            "fields": ["recovery_status"],
+            "rules": ["TRV-RETRO-001"]
+          }
+        },
+        {
+          "id": "QB-DD-retrofit-honesty-002",
+          "prompt": "Are all fields free of AI-fabricated content — no confident-sounding rationale for conversations that did not happen, no back-derived intent?",
+          "references": {
+            "rules": ["TRV-RETRO-001"]
+          }
+        },
+        {
+          "id": "QB-DD-retrofit-honesty-003",
+          "prompt": "Is the observable-vs-inferred distinction clear (\"observed from code\" passages are marked as such)?"
+        }
+      ]
+    },
+
+    {
+      "id": "spec-ambiguity-test",
+      "title": "Spec Ambiguity Test — meta-gate",
+      "kind": "meta_gate",
+      "load_bearing": true,
+      "items": [
+        {
+          "id": "QB-DD-spec-ambiguity-test-001",
+          "prompt": "Could a junior engineer, reading only this DD, produce a correct implementation without guessing?"
+        },
+        {
+          "id": "QB-DD-spec-ambiguity-test-002",
+          "prompt": "Could a test engineer, reading only this DD, write the unit-test suite without seeing the code?"
+        },
+        {
+          "id": "QB-DD-spec-ambiguity-test-003",
+          "prompt": "Would an equivalent implementation in a different language (e.g., Java → Python → Go) satisfy the same DD?"
+        }
+      ]
+    }
+  ]
+}
