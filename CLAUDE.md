@@ -35,7 +35,7 @@ The project pivoted on 2026-04-18 from a safety-specific V-model framework (HW/S
 - **Structured back-and-forth.** Present ideas, ask for input or approval, then implement. Applies to schemas, skills, prompts, and any new files.
 - **Small increments.** One concept at a time. Get alignment, then move on.
 - **Dispatch concrete execution to subagents.** Keep the main conversation focused on design, alignment, and sign-offs; file operations, multi-step lookups, and content rewrites go to subagents.
-- **Per-phase handoff docs.** Non-trivial phases get their own `PHASE{N}_AUTHORING_PATTERN.md` under `docs/plan/` — session handoff scaffolding, locked decisions, open points, recommended next step. Load alongside `CLAUDE.md` + `BACKLOG.md` + `TARGET_ARCHITECTURE.md` at session start. Archive to `archive/phase{n}/` on phase completion. Precedents: `archive/phase2/PHASE2_AUTHORING_PATTERN.md`, `archive/phase3/PHASE3_AUTHORING_PATTERN.md`.
+- **Per-phase handoff docs.** Non-trivial phases get their own `PHASE{N}_AUTHORING_PATTERN.md` under `docs/plan/` — session handoff scaffolding, locked decisions, open points, recommended next step. Load alongside `CLAUDE.md` + `BACKLOG.md` + `TARGET_ARCHITECTURE.md` at session start. Archive to `archive/phase{n}/` on phase completion. Precedents: `archive/phase2/PHASE2_AUTHORING_PATTERN.md`, `archive/phase3/PHASE3_AUTHORING_PATTERN.md`, `archive/phase4/PHASE4_AUTHORING_PATTERN.md`.
 
 ---
 
@@ -75,8 +75,8 @@ Ten load-bearing principles. Canonical wording in `TARGET_ARCHITECTURE.md §3`. 
 - **Phase 1** — Foundation rewrite (BACKLOG, TARGET_ARCHITECTURE, this CLAUDE.md) — **DONE** (2026-04-18).
 - **Phase 2** — Per-artifact documentation (6 types, 5-section structure) — **DONE** (2026-04-22).
 - **Phase 3** — Schemas (per-artifact JSON Schema draft 2020-12 + traceability catalogs + Quality Bar JSON + minimal fixtures) — **DONE** (2026-04-23).
-- **Phase 4** — Product Briefs for purpose-built tools (context only; can run parallel with Phase 5).
-- **Phase 5** — Skills (craft authoring + review per artifact; framework skills). Consumes Phase 3 schemas + Quality Bar JSON directly.
+- **Phase 4** — Product Descriptions for purpose-built tools — **CLOSED** (2026-04-26) without producing PDs. The vmodel-core pilot surfaced that PD was a category error: the actual gap is a missing **elicitation skill** at root scope. Framework retains 6 artifact types. Phase 5 picks up `vmodel-skill-elicit-requirements`. See `BACKLOG §3.4` + `archive/phase4/PHASE4_AUTHORING_PATTERN.md` §7.
+- **Phase 5** — Skills (craft authoring + review per artifact; framework skills; **stakeholder-elicitation skill carried over from Phase 4**). Consumes Phase 3 schemas + Quality Bar JSON directly.
 - **Phase 6** — Tools (each a separate product repo, built via framework — dogfooding). Gates on Build workflow design (deferred).
 - **Phase 7** — Retrofit-specific additions.
 

@@ -11,7 +11,8 @@ Execution plan for the VModelWorkflow framework following the 2026-04-18 pivot. 
 - **Phase 1** — foundation rewrite (this document + `TARGET_ARCHITECTURE.md` + `CLAUDE.md`) — **DONE**.
 - **Phase 2** — per-artifact documentation + cleanup — **DONE** (2026-04-22). Six artifact pages authored under the 5-section structure, landing-page rewrite against TARGET_ARCHITECTURE, domain-plugin machinery unwired, pre-pivot artifact pages archived. See §3.2.
 - **Phase 3** — schemas + traceability + Quality Bar — **DONE** (2026-04-23). Six per-artifact JSON Schemas (draft 2020-12), envelope + common-defs, traceability link-types + validation-rules catalogs, Quality Bar container + six per-artifact checklists, six minimal-example fixtures round-tripping clean through the schemas. `PHASE3_AUTHORING_PATTERN.md` archived to `archive/phase3/` on completion. See §3.3.
-- Phases 4–7 — pending.
+- **Phase 4** — Product Descriptions for purpose-built tools — **CLOSED** (2026-04-26) without producing PDs. The vmodel-core PD pilot surfaced that PD is a category error: the actual gap is a missing **elicitation skill** at root scope (interview-style, anti-assumption / explanation / gap-finding / readback for joint agreement, DDD-flavoured). Framework retains its 6-artifact set. Phase 5 picks up `vmodel-skill-elicit-requirements`; the vmodel-core PD draft is preserved as eval input for that skill. `PHASE4_AUTHORING_PATTERN.md` archived to `archive/phase4/` on closeout. See §3.4.
+- Phases 5–7 — pending.
 
 **Preserved and operational:**
 - Craft skills `develop-code` (Haiku eval 91%, +13% over baseline), `derive-test-cases` (100%, +3%), `vmodel-skill-review-code` (95.8%, +25%).
@@ -112,29 +113,30 @@ Architectural rationale — including the full Q8–Q15 and NQ-B/C/D/E decisions
 
 **Dependencies:** Phase 2 (docs are source of truth; Quality Bar HTML sections authored there).
 
-### 3.4 Phase 4 — Product Descriptions for Purpose-built Tools
+### 3.4 Phase 4 — Product Descriptions — CLOSED (2026-04-26)
 
-**Goal:** Kick off dogfooding by authoring Product Descriptions (PD) for the three purpose-built tool products defined in `TARGET_ARCHITECTURE §10`. Context only — does not depend on skills existing yet.
+**Goal (original):** Kick off dogfooding by authoring Product Descriptions (PD) for the three purpose-built tool products defined in `TARGET_ARCHITECTURE §10`. Context only — does not depend on skills existing yet.
 
-**Pivot during Phase 4 (2026-04-26):** The original deliverable was Product Briefs (PB). Authoring the `vmodel-core` PB surfaced that the PB craft shape is implicitly business-product-flavoured and produces ceremonial overweight for engineering-internal / dogfooded products. A new artifact type — **Product Description (PD)** — was introduced as the engineering-flavoured alternative. PB is preserved as an option for products with real markets; PD is the right anchor for engineering products. See `PHASE4_AUTHORING_PATTERN.md` Finding #9 for the full reasoning and follow-up actions.
+**Pivot during Phase 4 (2026-04-26):** The original deliverable was Product Briefs (PB). Authoring the `vmodel-core` PB surfaced that the PB craft shape is implicitly business-product-flavoured and produces ceremonial overweight for engineering-internal / dogfooded products. A new artifact type — **Product Description (PD)** — was introduced as the engineering-flavoured alternative. See `archive/phase4/PHASE4_AUTHORING_PATTERN.md` Finding #9 for the full reasoning.
 
-**Rationale for three products (not ten capabilities):** the anchor artifact (PD or PB) anchors a product, not a function. The ten `§10` capabilities are cohesion-grouped into three products by stakeholder cut and lifecycle. See `TARGET_ARCHITECTURE §10` for the full grouping.
+**Closeout (2026-04-26):** PD was a category error. After authoring the `vmodel-core` PD draft and researching the AI-coding frontier on stakeholder-intent capture (codex sweep + web research), the load-bearing finding was that the gap surfaced by the vmodel-core experiment is *not* a missing artifact type — it is a missing **elicitation skill** at root scope. The vmodel-core PB experiment failed because vmodel-core's stakeholder = architect = framework author, so the translation layer collapsed. For products with non-architect stakeholders, the Product Brief shape is fit for purpose. The missing piece is an interactive AI skill that can take unstructured stakeholder narrative and produce structured root-Requirements through anti-assumption dialog, explanation-while-eliciting, active gap-finding (NFRs, edges, integrations), and readback for joint agreement (DDD-flavoured ubiquitous language). The framework retains its 6-artifact set; PD is *not* introduced. The work moves into Phase 5 as `vmodel-skill-elicit-requirements` (see §3.5). The vmodel-core PD draft is preserved at `docs/plan/phase4-tool-briefs/core/product_description.md` as eval input for the new skill.
 
 **Tasks:**
 - [x] Product Brief for `vmodel-core` (business-PB experiment; archived to `archive/phase4-business-pb-experiment/`).
-- [ ] Product Description for `vmodel-core` (pilot — pattern-setter for PD shape).
-- [ ] Product Description for `vmodel-author`.
-- [ ] Product Description for `vmodel-retrofit`.
+- [x] Product Description for `vmodel-core` (PD pilot — surfaced the elicitation-skill reframe; preserved at `docs/plan/phase4-tool-briefs/core/product_description.md` as eval input for `vmodel-skill-elicit-requirements`).
+- [-] Product Description for `vmodel-author` — **CANCELLED.** PD was a category error (see Closeout). vmodel-author is spec'd in Phase 5+ via the regular Specification workflow.
+- [-] Product Description for `vmodel-retrofit` — **CANCELLED.** PD was a category error (see Closeout). vmodel-retrofit is spec'd in Phase 5+ via the regular Specification workflow.
 
-**Deliverables:** Three Product Descriptions under `docs/plan/phase4-tool-briefs/{core,author,retrofit}/product_description.md` — staging directory, lifts to each tool's own repo at Phase 6 kickoff. Each PD includes a §6 *References and Dependencies* manifest listing the framework files (TARGET_ARCHITECTURE excerpts, schemas, traceability rules, sibling-tool references) that must accompany the PD when it lifts to its own repo.
+**Deliverables (as built):** vmodel-core PD draft retained as eval input for the Phase 5 elicit-requirements skill. No PD craft doc, no PD schema, no PD Quality Bar — none authored, none needed. Closeout finding documented here and in `archive/phase4/PHASE4_AUTHORING_PATTERN.md` §7.
 
-**Success criteria:** Each PD covers vision, functional scope, non-functional scope, out-of-scope, assumptions, and references with sufficient density that a fresh repo containing the PD plus the §6-listed dependencies allows independent design and build to continue. Schema validation deferred — PD schema is authored after the three concrete PDs land (schema-after-artifact, see Finding #9 in `PHASE4_AUTHORING_PATTERN.md`).
-
-**Dependencies:** Phase 2 docs (PB craft doc as informative reference; PD craft doc to be authored in Phase 2 revision after Phase 4 closeout).
+**Dependencies:** Phase 2 docs (PB craft doc as informative reference).
 
 ### 3.5 Phase 5 — Skills (craft + framework)
 
-**Goal:** Build per-artifact authoring + review skills, plus framework skills (orchestration, traceability, retrofit). Quality Bar content is already in place — HTML in Phase 2, canonical JSON in Phase 3 — and is consumed here.
+**Goal:** Build per-artifact authoring + review skills, plus framework skills (orchestration, traceability, retrofit), plus the **stakeholder-elicitation skill** carried over from Phase 4 closeout. Quality Bar content is already in place — HTML in Phase 2, canonical JSON in Phase 3 — and is consumed here.
+
+**Tasks (elicitation skill — Phase 4 carryover):**
+- [ ] `vmodel-skill-elicit-requirements` — interview-style stakeholder elicitation. Distinct from `vmodel-skill-author-requirements`. **Same output** (root-Requirements); **different input** (unstructured stakeholder narrative vs structured parent allocation). **Behaviour:** anti-assumption (surface choices, never silently fill), explanation-while-eliciting (architect-concepts in stakeholder-accessible terms), active gap-finding (NFRs / edge cases / integrations), readback for joint agreement (DDD-flavoured ubiquitous language). Pilot eval input: `docs/plan/phase4-tool-briefs/core/product_description.md`. Closest discipline match in the project corpus: codex `pat-hitl-gates` rejection format (Expected / Found / Why this matters / How should I proceed?). AI-frontier comparison points (none ship the readback-for-joint-agreement behaviour): LLMREI, Follow-Up Question Generation, ClarifyGPT, BMAD analyst step, Spec Kit `/specify`, Outset / Kraftful / Strella interview tools.
 
 **Tasks (per-artifact skills):**
 - [ ] `vmodel-skill-author-product-brief` and `vmodel-skill-review-product-brief`.
@@ -313,4 +315,4 @@ Phase 0 (done) → Phase 1 (this commit) → Phase 2 (docs)
 
 ---
 
-*Last updated: 2026-04-23 (Phase 4 kickoff — §3.4 three-product consolidation; §6 Q5 closed).*
+*Last updated: 2026-04-26 (Phase 4 closeout — PD was a category error; gap was a missing elicitation skill; framework retains 6 artifact types; `vmodel-skill-elicit-requirements` added to Phase 5).*

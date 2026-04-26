@@ -167,4 +167,34 @@ The pivot point seems to be product scale (large = separate makes sense; small C
 
 ---
 
-*Last updated: 2026-04-26 (session pause — PD pilot mostly complete; PD-vs-Requirements research is the load-bearing next-session question).*
+---
+
+## 7. Closeout (2026-04-26)
+
+Phase 4 closes without producing the three PDs originally planned. The session-pause open question — *is PD distinct from root-scope Requirements, or do they collapse for engineering products?* (see §6) — was re-examined alongside two parallel research passes (codex sweep + web research on the AI-coding frontier for stakeholder-intent capture). The reframe that surfaced is bigger than the question.
+
+**PD was a category error.** The Phase 4 PB → PD pivot (Finding #9) correctly identified that the vmodel-core PB experiment did not fit, but mis-diagnosed the cause as *artifact-shape misfit*. The actual cause is more specific: vmodel-core's stakeholder = architect = framework author. The translation layer that PB exists to bridge — between non-technical stakeholder and software architect — collapsed because there was no separation of roles. PB itself remains fit for purpose for products with non-architect stakeholders.
+
+**The real gap is a missing elicitation skill.** What was actually wanted at the top of the spec tree was not a new artifact but a specific *interaction*: an AI skill that takes unstructured stakeholder narrative, runs an interview-style dialog with explicit anti-assumption discipline, explains architect-concepts in stakeholder-accessible terms, actively surfaces gaps a competent architect would find (NFRs, edge cases, integrations), and reads its structured understanding back to the stakeholder in stakeholder-accessible language for joint agreement (DDD-flavoured ubiquitous language). The output of that interaction is just the existing root-Requirements (in EARS or similar). No new artifact type needed.
+
+**AI-frontier evidence (2026-04-26 research).** The closest tools that exist today — BMAD-METHOD analyst step, GitHub Spec Kit `/specify`, ChatPRD, Outset / Kraftful / Strella interview tools, Qlerify event-storming, LLMREI elicitation chatbot, ClarifyGPT, the Follow-Up Question Generation paper — all stop short of the **readback-for-joint-agreement** behaviour and the **anti-assumption discipline** described above. No shipping product names a "stakeholder-voice top-of-tree artifact" with consensus. The codex `pat-hitl-gates` rejection format (*Expected / Found / Why this matters / How should I proceed?*) is the closest discipline match in the project's substrate; it can carry the readback contract directly. Field signal: SLR (arXiv 2509.11446) reports +136% YoY paper growth on LLMs in RE, with only ~5% of studies using "interactive prompting." Early field — the framework leads here, not follows.
+
+**Decisions locked.**
+
+1. **Framework retains its 6-artifact set.** PD is not introduced. `TARGET_ARCHITECTURE §5` and the Phase 2 PB craft doc do not change.
+2. **Phase 4 closes** without authoring vmodel-author or vmodel-retrofit PDs. Those tools are spec'd in Phase 5+ via the regular Specification workflow (Requirements → Architecture → DD → TestSpec).
+3. **The vmodel-core PD draft is preserved** at `docs/plan/phase4-tool-briefs/core/product_description.md` as eval input for the new skill — it is the kind of unstructured-but-rich stakeholder narrative the skill is supposed to consume. The empty `phase4-tool-briefs/{author,retrofit}/` staging directories are removed.
+4. **Phase 5 picks up `vmodel-skill-elicit-requirements`** as a separate skill from `vmodel-skill-author-requirements`. Same output (root-Requirements), different input (unstructured stakeholder narrative vs structured parent allocation). Behaviour: anti-assumption / explanation-while-eliciting / gap-finding / readback for joint agreement. See `BACKLOG §3.5`.
+5. **Codex raw-folder additions** were proposed for: LLMREI, Follow-Up Question Generation, ClarifyGPT, Structured Uncertainty-guided Clarification, SLR on LLMs for RE, Teresa Torres Interview Coach + caution against synthetic interviews, BMAD analyst step, live AI-discovery products (Outset, Kraftful, Strella, Qlerify). Cross-checked against codex index and added where new — see commit history.
+
+**Re-evaluation of earlier findings.**
+
+- **Findings #7 and #8** (the §G two-tier deferral pattern and the open-questions register form) remain candidates for a Phase 2 PB-craft-doc revision but are no longer urgent; surface again only if a real PB is authored and the gaps re-emerge.
+- The **PB JSON Schema** and **PB Quality Bar** are unchanged. PB is still in the 6-artifact set.
+- `TARGET_ARCHITECTURE §10` (three-product structure + AI-ergonomic CLI subsection) is unchanged. The AI-ergonomic CLI principles continue to apply when each tool's specs are authored in Phase 5+.
+
+This file is archived to `archive/phase4/PHASE4_AUTHORING_PATTERN.md` on closeout.
+
+---
+
+*Last updated: 2026-04-26 (Phase 4 closeout — PD was a category error; gap was a missing elicitation skill at root scope).*
