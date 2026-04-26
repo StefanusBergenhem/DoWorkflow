@@ -112,18 +112,25 @@ Architectural rationale — including the full Q8–Q15 and NQ-B/C/D/E decisions
 
 **Dependencies:** Phase 2 (docs are source of truth; Quality Bar HTML sections authored there).
 
-### 3.4 Phase 4 — Product Briefs for Purpose-built Tools
+### 3.4 Phase 4 — Product Descriptions for Purpose-built Tools
 
-**Goal:** Kick off dogfooding by authoring Product Briefs for the purpose-built tools listed in `TARGET_ARCHITECTURE §10`. Context only — does not depend on skills existing yet.
+**Goal:** Kick off dogfooding by authoring Product Descriptions (PD) for the three purpose-built tool products defined in `TARGET_ARCHITECTURE §10`. Context only — does not depend on skills existing yet.
+
+**Pivot during Phase 4 (2026-04-26):** The original deliverable was Product Briefs (PB). Authoring the `vmodel-core` PB surfaced that the PB craft shape is implicitly business-product-flavoured and produces ceremonial overweight for engineering-internal / dogfooded products. A new artifact type — **Product Description (PD)** — was introduced as the engineering-flavoured alternative. PB is preserved as an option for products with real markets; PD is the right anchor for engineering products. See `PHASE4_AUTHORING_PATTERN.md` Finding #9 for the full reasoning and follow-up actions.
+
+**Rationale for three products (not ten capabilities):** the anchor artifact (PD or PB) anchors a product, not a function. The ten `§10` capabilities are cohesion-grouped into three products by stakeholder cut and lifecycle. See `TARGET_ARCHITECTURE §10` for the full grouping.
 
 **Tasks:**
-- [ ] Product Brief per purpose-built tool (single aggregated task; tool list canonical in `TARGET_ARCHITECTURE §10`).
+- [x] Product Brief for `vmodel-core` (business-PB experiment; archived to `archive/phase4-business-pb-experiment/`).
+- [ ] Product Description for `vmodel-core` (pilot — pattern-setter for PD shape).
+- [ ] Product Description for `vmodel-author`.
+- [ ] Product Description for `vmodel-retrofit`.
 
-**Deliverables:** One Product Brief per tool, in each tool's own future repo or a staging area until the repo is created.
+**Deliverables:** Three Product Descriptions under `docs/plan/phase4-tool-briefs/{core,author,retrofit}/product_description.md` — staging directory, lifts to each tool's own repo at Phase 6 kickoff. Each PD includes a §6 *References and Dependencies* manifest listing the framework files (TARGET_ARCHITECTURE excerpts, schemas, traceability rules, sibling-tool references) that must accompany the PD when it lifts to its own repo.
 
-**Success criteria:** Each tool has an anchor artifact describing stakeholders, problem, outcomes, operational concept, constraints, non-goals, success criteria.
+**Success criteria:** Each PD covers vision, functional scope, non-functional scope, out-of-scope, assumptions, and references with sufficient density that a fresh repo containing the PD plus the §6-listed dependencies allows independent design and build to continue. Schema validation deferred — PD schema is authored after the three concrete PDs land (schema-after-artifact, see Finding #9 in `PHASE4_AUTHORING_PATTERN.md`).
 
-**Dependencies:** Phase 2 (Product Brief doc needed as reference).
+**Dependencies:** Phase 2 docs (PB craft doc as informative reference; PD craft doc to be authored in Phase 2 revision after Phase 4 closeout).
 
 ### 3.5 Phase 5 — Skills (craft + framework)
 
@@ -252,7 +259,7 @@ Questions tied to upcoming phases. Architectural open questions live in `TARGET_
 2. **Topology discovery algorithm choice.** Dependency analysis vs package boundaries vs bounded-context detection. Phase 7 decision; pilot-driven.
 3. **Scaffolder CLI shape.** Exact commands and options for the scaffolder tool. Phase 6.
 4. **Project config format (e.g., `.vmodel/tools.yaml`).** How projects declare available tools. Draft needed before Phase 5's framework skills reference it.
-5. **Dogfooding kickoff order.** Which purpose-built tool to Product-Brief first in Phase 4. Candidate: schema validator (smallest, cleanest scope).
+5. ~~**Dogfooding kickoff order.**~~ Resolved 2026-04-23: three-product consolidation (`vmodel-core`, `vmodel-author`, `vmodel-retrofit`) per §3.4 update. `vmodel-core` is the pattern-setter pilot; `vmodel-author` and `vmodel-retrofit` follow once the pattern is locked.
 6. **Legacy pilot start date.** When to attempt a pilot retrofit (Java 17 / Gradle / JUnit 5 / ~100k LOC / ~10% coverage). Depends on Phases 5 + 7 being at least partially operational.
 
 ---
@@ -306,4 +313,4 @@ Phase 0 (done) → Phase 1 (this commit) → Phase 2 (docs)
 
 ---
 
-*Last updated: 2026-04-23 (Phase 3 complete).*
+*Last updated: 2026-04-23 (Phase 4 kickoff — §3.4 three-product consolidation; §6 Q5 closed).*

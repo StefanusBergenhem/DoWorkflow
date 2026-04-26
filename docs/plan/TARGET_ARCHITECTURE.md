@@ -526,17 +526,35 @@ ADRs are **cross-cutting** first-class artifacts — not inlined in Architecture
 
 **Tool universe** (for this framework's use cases — projects pick subsets):
 
-**Purpose-built:**
+**Product boundaries follow cohesion and stakeholder cut, not functional granularity.** Capabilities that share plumbing and ship to the same user at the same time belong to one product; capabilities with distinct stakeholders or lifecycles warrant separate products. The framework defines **three purpose-built tool products**, each covering several capability areas.
+
+**Purpose-built tool products:**
+
+**`vmodel-core`** — Daily-driver validation and query.
+*Primary stakeholder:* every adopter — engineers running pre-commit checks, CI pipelines, authoring and review skills invoking subprocess tools.
+*Capabilities:*
 - Artifact parser (`.md` + YAML + Mermaid → structured data).
 - Schema validator (structural rigor per artifact type).
 - Traceability validator (link integrity, completeness, cycles).
 - Quality Bar structural runner.
 - Graph builder (derived traceability graph).
 - Query engine (coverage, impact, candidate sets, what-verifies-what).
+
+**`vmodel-author`** — Artifact authoring and presentation.
+*Primary stakeholder:* humans and skills drafting new artifacts; teams publishing rendered docs for review.
+*Capabilities:*
 - Scaffolder (generate skeleton `.md` from artifact type).
 - Renderer (artifacts → HTML / static docs).
+
+**`vmodel-retrofit`** — Legacy reverse-engineering support.
+*Primary stakeholder:* retrofit pilot teams — distinct user journey from greenfield adopters.
+*Capabilities:*
 - Topology discovery (scope tree from code).
-- Gap report aggregator (retrofit gaps).
+- Gap report aggregator (retrofit gaps per §8.2).
+
+**Capabilities are internal to their product** — typically exposed as subcommands (`vmodel-core validate schema`, `vmodel-author scaffold`, `vmodel-retrofit topology`). They are not separately distributable; their spec chain (Requirements → Architecture → Detailed Design → TestSpec) lives inside the product's spec tree.
+
+**`vmodel-author` and `vmodel-retrofit` depend on `vmodel-core`** (via library or subprocess — each product's ADRs decide). The framework repo itself bundles none.
 
 **Pre-existing general tools:**
 - git, graphviz, jq, ripgrep, linters, compilers, test runners — whatever the project already uses.
@@ -561,6 +579,19 @@ ADRs are **cross-cutting** first-class artifacts — not inlined in Architecture
 - `--format text` (human-default: tables, color, formatting).
 - Default is **TTY-aware** — terminal gets `text`, pipe gets `json`.
 - Errors are **actionable** — report file, rule, and what to fix. Never just "validation failed."
+
+### AI-ergonomic CLI (applies to every tool)
+
+Agents are first-class callers alongside humans. The following patterns extend the output-discipline contract above; they apply uniformly across all three tool products. Source: engineering-codex page on CLI design for AI agents (see codex index).
+
+- **Non-interactive by default.** Every input passable as a flag. Interactive prompts are a fallback when flags are missing, never the primary path. An agent must never get stuck on input it can't answer.
+- **Idempotent commands.** Running the same operation twice returns "no-op" rather than duplicating work or failing. Agents retry constantly; the contract must be retry-safe.
+- **`--dry-run` on destructive operations.** Preview mode that validates the plan without committing.
+- **`--yes` / `--force` to bypass confirmations.** Safe path is the default; agents pass the bypass flag explicitly.
+- **Predictable resource + verb structure.** Once an agent learns `vmodel-core validate schema`, it should be able to guess `vmodel-core validate trace`. Pick a pattern and hold it across subcommands.
+- **Accept stdin for all inputs.** Pipelines are the native composition mode; `cat file.md | vmodel-core parse --stdin` must work as well as `vmodel-core parse file.md`.
+- **Progressive `--help`.** Top-level help lists subcommands; subcommand `--help` includes examples. Examples carry the discovery load — agents pattern-match off them faster than prose.
+- **Return structured data on success.** Ids, paths, durations as structured fields. No decorative formatting beyond what `--format text` explicitly renders.
 
 ### Integration interface
 
