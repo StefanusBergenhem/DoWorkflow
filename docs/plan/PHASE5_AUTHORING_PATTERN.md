@@ -6,18 +6,18 @@ Load this file alongside `CLAUDE.md` + `BACKLOG.md` + `TARGET_ARCHITECTURE.md` a
 
 ---
 
-## 1. Status as of 2026-04-27 (pattern locked)
+## 1. Status as of 2026-04-29 (pattern locked + elicit-needs landed)
 
 **Phase 5 goal:** Build per-artifact authoring + review skills (6 × 2 = 12 per-artifact skills), plus framework skills (orchestration, traceability, retrofit), plus the stakeholder-elicitation skill carried over from Phase 4 closeout, plus a rewrite of `docs/guide/skills-architecture.html` for the new 6-artifact model.
 
-**Work landed this session:**
+**Work landed:**
 
-| Commit | Step | What |
+| Date | Step | What |
 |---|---|---|
-| (pending) | Pattern-setter pair | `vmodel-skill-author-requirements` (18 files, ~2071 lines) and `vmodel-skill-review-requirements` (14 files, ~1823 lines) authored under `.claude/skills/`. Both self-contained, framework-neutral, lean-fragile. The author skill encodes the EARS / NFR-five-elements / interface-five-dimensions / no-fabrication / no-smuggled-design disciplines. The review skill mirrors them as checks plus a structured-verdict (APPROVED / REJECTED / DESIGN_ISSUE) with deterministic gates and a stable `check_failed` identifier catalog. |
+| 2026-04-27 | Pattern-setter pair | `vmodel-skill-author-requirements` (18 files, ~2071 lines) and `vmodel-skill-review-requirements` (14 files, ~1823 lines) authored under `.claude/skills/`. Both self-contained, framework-neutral, lean-fragile. The author skill encodes the EARS / NFR-five-elements / interface-five-dimensions / no-fabrication / no-smuggled-design disciplines. The review skill mirrors them as checks plus a structured-verdict (APPROVED / REJECTED / DESIGN_ISSUE) with deterministic gates and a stable `check_failed` identifier catalog. |
+| 2026-04-29 | Phase 4 carryover | `vmodel-skill-elicit-needs` (17 files, ~1340 lines) authored under `.claude/skills/`. Renamed from `vmodel-skill-elicit-requirements` during authoring to align with INCOSE's Needs vs Requirements distinction (Stakeholder Real-World Expectations → Integrated Set of Needs → Design Input Requirements). Output is a rough `needs.md` in **prototype mode** — not a tracked framework artifact yet (decision γ — prototype before formalizing). Encodes a state-machine spine (ELICIT → DRAFT → READBACK → CONFIRM → COMMIT) with readback-for-joint-agreement as a fragile contract. Self-review surfaced 2 MAJOR findings (description over 1024-char cap; WRAP-UP state coherence drift), both fixed at landing. |
 
 **Pending tasks (Phase 5 backlog):**
-- [ ] `vmodel-skill-elicit-requirements` (Phase 4 carryover; pilot eval input at `docs/plan/phase4-tool-briefs/core/product_description.md`).
 - [ ] `vmodel-skill-author-product-brief` and `vmodel-skill-review-product-brief`.
 - [ ] `vmodel-skill-author-architecture` and `vmodel-skill-review-architecture`.
 - [ ] `vmodel-skill-author-adr` and `vmodel-skill-review-adr`.
@@ -128,11 +128,9 @@ Six per-artifact pairs total; one done. The remaining five:
 
 **Recommendation:** product-brief next (simplest, lowest risk; further validates the pattern). Then `testspec` (rigid `verifies` requirement is mechanically checkable, low novelty). Then `architecture` + `adr` together (cross-cutting; Composition / Reversibility have novel sub-shapes that benefit from co-authoring). Detailed-design last (largest scope per artifact; superseding C2–C4 introduces migration concerns).
 
-### Q3 — When to do the elicitation skill
+### Q3 — When to do the elicitation skill — RESOLVED 2026-04-29
 
-`vmodel-skill-elicit-requirements` is the Phase 4 carryover. It is novel — no AI-coding-frontier tool ships the readback-for-joint-agreement behaviour. Doing it before the pattern-setter pair would have been risky (novel + pattern-defining). Doing it now (pattern locked) is the right window. But it has a different *input* shape (unstructured stakeholder narrative) and a different *failure mode* (elicitation drift), so it warrants a session of its own rather than batching with another author skill.
-
-**Recommendation:** elicitation skill is a single-skill session whenever it lands; do not batch.
+`vmodel-skill-elicit-needs` (renamed during authoring from `vmodel-skill-elicit-requirements`) landed in a single-skill session as recommended. The single-session approach was correct — the design surfaced two non-trivial architectural decisions during the interview (output type vs Requirements; positioning relative to the 6-artifact set) that would have been costly to resolve under per-artifact-pair batching pressure. Decision γ (prototype-mode `needs.md`, no upstream commitment to formalization) preserves optionality until pilot reps inform the choice between (α) new 7th artifact, (β) merger into Product Brief, or (γ) staying as transient elicitation output. Self-review found the skill clean against Phase 5 §2 conventions; only minor description-cap and state-coherence drifts surfaced and were fixed at landing.
 
 ### Q4 — Framework skills
 
