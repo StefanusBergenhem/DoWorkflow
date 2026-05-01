@@ -6,7 +6,7 @@ Load this file alongside `CLAUDE.md` + `BACKLOG.md` + `TARGET_ARCHITECTURE.md` a
 
 ---
 
-## 1. Status as of 2026-05-01 (ADR pair landed; all five per-artifact pairs complete)
+## 1. Status as of 2026-05-01 (Phase 5 closeout deferred; Phase 6 pilot starts)
 
 **Phase 5 goal:** Build per-artifact authoring + review skills (6 × 2 = 12 per-artifact skills), plus framework skills (orchestration, traceability, retrofit), plus the stakeholder-elicitation skill carried over from Phase 4 closeout, plus a rewrite of `docs/guide/skills-architecture.html` for the new 6-artifact model.
 
@@ -21,21 +21,24 @@ Load this file alongside `CLAUDE.md` + `BACKLOG.md` + `TARGET_ARCHITECTURE.md` a
 | 2026-05-01 | Builder-skill conformance audit | All four shipped pairs/skills audited against `prompt-skill-agent-builder/references/{skill,anti-patterns}.md`. Audit pre-flight invoked the builder skill via `Skill` tool per §2.12. **Requirements pair**: 62 findings, all fixed (substantive prime-don't-teach pass on 18 sites + maxim/alternatives/duplication strip; structural pass added 13 TOCs, trimmed both descriptions under 1024 cap, added inline cap-exception block to `quality-bar-gate.md`); one tactical catalog superset (added `check.ears.non-conformant` to back rewritten alternatives fix); all 48 `check.*` + 16 `anti-pattern.*` IDs preserved. **Elicit-needs**: 9 findings, all fixed (small prime-don't-teach trims + 1 TOC); state machine, hard refusals, readback contract intact. **DD pair**: 4 findings, all fixed (description trims + project-path placeholder + canonical cap-exception wording); cleanest pair, no Phase A needed (refs already prime + slot motivation, no theory derivation). **Architecture pair**: 21 findings; structural fixes applied (10 TOCs, description trim 1065→908, canonical cap-exception wording, project-path placeholder); 9 audit-flagged "substantive" findings (Parnas/CAP/STRIDE/circuit-breaker/Ford/Hoare "re-derivation") **dismissed as false positives** after spot-check of `decomposition-discipline.md` and `data-and-persistence.md` — both files name + cite + give operational discriminator + slot, with zero theory derivation; the audit pattern-matched on keywords without inspecting structure. Identifier counts unchanged (58 `check.*` + 10 `anti-pattern.*`). Lesson: builder-skill anti-pattern matching needs verb-level inspection, not keyword matching, on subsequent audits. **§3 Q6 RESOLVED.** |
 | 2026-05-01 | Phase 5 fourth pair | `vmodel-skill-author-testspec` (23 files, ~2162 lines) and `vmodel-skill-review-testspec` (20 files, ~1783 lines) authored under `.claude/skills/`. Pair total ~3945 lines. Pre-flight invoked `prompt-skill-agent-builder` via Skill tool per §2.12; build proceeded against a single `/tmp/testspec-pair-contract.md` consumed by two parallel build subagents. **14 author references + 15 review references** — deviation from the four-prior-pair pattern of 9–12 per side, justified by **three upstream seams** (DD ↔ leaf, Architecture ↔ branch, Requirements + Product Brief ↔ root) vs DD's single downstream seam to TestSpec. Hard refusals A/B/C/D: A — fabricated retrofit intent on `title`/`notes` (anti-pattern 13); B — `verifies` empty or unresolvable at artifact or case level (anti-pattern 12); C — weak/unbounded oracle on `expected` (anti-pattern 5); D — Spec Ambiguity Test override. **One derived-hard reject beyond A/B/C/D**: `check.coverage-mutation.section-missing` — the load-bearing QB group flag forces structural enforcement (the *bar* must be declared; *values* are project-policy and not prescribed). This is one extra hard-reject ID, not a fifth hard refusal. `check_failed` catalog: **13 `anti-pattern.*` + 53 `check.*` = 66 IDs**, partitioned across `anti-patterns-catalog.md` and `quality-bar-gate.md`. Catalog-file exception held: review's `quality-bar-gate.md` at ~250 lines with canonical cap-exception block. **Self-review**: 0 findings on author side; 1 MAJOR + 3 minor on review side. The MAJOR was a self-violation — SKILL.md cited two `check_failed` IDs (`check.adr.governing-not-resolved`, `check.derived-from.unresolvable`) that were not in the canonical catalog; fixed by adding both as new front-matter-reference-integrity sections (both hard-reject). Three minors fixed: cross-pair example coupling clarified with illustrative-only notes, "too many collaborators" prose tightened to numeric bound, "many codebases" tightened to the empirical 100% line / ~5% mutation figure. Cross-artifact seam files: `dd-traceability-cues.md` + `dd-traceability-checks.md` (mirroring DD pair's `testspec-traceability-{cues,checks}.md` from inverse direction); `architecture-traceability-{cues,checks}.md`; `requirements-traceability-{cues,checks}.md`. |
 | 2026-05-01 | Phase 5 fifth pair (final per-artifact pair) | `vmodel-skill-author-adr` (21 files, ~1629 lines) and `vmodel-skill-review-adr` (16 files, ~1606 lines) authored under `.claude/skills/`. Pair total ~3235 lines — smallest per-artifact pair so far, matching the contract estimate. Pre-flight invoked `prompt-skill-agent-builder` via Skill tool per §2.12; build proceeded against `/tmp/adr-pair-contract.md` with two parallel build subagents. **11 author references + 11 review references** — locked-pattern compliance held; ADR's smaller surface (single inward-facing seam — `governing_adrs:` resolution from Architecture/DD/TestSpec) drove the lower count vs testspec's 14/15. Hard refusals **A/B/C/D plus a fifth — E**: A — honest retrofit posture (no fabricated rationale on the four human-only fields; `recovery_status: reconstructed` schema-banned); B — Reversibility sub-prompt non-empty and answered (rollback path or named sign-off; "partially reversible" hedge refused); C — Decision and Consequences both present and not-empty + ≥2 real alternatives; D — Spec Ambiguity Test override; **E — threshold violation refusal** (the three-condition gate — load-bearing AND ≥2 real options AND contingent on changeable assumptions — refused at intake to prevent ADRs for routine choices, anti-pattern 6). `check_failed` catalog: **11 `anti-pattern.*` + 40 `check.*` = 51 IDs**, partitioned across `anti-patterns.md` (author single SoT) and `quality-bar-gate.md` + `anti-patterns-catalog.md` (review). Catalog-file exception held twice: author's `anti-patterns.md` at 168 lines (canonical cap-exception block) and review's `quality-bar-gate.md` at 236 lines (canonical cap-exception block). 20 hard-reject IDs (7 anti-pattern + 13 check) — slightly more than architecture's 13, driven by ADR's many structural-integrity gates (front-matter required-field, id-pattern, status enum, body-section presence) on top of refusals A/B/C/D/E. Both descriptions under cap (author 1010, review 993). Catalog cite-without-add audit clean on both sides. Builder-skill self-review clean. **Contract internal inconsistency surfaced and resolved at build time**: contract §3 totals stated "35 check.* IDs" but the enumerated detail summed to 40; both subagents trusted enumeration over summary count and surfaced the discrepancy in their reports. The pair built to 51 IDs (40 + 11) accordingly — no IDs invented, every one traceable to an enumerated contract sentence. |
+| 2026-05-01 | Phase 5 closeout deferral + Phase 6 pilot kickoff | All Phase 5 remaining work deferred until after Phase 6 dogfooding signal: (a) the **three framework skills** (`traceability`, `orchestration`, `retrofit`) — orchestration moved out of skill packaging entirely (harness/command concern); traceability deferred to post-Phase 6 (skill wrapping a non-existent tool is shadow-boxing); retrofit deferred to post-greenfield-pilot (designing retrofit without lived forward-run experience would calcify wrong assumptions); (b) **Haiku-floor evals** on the 11 shipped skills deferred — pilot real-use failure modes higher-signal than synthetic scenarios; (c) **`docs/guide/skills-architecture.html` rewrite** deferred — documenting skills while their surface is still settling burns more than it saves. Phase 6 starts now: `vmodel-core` greenfield dogfooding pilot at `/home/stefanus/repos/vmodel-core/`; fresh repo (true self-containment test); 11 vmodel skills copied into `.claude/skills/`; next session = elicit-needs run with user as stakeholder; this is the first decision γ data point on the elicit-needs `needs.md` promotion path. Phase 5 status: "effective complete; closeout deferred until pilot signal." |
 
-**Pending tasks (Phase 5 backlog):**
-- [-] ~~`vmodel-skill-author-product-brief` and `vmodel-skill-review-product-brief`.~~ **DEFERRED INDEFINITELY 2026-04-30.** `needs.md` from `vmodel-skill-elicit-needs` will carry the root-scope upstream role for now. Re-evaluate alongside the elicit-needs decision γ (promote / merge / stay-transient) once pilot reps inform whether a formal Product Brief authoring skill is load-bearing or ceremonial. Framework still retains the Product Brief artifact type — only the authoring/review *skill pair* is skipped; if a formal PB is needed for a specific project, it can be hand-authored against the existing `docs/guide/artifacts/product-brief.html` craft doc + `schemas/artifacts/product-brief.schema.json`.
+**Pending tasks (Phase 5 backlog) — all remaining items DEFERRED 2026-05-01:**
+- [-] ~~`vmodel-skill-author-product-brief` and `vmodel-skill-review-product-brief`.~~ **DEFERRED INDEFINITELY 2026-04-30.** `needs.md` from `vmodel-skill-elicit-needs` will carry the root-scope upstream role for now. Re-evaluate alongside the elicit-needs decision γ once pilot reps inform whether a formal Product Brief authoring skill is load-bearing.
 - [x] ~~`vmodel-skill-author-architecture` and `vmodel-skill-review-architecture`.~~ (landed 2026-04-30)
 - [x] ~~`vmodel-skill-author-detailed-design` and `vmodel-skill-review-detailed-design`~~ (landed 2026-04-30; supersedes the paused C2–C4 DD skills)
 - [x] ~~**Builder-skill conformance audit across the four shipped pairs**~~ (completed 2026-05-01; see §3 Q6 RESOLVED).
 - [x] ~~`vmodel-skill-author-testspec` and `vmodel-skill-review-testspec`~~ (landed 2026-05-01)
 - [x] ~~`vmodel-skill-author-adr` and `vmodel-skill-review-adr`~~ (landed 2026-05-01 — final per-artifact pair).
-- [ ] `vmodel-skill-traceability` (framework). **Recommended next** — see §4.
-- [ ] `vmodel-skill-orchestration` (framework).
-- [ ] `vmodel-skill-retrofit` (framework — four-phase retrofit mode; enforces `recovery_status` discipline at the skill level).
-- [ ] Rewrite `docs/guide/skills-architecture.html` for the 6-artifact model.
-- [ ] Haiku-floor evaluation pass on every skill (Phase 5 closeout gate; see §3 Q1).
+- [-] ~~`vmodel-skill-traceability`~~ — **deferred to post-Phase 6.** Skill wrapping a non-existent tool is shadow-boxing. Build `vmodel-core`'s traceability validator first; reassess.
+- [-] ~~`vmodel-skill-orchestration`~~ — **dropped from Phase 5; tracked as harness/command work.** Current Claude Code doesn't reliably support skill-dispatching-skill; this is a harness concern, not a skill.
+- [-] ~~`vmodel-skill-retrofit`~~ — **deferred to post-greenfield-pilot.** Designing retrofit without lived forward-run experience would calcify wrong assumptions. Phase 6 dogfooding signal informs Phase 7.
+- [-] ~~Rewrite `docs/guide/skills-architecture.html` for the 6-artifact model.~~ **Deferred** — documenting a still-settling surface burns more than it saves.
+- [-] ~~Haiku-floor evaluation pass on every skill.~~ **Deferred** — pilot real-use failure modes higher-signal than synthetic scenarios; let pilot surface what to test, then build the eval.
 
-**Phase 5 closeout signal:** all 16 skills authored, each one's anti-pattern catalogue and check identifiers stable, the skills-architecture HTML rewritten, and `/skill-creator` Haiku-floor evaluations run (deferred — see §3 below).
+**Phase 5 closeout signal (revised):** triggered by Phase 6 dogfooding signal — pilot reps will tell us whether to (a) finish the deferred items as-spec'd, (b) revise them based on pilot learnings, or (c) drop them entirely. Until then, Phase 5 remains "effective complete; closeout deferred."
+
+**Phase 6 starts now:** `vmodel-core` greenfield dogfooding pilot at `/home/stefanus/repos/vmodel-core/` (fresh repo — true self-containment test). 11 skills copied. Next session = elicit-needs run with user as stakeholder. This is also the first decision γ data point for elicit-needs `needs.md` promotion path.
 
 ---
 
@@ -133,15 +136,18 @@ Every Phase 5 skill pair must conform to the discipline encoded in the `prompt-s
 
 ## 3. Open Questions
 
-### Q1 — When and how to run Haiku-floor evals
+### Q1 — When and how to run Haiku-floor evals — DEFERRED 2026-05-01
 
-Phase 5 success criteria say each skill passes `/skill-creator` Haiku evaluation. The requirements pair was authored without evals — explicitly deferred. Three sub-questions:
+Decision: defer Haiku-floor evals on all 11 shipped skills until **after the Phase 6 dogfooding pilot** has produced real-use signal.
 
-- (a) Eval budget per skill: how many scenarios? Phase 5's earlier draft said 3+; the prompt-skill-agent-builder reference says 3 minimum.
-- (b) Run evals incrementally (after each pair) or as a Phase 5 closeout pass?
-- (c) Threshold for pass: pass-rate, qualitative judgement, both?
+**Reasoning:** synthetic eval scenarios at this stage would test against assumptions we haven't yet validated. The greenfield pilot will surface concrete failure modes — what the skills miss, what they over-enforce, what users hit when the contract isn't quite right. Build the eval *from* those observed failure modes, not before them.
 
-**Recommendation when reopened:** start incremental — run the requirements pair through Haiku eval first to surface concrete failure modes; let those failures shape the eval discipline for the remaining 14 skills.
+**When reopened post-pilot:** the original three sub-questions still apply:
+- (a) Eval budget per skill (3+ scenarios per `prompt-skill-agent-builder` reference).
+- (b) Incremental (per-pair) vs Phase 5 closeout pass.
+- (c) Threshold for pass: pass-rate, qualitative judgement, both.
+
+The pilot will inform (a) and (c) directly; (b) is probably "incremental, in priority order driven by pilot pain points."
 
 ### Q2 — Order of remaining pairs — RESOLVED 2026-05-01 (final)
 
@@ -164,17 +170,34 @@ Six per-artifact pairs originally; **four landed** (requirements 2026-04-27, arc
 
 `vmodel-skill-elicit-needs` (renamed during authoring from `vmodel-skill-elicit-requirements`) landed in a single-skill session as recommended. The single-session approach was correct — the design surfaced two non-trivial architectural decisions during the interview (output type vs Requirements; positioning relative to the 6-artifact set) that would have been costly to resolve under per-artifact-pair batching pressure. Decision γ (prototype-mode `needs.md`, no upstream commitment to formalization) preserves optionality until pilot reps inform the choice between (α) new 7th artifact, (β) merger into Product Brief, or (γ) staying as transient elicitation output. Self-review found the skill clean against Phase 5 §2 conventions; only minor description-cap and state-coherence drifts surfaced and were fixed at landing.
 
-### Q4 — Framework skills
+### Q4 — Framework skills — RESOLVED 2026-05-01 (all deferred)
 
-`vmodel-skill-traceability`, `vmodel-skill-orchestration`, `vmodel-skill-retrofit` are operationally distinct from the per-artifact craft pairs. They orchestrate, validate cross-artifact links, and enforce process-level rules (e.g., the retrofit skill's no-fabrication enforcement at the skill-dispatcher level).
+All three framework skills deferred — but for different reasons, with different re-evaluation triggers:
 
-**Recommendation:** defer until at least 3 per-artifact pairs are done, so the framework skills have a stable surface to orchestrate over.
+- **`vmodel-skill-orchestration` — dropped from Phase 5 entirely; tracked as harness/command work.** Current Claude Code doesn't reliably support skill-dispatching-skill; the harness already provides flow control. Building a "skill that orchestrates skills" pre-pilot would calcify wrong assumptions about where the seams are. Re-evaluation: when the harness/command shape becomes the explicit work, not as a skill.
 
-### Q5 — Skills-architecture HTML rewrite
+- **`vmodel-skill-traceability` — deferred to post-Phase 6.** A skill wrapping a tool that doesn't exist yet is shadow-boxing. Most of what this skill would do (link integrity, completeness counting, cycle detection) is mechanical — it belongs in `vmodel-core` (Phase 6) with good error messages. The skill's only justifiable interpretive value is on the *creation* side (suggesting links during authoring). After `vmodel-core`'s traceability validator exists, reassess whether a thin authoring-time skill adds value over tool error messages alone.
+
+- **`vmodel-skill-retrofit` — deferred to post-greenfield-pilot (post-Phase 6).** Designing retrofit before having lived through a forward run would calcify wrong assumptions about what's hard vs. easy. The per-artifact author skills already encode retrofit honesty (hard refusal A in ADR pair; equivalent in DD); the framework retrofit skill's job is *sequencing* (bottom-up four phases) and *aggregation* (gap report). Both are mechanical-leaning; the interpretive surface that justifies a skill (vs. a tool feature) is unclear until pilot reps inform it. Phase 6 dogfooding generates that signal; Phase 7 retrofit work then proceeds (or doesn't) on real evidence.
+
+**Underlying open question worth a real conversation when reopened:**
+
+> *Are framework skills the right packaging at all?*
+
+Three sub-questions:
+- **Skill vs tool.** Traceability validation is mostly mechanical. Should it just be a Phase 6 tool with great error messages?
+- **Skill vs command.** Orchestration is sequencing logic — that's a command/harness concern in Claude Code.
+- **Skill vs cross-cutting protocol.** Retrofit's discipline is already in the per-artifact skills. Is there enough interpretive surface left to warrant a skill?
+
+If the honest answer to all three is "no" — Phase 5 might end with **zero framework skills**, plus a tool-centric `vmodel-core` and a harness-centric orchestration. Pilot will inform.
+
+### Q5 — Skills-architecture HTML rewrite — DEFERRED 2026-05-01 (until post-pilot)
 
 Pre-pivot version is stale. Should describe the post-pivot 6-artifact model and the author/review pair convention.
 
-**Recommendation:** defer to Phase 5 closeout. The HTML page documents skills; documenting them while they are in flux costs more than it earns.
+**Decision:** deferred until **after Phase 6 dogfooding signal**, not just Phase 5 closeout. The page documents skills; documenting them while their surface is still settling burns more than it saves. The pilot will surface what's actually load-bearing in the skill set vs. what's accidental — the rewrite captures the load-bearing parts and ignores the rest.
+
+**When reopened post-pilot:** scope likely narrows. If framework skills get dropped (Q4), the page becomes a documentation of per-artifact pairs + elicit-needs only — simpler than the original Phase 5 plan envisioned.
 
 ### Q6 — Builder-skill conformance audit — RESOLVED 2026-05-01
 
@@ -195,32 +218,33 @@ Audit ran across all four shipped pairs/skills with builder-skill pre-flight per
 
 ---
 
-## 4. Recommended Next Step
+## 4. Recommended Next Step — Phase 6 Dogfooding Pilot
 
-**Per-artifact pairs are done.** All five shipped (requirements 2026-04-27, architecture 2026-04-30, detailed-design 2026-04-30, testspec 2026-05-01, ADR 2026-05-01); product-brief deferred indefinitely 2026-04-30. Phase 5 now turns to:
+**Phase 5 effective complete (2026-05-01); closeout deferred until Phase 6 dogfooding signal.**
 
-1. **Three framework skills** — `vmodel-skill-traceability`, `vmodel-skill-orchestration`, `vmodel-skill-retrofit`. These are operationally distinct from the per-artifact craft pairs (orchestration, cross-artifact link validation, retrofit-mode no-fabrication enforcement at the skill-dispatcher level). Decision needed before building: do they follow the locked author/review pattern, or a different shape? They are not artifact-producing skills — the locked §2 conventions may not all apply directly.
+All five per-artifact pairs shipped (requirements / architecture / detailed-design / testspec / ADR), elicit-needs shipped, product-brief deferred indefinitely. Three framework skills + Haiku evals + skills-architecture.html rewrite all deferred — see §3 Q1, Q4, Q5 for per-item rationale.
 
-2. **Haiku-floor evaluation pass** on the 11 already-shipped skills (5 author + 5 review pairs + elicit-needs). Per §3 Q1, the recommendation is incremental — start with the requirements pair, surface concrete failure modes, let those failures shape the eval discipline for the rest. `/skill-creator` is the tool.
+**Phase 6 starts now: greenfield dogfooding pilot — `vmodel-core`.**
 
-3. **Skills-architecture HTML rewrite** — defer to Phase 5 closeout per §3 Q5; documenting skills while their surface is still settling burns more than it saves.
+- **Repo:** `/home/stefanus/repos/vmodel-core/` (fresh repo, separate from VModelWorkflow framework repo — true self-containment test for the skills).
+- **Skills:** 11 vmodel skills copied into `.claude/skills/` (5 author/review pairs + elicit-needs).
+- **First-session work:** elicit-needs run with the user as stakeholder, producing `needs.md` for `vmodel-core` scope. This is also the first concrete data point for the elicit-needs decision γ (promote / merge / stay-transient).
+- **Build workflow not designed yet:** spec authoring proceeds independently; code generation waits on Build workflow design (a later session).
 
-**Recommended order for the next session**: open with a design discussion on framework-skill shape (decision needed before building any of them), or pick item 2 and run the requirements-pair Haiku eval as the first concrete deliverable. The ADR pair build also surfaced one minor process refinement worth capturing in the next contract: include exact ID counts (not just totals) in §3 of the build contract, so the enumeration-vs-summary discrepancy that caught the ADR build doesn't repeat.
+**What the pilot generates that Phase 5 closeout needs:**
 
-**Pre-flight (mandatory per §2.12):**
+- **Real-use failure modes** for the shipped skills → input for Haiku-eval design (Q1).
+- **Self-containment validation** — running skills in a fresh repo proves whether the bundled-content claim holds.
+- **Framework-skill necessity signal** — orchestrating five per-artifact pairs by hand reveals what's missing; that gap is what (if anything) `vmodel-skill-traceability` / `vmodel-skill-retrofit` should be (Q4).
+- **Skills-architecture page surface** — pilot reps tell us what's load-bearing vs. accidental in the skill set; the rewrite captures the load-bearing parts (Q5).
+- **Decision γ data** — `needs.md` lifecycle observed in real use: does it get re-derived on each requirements rewrite, archived after one use, or maintained ongoing? The answer determines promote/merge/stay-transient.
 
-1. **Invoke `prompt-skill-agent-builder` via the Skill tool** at session start.
-2. **Read** `references/skill.md` and `references/anti-patterns.md` from that skill before reading anything else.
-3. PHASE5 §2 conventions layer on top of the builder's craft floor — they do not replace it.
+**Cross-repo coordination during the pilot:**
 
-**Pre-build checklist for the ADR pair:**
-- Read `docs/guide/artifacts/adr.html` — Phase 2 craft doc.
-- Read `schemas/artifacts/adr.schema.json` and `schemas/artifacts/quality-bar/adr.quality-bar.json`.
-- The ADR ↔ Architecture seam is already specified from the architecture side (`adr-extraction-cues.md` + `adr-traceability-checks.md` + the `[NEEDS-ADR: <decision>]` stub mechanism). Author the ADR pair from the inverse perspective: ADR is what gets created when an extraction cue fires; review enforces ADR shape and confirms the resolution back to citing artifacts (Architecture, DD, TestSpec via `governing_adrs:`).
-- Likely hard refusals: *(A)* honest retrofit posture (no fabricated rationale; `recovery_status: unknown` on reconstructed decision context); *(B)* Reversibility sub-prompt non-empty (an ADR without a documented reversibility analysis is decoration); *(C)* Decision and Consequences both present and not-empty (the load-bearing pair; an ADR missing either is incomplete); *(D)* Spec Ambiguity Test meta-gate.
-- Likely smaller catalog than testspec (ADR is a single-decision artifact with a tighter surface). Plan for ~10 references / side, ~50 IDs, possibly no catalog cap-exception. If `quality-bar-gate.md` does cross 150 lines, use the canonical cap-exception block per §1.7 of the contract pattern.
-- **At write time, every `check_failed` mentioned anywhere in the skill must be added to `quality-bar-gate.md`** — testspec-pair self-review caught a self-violation where SKILL.md cited two IDs not in the catalog. Audit the catalog against every reference file and SKILL.md before declaring the build done.
+- The framework repo (`VModelWorkflow`) is read-only from `vmodel-core`'s perspective. Skill bug fixes discovered during the pilot get backported to the framework repo, then re-copied into `vmodel-core` (proves the skill is still self-contained).
+- Don't symlink — defeats the self-containment test.
+- Document pilot learnings in this file or a new `PHASE6_AUTHORING_PATTERN.md` once the pattern is clear.
 
-**Build pattern proven across four pairs:** draft a single `/tmp/adr-pair-contract.md` source-of-truth, dispatch two parallel build subagents (author + review), run builder-skill self-review, apply fixes inline. Pair budget likely ~3,000–3,500 lines (smaller than the testspec pair's ~3,945).
+**One process refinement carried forward** (from the ADR build): if a future build contract is needed (e.g., for the eventual framework skills), include **exact ID counts** in the contract, not just totals, so the enumeration-vs-summary discrepancy that caught the ADR build doesn't repeat.
 
-If pattern stress is observed, surface the deviation explicitly before locking.
+**Pre-flight discipline still applies** when authoring inside `vmodel-core` (and in any future framework-skill work): invoke `prompt-skill-agent-builder` via the Skill tool, read its `references/skill.md` + `references/anti-patterns.md`, treat PHASE5 §2 conventions as layering on top.
