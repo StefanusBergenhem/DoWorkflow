@@ -1,0 +1,77 @@
+- id: F-NNN
+  # Sequential within this review (F-001, F-002, ...). Stable for a single review run.
+
+  case_id: <case id | "GLOBAL" | "FRONTMATTER">
+  # The specific TestSpec element the finding applies to.
+  # Examples:
+  #   - case_id: "TC-leaf-04"  / "TC-branch-12" / "TC-root-02"
+  #   - "FRONTMATTER" — front-matter-level findings (missing required field, level mismatch,
+  #     coverage_mutation_bar section absent)
+  #   - "GLOBAL"      — document-wide findings (happy-path-bias at artifact level,
+  #     ice-cream-cone-coverage, Gap Report missing, Spec Ambiguity Test failure)
+
+  check_failed: <dotted catalog identifier>
+  # Must appear in `references/quality-bar-gate.md` (for `check.*`) or
+  # `references/anti-patterns-catalog.md` (for `anti-pattern.*`). Examples:
+  #   - check.shape.frontmatter-missing-required-field
+  #   - check.derivation.type-not-in-enum
+  #   - check.verifies.artifact-level-empty
+  #   - check.verifies.case-level-empty
+  #   - check.verifies.unresolvable
+  #   - check.oracle.weak-assertion
+  #   - check.coverage-mutation.section-missing
+  #   - check.retrofit.intent-on-title
+  #   - check.retrofit.recovery-status-reconstructed-verifies
+  #   - check.spec-ambiguity-test.fail
+  #   - anti-pattern.weak-assertions
+  #   - anti-pattern.orphan-tests
+  #   - anti-pattern.fabricated-retrofit-intent
+  #   - anti-pattern.over-mocking
+  # Do not invent ad-hoc strings. If the check is genuinely new, surface it as a
+  # self-review note rather than minting a new identifier mid-review.
+
+  severity: <hard_reject | soft_reject | info>
+  # hard_reject — fatal; one occurrence triggers REJECTED (or DESIGN_ISSUE if
+  #   the meta-gate fires upstream-traceably). Maps to refusal A / B / C /
+  #   coverage-mutation-section-missing / broken-reference, or to the meta-gate.
+  # soft_reject — Quality Bar No or anti-pattern hit other than the hard-reject ones;
+  #   accumulates to REJECTED.
+  # info — observation worth surfacing but does not affect verdict.
+
+  category: <shape | derivation | per-layer | case-quality | oracle | verifies | test-double | coverage-mutation | integration-system | retrofit | dd-traceability | architecture-traceability | requirements-traceability | meta-gate>
+  # Top-level category — matches the namespaces in `quality-bar-gate.md` and the
+  # eight-step review sweep in SKILL.md.
+
+  evidence: |
+    <verbatim quote from the document, OR a specific structural observation>
+    # Examples:
+    # - "Front-matter declares `verifies: []` — refusal B."
+    # - "Case TC-leaf-07: `expected: 'verifies behaviour'` — refusal C
+    #    (qualitative non-bounded phrase)."
+    # - "Case TC-leaf-12 has `verifies: [DD-foo.behavior.invalid]` — id does
+    #    not resolve in any upstream spec; refusal B."
+    # - "Front-matter has no `coverage_mutation_bar:` block — derived hard."
+    # - "Retrofit case TC-leaf-03 carries `title: 'verifies user can log in'`
+    #    and `recovery_status: verified` on a reconstructed `verifies` link
+    #    — refusal A."
+    # - "Case TC-branch-09 declares 4 doubles in preconditions
+    #    (stub clock, mock JobRepository, fake EmailService, spy MetricsClient)
+    #    — over-threshold for the leaf level the case implies."
+
+  recommended_action: |
+    <generic pointer; never specific replacement wording>
+    # Acceptable:
+    # - "Populate `verifies` with resolvable upstream IDs at artifact level
+    #    and on every case. See `verifies-traceability-checks.md`
+    #    `check.verifies.artifact-level-empty` (refusal B)."
+    # - "Replace the qualitative phrase with a specific value or bounded
+    #    invariant. See `oracle-checks.md` (refusal C)."
+    # - "Mark the reconstructed `verifies` `recovery_status: unknown`, OR
+    #    cite the human source confirming the link. Refusal A."
+    # - "Add the `coverage_mutation_bar:` block. Placeholder values are
+    #    acceptable; absence is not."
+    # NOT acceptable:
+    # - "Replace with: `verifies: [DD-session-store.expiry_calculator]`"
+    # - "Set `expected: 1735689600`"
+    # - The matched author skill rewrites; this skill points to the rule, not
+    #   the replacement text.

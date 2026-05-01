@@ -1,0 +1,30 @@
+# Branch case (level: integration) — fixtures-rich shape
+# Use for cases at non-leaf scope where the parent spec is an Architecture.
+# Cases drive composition through published interfaces; observe cross-child state.
+
+- id: TC-<<scope>>-NNN
+  title: "<<scenario describing cross-child interaction>>"
+  type: <<functional | error | fault-injection | contract | state-transition | property | performance | security | accessibility>>
+  verifies:
+    - "ARCH-<<scope>>.interfaces.<<name>>"        # interface contract
+    # OR
+    - "ARCH-<<scope>>.composition.<<invariant>>"  # composition invariant
+    # additional upstream IDs as needed
+  preconditions:
+    - "Environment: <<in-process | test-containers (Postgres 16, Kafka 3.6, ...) | shared-staging | production-like>>"
+    - "Fixture: <<named fixture>>"
+    - "Test double: <<child component>> as <<dummy | stub | spy | mock | fake>>"
+                              # Fakes require a paired contract case — see test-double-discipline.md
+    - "Seed: <<data fixture>>"
+    - "Provider version pinned: <<service>>@<<sha-or-tag>>"   # for contract cases
+    - "Clock: <<fixed at TIMESTAMP | advanceable>>"           # when load-bearing
+    - "Random seed: <<integer>>"                              # when load-bearing
+  steps:
+    - "<<step 1: call into the published interface>>"
+    - "<<step 2: observe cross-child state>>"
+    # Single Act per case — multiple call-and-observe pairs split into separate cases
+  expected:
+    - "<<observable on child component A: state, return value, emitted event>>"
+    - "<<cross-child invariant holds, e.g., 'order of events preserved across boundary'>>"
+    # No qualitative phrases — refusal C
+  notes: ""                                       # optional; greenfield only

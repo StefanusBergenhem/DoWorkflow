@@ -1,0 +1,27 @@
+# Root case (level: system) — user-journey narrative shape
+# Use for cases at root scope where the parent specs are root Requirements + Product Brief.
+# Cases narrate user journeys in PB vocabulary; observe business / user-visible state.
+
+- id: TC-<<scope>>-NNN
+  title: "<<user journey, e.g., 'tenant signs up, creates first project, invites teammate'>>"
+  type: <<functional | error | performance | security | accessibility>>
+  verifies:
+    - "REQ-<<id>>"             # at least one requirement
+    - "PB-outcome-<<id>>"      # at least one PB outcome (where applicable)
+  preconditions:
+    - "Environment: production-like (<<named tier>>)"
+    - "Tenant: <<named test tenant or persona-bound tenant>>"
+    - "Persona: <<named PB persona>>"
+    - "Feature flag: <<flag>> = <<value>>"
+    - "Initial state: <<load-bearing prerequisite, e.g., 'tenant directory empty'>>"
+  steps:
+    - "<<step in user vocabulary, e.g., 'admin opens signup, completes form with valid email'>>"
+    - "<<step>>"
+    - "<<step>>"
+    # Steps narrate the journey at the user-visible level — not HTTP requests, not API calls
+  expected:
+    - "<<observable in PB vocabulary, e.g., 'tenant exists in directory, owner role assigned'>>"
+    - "<<business-state outcome, e.g., 'welcome email sent within 60s'>>"
+    - "<<journey timing or threshold where applicable, e.g., 'total elapsed <= 5 minutes p95'>>"
+    # No internal API terms, no class names, no HTTP status codes — those belong at branch
+  notes: ""                    # optional; greenfield only

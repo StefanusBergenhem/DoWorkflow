@@ -1,0 +1,18 @@
+# Coverage and mutation bar — front-matter slot
+# This block MUST be present in front-matter (derived-hard refusal — section-missing).
+# Author does NOT prescribe specific values; values are project-policy.
+# Use the literal string "TBD-by-project-policy" as a placeholder when policy has not set a value.
+
+coverage_mutation_bar:
+  structural_coverage:
+    threshold_pct: <<number | "TBD-by-project-policy">>     # e.g., 80, or "TBD-by-project-policy"
+    metric: <<line | branch | statement>>                   # which structural metric
+
+  mutation_score:
+    threshold_pct: <<number | "TBD-by-project-policy">>     # e.g., 60, or "TBD-by-project-policy"
+    tool_category: <<PIT-class | Stryker-class | mutmut-class | "TBD-by-project-policy">>
+                                                            # mutation-tool family for this stack
+
+  enforcement:
+    frequency: <<per-PR | nightly | weekly | "TBD-by-project-policy">>
+    blocking: <<true | false | "TBD-by-project-policy">>    # whether failure blocks merge / release

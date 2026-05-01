@@ -1,0 +1,25 @@
+# Retrofit case stub
+# Use when retrofitting a TestSpec from existing tests.
+# `title` and `notes` are HUMAN-ONLY fields — refusal A trips on inferred intent.
+# Default `recovery_status: unknown` for any reconstructed `verifies` link.
+
+- id: TC-<<scope>>-NNN
+  title: ""                                    # HUMAN-ONLY — leave empty until human supplies intent
+                                               # (refusal A: never populate from inferred test method name)
+  type: <<functional | boundary | error | property | state-transition | error-guessing>>
+  verifies:
+    - "<<upstream-id>>"                        # ID derived from the spec; the link is reconstructed
+                                               # without confirmation that the existing test was
+                                               # written to verify it
+  recovery_status: unknown                     # default for reconstructed verifies — refusal A
+                                               # set to `verified` only when a human has confirmed
+                                               # the link
+  inputs:
+    <<param>>: <<value-observed-from-existing-test>>     # observable from test code; not intent
+  expected: <<value-or-bounded-predicate-observed-from-existing-test-assertion>>
+                                               # observable from the assertion; not intent
+  notes: ""                                    # HUMAN-ONLY — leave empty until human supplies intent
+  source_test_ref:                             # optional pointer back to the existing test
+    file: "<<test-file>>"
+    line: <<line-number>>
+    commit: "<<commit-hash-when-mapped>>"

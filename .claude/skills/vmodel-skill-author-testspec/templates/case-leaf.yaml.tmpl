@@ -1,0 +1,27 @@
+# Leaf case (level: unit) — thin shape
+# Use for cases at leaf scope where the parent spec is a Detailed Design.
+# Cases call directly into the public interface; max 2 test doubles.
+
+- id: TC-<<scope>>-NNN
+  title: "<<scenario, not method name. e.g., 'returns earliest of idle and absolute thresholds'>>"
+  suite: "<<optional logical grouping, e.g., 'expiry-calculation'>>"
+  type: <<functional | boundary | error | property | state-transition | error-guessing>>
+  verifies:
+    - "DD-<<scope>>.<<field-or-subfield>>"     # field-level qualification permitted
+    # additional upstream IDs only when one case verifies multiple elements
+  inputs:
+    <<param_a>>: <<value>>
+    <<param_b>>: <<value>>
+  expected: <<specific value | enumerated set | bounded predicate>>
+  # Examples of legal `expected:` values:
+  #   expected: 1735689600                                # specific value
+  #   expected: { result: 1735689600, branch_taken: idle } # structured
+  #   expected: "result <= 50ms"                          # bounded predicate
+  #   expected: "result is permutation of input AND non-descending"  # property
+  #
+  # ILLEGAL — refusal C trips on these:
+  #   expected: "verifies behaviour"
+  #   expected: "does not throw"
+  #   expected: "non-null"
+  #   expected: "instance of SessionClaims"
+  notes: ""                                    # optional; greenfield only — see retrofit template otherwise

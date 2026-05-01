@@ -1,0 +1,76 @@
+---
+id: TS-<<scope-flattened>>
+artifact_type: test-spec
+scope: <<scope-path>>                    # e.g., session-store/expiry-calculator
+level: <<unit | integration | system>>   # leaf=unit, non-leaf=integration, root=system
+derived_from:
+  - <<parent-spec-id-1>>                 # e.g., DD-session-store-expiry-calculator (leaf)
+                                         #   or ARCH-cart-service (branch)
+                                         #   or REQ-001 + PB-outcome-X (root)
+verifies:
+  - <<upstream-id-1>>                    # MUST be non-empty (refusal B)
+  - <<upstream-id-2>>
+governing_adrs:
+  - <<ADR-NNN-name>>                     # omit if no governing ADRs apply
+status: draft
+date: <<YYYY-MM-DD>>
+coverage_mutation_bar:                   # MUST be present (derived-hard refusal)
+  structural_coverage:
+    threshold_pct: <<number | "TBD-by-project-policy">>
+    metric: <<line | branch | statement>>
+  mutation_score:
+    threshold_pct: <<number | "TBD-by-project-policy">>
+    tool_category: <<PIT-class | Stryker-class | mutmut-class | "TBD-by-project-policy">>
+  enforcement:
+    frequency: <<per-PR | nightly | weekly | "TBD-by-project-policy">>
+    blocking: <<true | false | "TBD-by-project-policy">>
+# === RETROFIT-ONLY — uncomment for retrofit mode ===
+# recovery_status:
+#   verifies: unknown                    # default for reconstructed verifies links
+---
+
+# TestSpec — <<scope name>>
+
+## Overview
+
+<<one or two paragraphs.>>
+
+<<Para 1: what this TestSpec covers — which slice of the parent spec is being verified
+ at this layer.>>
+
+<<Para 2 (optional, retrofit-only): retrofit posture; cite the existing test surface
+ that was mapped against the derived cases; reference the Retrofit Gap Report below.>>
+
+## Cases
+
+<<One embedded YAML block per case. Use the layer-appropriate template:
+   - templates/case-leaf.yaml.tmpl   (leaf scope, level: unit)
+   - templates/case-branch.yaml.tmpl (non-leaf scope, level: integration)
+   - templates/case-root.yaml.tmpl   (root scope, level: system)
+   For retrofit cases use templates/retrofit-stub.yaml.tmpl.
+>>
+
+```yaml
+cases:
+  - id: TC-<<scope>>-001
+    title: "<<scenario, not method name>>"
+    type: <<functional | boundary | error | fault-injection | property | state-transition | contract | performance | security | accessibility | error-guessing>>
+    verifies:
+      - "<<upstream-id>>"
+    # ... layer-appropriate fields (see case templates) ...
+```
+
+## Retrofit Gap Report <<retrofit only — delete on greenfield>>
+
+| Bucket | Items |
+|---|---|
+| Spec elements without tests | <<list, citing upstream IDs; or `(none observed)`>> |
+| Tests without spec elements | <<list, citing existing test file:line; or `(none observed)`>> |
+| Observed-but-suspect cases | <<list of case IDs with reason; or `(none observed)`>> |
+| Cases with `recovery_status: unknown` | <<list of case IDs awaiting human confirmation; or `(none observed)`>> |
+
+## Notes
+
+- Replace `<<placeholders>>` with concrete content. No placeholder text in finalised artifacts.
+- Run `references/anti-patterns.md` and `references/quality-bar-checklist.md` sweeps before delivering.
+- Apply the Spec Ambiguity Test as the meta-gate (refusal D).
