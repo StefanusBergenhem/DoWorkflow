@@ -1,5 +1,26 @@
 # Quality Bar gate — checklist + canonical check identifier catalog
 
+> **Cap exception (~150-line soft cap):** This file is the single source of truth for the canonical `check.*` and `anti-pattern.*` catalog used across the entire skill. Splitting would fragment the catalog and break the convention that one file owns one identifier namespace. The file is structured as a TOC + per-section catalog tables for navigation; readers do not need to read end-to-end.
+
+**Contents**
+- [Quality Bar — Yes/No checklist](#quality-bar--yesno-checklist)
+- [Canonical `check_failed` identifier catalog](#canonical-check_failed-identifier-catalog)
+  - [`check.vocabulary.*`](#checkvocabulary)
+  - [`check.type.*`](#checktype)
+  - [`check.ears.*`](#checkears)
+  - [`check.statement-quality.*`](#checkstatement-quality)
+  - [`check.nfr.*`](#checknfr)
+  - [`check.interface.*`](#checkinterface)
+  - [`check.constraints.*`](#checkconstraints)
+  - [`check.rationale.*`](#checkrationale)
+  - [`check.traceability.*`](#checktraceability)
+  - [`check.meta-gate.*`](#checkmeta-gate)
+  - [`anti-pattern.*` (the 16)](#anti-pattern-the-16)
+  - [`design-issue.*`](#design-issue)
+- [Rule for new check identifiers](#rule-for-new-check-identifiers)
+
+---
+
 Two purposes in one file:
 1. The Yes/No checklist that the review skill walks as Step 6 of orchestration. Every No is a finding.
 2. The canonical catalog of `check_failed` identifiers used across the skill — the stable name space for findings.
@@ -81,7 +102,7 @@ Walk every applicable item. Every No becomes a finding with the `check_failed` i
 
 - [ ] Could a junior engineer or mid-tier AI, reading only this document plus its glossary and governing decisions, derive a defensible architecture allocation, detailed design, and test specification — **without asking clarifying questions**?
 
-If No, the document fails regardless of how many other items passed.
+When meta-gate Spec-Ambiguity-Test answer is No: emit `check.meta-gate.spec-ambiguity-test-fails` with severity `hard_reject`. Verdict is REJECTED regardless of other counts.
 
 ---
 
@@ -119,6 +140,7 @@ Stable identifiers used across all findings. Three namespaces:
 | `check.ears.compound-too-many-keywords` | soft_reject |
 | `check.ears.compound-out-of-order` | soft_reject |
 | `check.ears.mixed-structured-forms` | soft_reject |
+| `check.ears.non-conformant` | soft_reject |
 
 ### `check.statement-quality.*`
 

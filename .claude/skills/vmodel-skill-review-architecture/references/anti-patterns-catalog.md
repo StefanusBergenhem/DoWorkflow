@@ -4,6 +4,13 @@ Ten failure modes, each with a tell, a `check_failed` identifier, a severity, an
 
 Patterns 1–6 are universal; patterns 7–10 are AI-era / retrofit-specific. Hard-reject triggers are flagged ★.
 
+## Contents
+
+- Universal six (1. Big ball of mud / 2. Distributed monolith / 3. God component / 4. Premature decomposition / 5. Stale architecture / 6. Cyclic dependencies)
+- AI-era and retrofit four (7. Laundered architecture HARD / 8. Fabricated decomposition rationale HARD / 9. Ad-hoc composition / 10. DD-content-in-architecture HARD)
+- Sweep order
+- Aggregation rule
+
 ## Universal six
 
 ### 1. Big ball of mud

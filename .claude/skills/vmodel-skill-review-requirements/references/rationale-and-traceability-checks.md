@@ -1,5 +1,13 @@
 # Rationale and traceability — checks
 
+**Contents**
+- [Rationale checks](#rationale-checks) — present, fabrication tells, retrofit recovery_status, circularity, laundering
+- [Derived-requirement checks](#derived-requirement-checks)
+- [Traceability checks](#traceability-checks)
+- [Recommended-action discipline reminder](#recommended-action-discipline-reminder)
+
+---
+
 Two related lifecycle checks. Rationale is the most-violated discipline in AI-authored requirements; this reference catalogs the tells, including the **hard-reject** trigger for retrofit `recovery_status` violations.
 
 ## Rationale checks
@@ -15,8 +23,6 @@ Every requirement must have a `rationale` field with non-trivial content, OR an 
 
 ### Check 2 — Fabricated rationale tells
 
-The most corrosive AI-era anti-pattern. Tells:
-
 | Tell | Examples |
 |---|---|
 | Generic phrases without source | *"industry-standard"*, *"best practice"*, *"common approach"* |
@@ -25,8 +31,6 @@ The most corrosive AI-era anti-pattern. Tells:
 | Reasoning instead of recall | *"because CSPRNG is more secure"* (reasoning) vs *"because the 2024 entropy audit mandated CSPRNG"* (recall) |
 | Defending a number with vague justification | *"30 minutes balances security and UX"* — could justify 10, 30, 60, 120 equally |
 
-In retrofit mode, fabrication tells are particularly dangerous: an agent reading code can fabricate plausible-sounding rationale for any observed value.
-
 - **check_failed**: `anti-pattern.fabricated-rationale`
 - **severity**: `hard_reject` ← one of the five hard-reject triggers
 - **evidence shape**: quote the rationale; name the tell(s) present
@@ -34,16 +38,12 @@ In retrofit mode, fabrication tells are particularly dangerous: an agent reading
 
 ### Check 3 — Retrofit `recovery_status` legality on the rationale field
 
-In retrofit mode, the rationale field is **human-only**. Allowed values for `rationale_recovery_status` (or per-section recovery_status mapping for `rationale`): `verified` (a human confirmed the rationale from preserved documents or conversation) or `unknown` (no recall available).
-
-**`reconstructed` is forbidden on the rationale field.** Behaviour can be reconstructed from observable code; rationale cannot.
+In retrofit mode the rationale field is human-only. Allowed values for `rationale_recovery_status`: `verified` or `unknown`. `reconstructed` is forbidden.
 
 - **check_failed**: `check.rationale.recovery-status-reconstructed`
 - **severity**: `hard_reject` ← one of the five hard-reject triggers
 - **evidence shape**: cite the offending field
-- **recommended_action**: *"Change `recovery_status` to `verified` (if a human can confirm) or `unknown` (if no recall available). Reconstructing rationale from observable code is fabrication."*
-
-> **Retrofit-mode callout.** This check is the most consequential single rule the review skill enforces. A retrofit document that emits `rationale_recovery_status: reconstructed` is fabricating rationale — full stop. There is no negotiation; the verdict is REJECTED on this finding alone.
+- **recommended_action**: *"Change `recovery_status` to `verified` (if a human can confirm) or `unknown` (if no recall available)."*
 
 ### Check 4 — Circular rationale (test-as-rationale inversion)
 

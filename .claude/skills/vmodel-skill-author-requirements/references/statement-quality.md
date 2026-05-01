@@ -1,6 +1,6 @@
 # Statement-level quality
 
-Every requirement statement, regardless of type, must clear three gates: atomic, testable, solution-free. Plus the complementary-pair rule for state-driven statements.
+When drafting a statement: check it has one `shall`, can be tested from statement+glossary alone, and names no technology / library / algorithm. Plus the complementary-pair rule for state-driven statements.
 
 ## Gate 1 — Atomic
 

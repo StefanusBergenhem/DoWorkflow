@@ -1,16 +1,21 @@
 # Constraints and glossary
 
-Two related disciplines: the glossary names the terms requirements are built from; constraints name the bounds the requirements must honour. Both are authored before (or at the same time as) the requirement statements that depend on them.
+**Contents**
+- [Glossary discipline](#glossary-discipline) — rules, slot-fill, example
+- [Inherited constraints](#inherited-constraints) — rules, categories, slot-fill, example
+- [Cross-checks](#cross-checks)
+
+---
+
+Glossary first; one word per concept; check every domain term resolves before authoring requirements.
 
 ## Glossary discipline
 
-Every non-trivial requirements document opens with a Glossary section that names every domain term with a single definition. A term used in a requirement that is not in the glossary is either slang, a synonym of a glossary term, or an undefined concept that needs adding.
-
 ### Rules
 
-1. **One word per concept, one concept per word** — within this scope. Different scopes may use the same word with different meanings; that is the point of a bounded context.
-2. **Terms are model-anchored** — they name things in the domain the system reasons about, not things in the implementation. *Session* is a domain concept; *SessionRow* is an implementation detail and does not belong here.
-3. **Generic placeholder terms are audited out** — *Manager*, *Service*, *Handler*, *Record*, *Processor* — unless they name an actual domain concept. Most often they are filler that hides under-defined concepts.
+1. **One word per concept, one concept per word** — within this scope.
+2. **Terms are model-anchored** — they name domain concepts, not implementation. *Session* is a domain concept; *SessionRow* is an implementation detail and does not belong here.
+3. **Generic placeholder terms are audited out** — *Manager*, *Service*, *Handler*, *Record*, *Processor* — unless they name an actual domain concept.
 
 ### Slot-fill template
 
@@ -54,10 +59,6 @@ glossary:
       N minutes, eligible to perform security-sensitive operations.
     distinct_from: "Session — without the elevation marker."
 ```
-
-### Why vocabulary discipline is checked first
-
-A grammatically perfect EARS statement built on a sloppy vocabulary is still ambiguous. Two readers who imagine different definitions for *session* and *idle* produce two different tests and two incompatible designs. **Vocabulary is checked before any other quality discipline applies** — statement-level craft cannot salvage a requirement built on undefined terms.
 
 ## Inherited constraints
 

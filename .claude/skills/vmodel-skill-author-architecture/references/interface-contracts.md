@@ -2,6 +2,17 @@
 
 Interfaces are the committable surface of an Architecture. Components come and go; interfaces, once published, are load-bearing for everything downstream. **Specify interfaces to the level that a second team could build against them without talking to the first.**
 
+## Contents
+
+- Syntax vs semantics — the load-bearing split
+- Design by Contract (Meyer / Hoare)
+- Postcondition triple
+- SEI nine-part interface template
+- Interface Segregation Principle (ISP, Martin)
+- Versioning and deprecation
+- What goes in Architecture vs what goes in Detailed Design
+- Authn / authz at the interface boundary
+
 ## Syntax vs semantics — the load-bearing split
 
 | | Syntactic | Semantic |

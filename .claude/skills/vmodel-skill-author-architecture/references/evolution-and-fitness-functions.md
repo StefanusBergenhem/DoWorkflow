@@ -2,6 +2,15 @@
 
 Architecture that cannot change becomes a liability before it becomes a legacy. Design for evolution deliberately: name the properties that must be preserved, automate their verification, plan the migration path for changes that will not preserve them.
 
+## Contents
+
+- Architecture as hypothesis
+- Evolutionary architecture (Ford / Parsons / Kua)
+- Four fitness function categories worth most non-trivial Architectures
+- Strangler fig (Fowler)
+- Testability as an architectural quality
+- Slot-fill check
+
 ## Architecture as hypothesis
 
 Every non-trivial decomposition is a bet on how the system will change over the next one to three years. The bet is wrong some of the time; the Architecture is a hypothesis, not a statute.

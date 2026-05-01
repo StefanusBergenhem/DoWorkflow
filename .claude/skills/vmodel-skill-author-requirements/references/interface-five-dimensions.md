@@ -1,8 +1,15 @@
 # Interface requirements — five dimensions
 
-Interface requirements are the single most common omission in requirements audits, and the most common failure mode is **syntax without semantics** — a function signature or JSON schema with no statement of what actually happens.
+**Contents**
+- [The five dimensions](#the-five-dimensions)
+- [Slot-fill template](#slot-fill-template)
+- [Worked example](#worked-example)
+- [Design by Contract at the requirements layer](#design-by-contract-at-the-requirements-layer)
+- [Versioning](#versioning)
 
-Every interface requirement covers all five dimensions. Plus pre-/post-conditions and invariants per externally callable operation. Plus a versioning policy.
+---
+
+When drafting an interface requirement: cover all five dimensions (protocol+endpoint, payload contract, error contract, version policy, observability). Flag missing dimensions. Plus Design-by-Contract clauses per operation. Plus a version policy.
 
 ## The five dimensions
 
@@ -132,20 +139,16 @@ REQ-020:
 
 ## Design by Contract at the requirements layer
 
-For each externally callable operation, the interface requirement states:
+Apply Meyer's Design-by-Contract (preconditions, postconditions, invariants) at the requirements layer for each externally callable operation. Slot-fill:
 
 - **Preconditions** — what the caller must guarantee
 - **Postconditions** — what the system guarantees if preconditions hold (success and error variants)
 - **Invariants** — conditions true before and after, always
 
-This is the requirements-layer form of Design by Contract. Each precondition branch is a test-case class; each postcondition is an assertion; each invariant is a property to fuzz or cross-check.
+## Versioning
 
-## Versioning is a first-class element
-
-An interface that is not versioned has silently committed to never-changing — which is a commitment the system cannot keep. Every interface requirement names:
+State a version policy. Unversioned interfaces silently commit to never changing. Slot-fill:
 
 - **Version label** — v1, 2026-04, semver, etc.
 - **Compatibility regime** — semver, date-based, additive-only-within-major
 - **Deprecation policy** — how long old versions remain available; how callers are notified
-
-Teams that omit versioning discover, at the first breaking change, that there was no written rule for how to change the interface, and every caller's migration story is improvised.

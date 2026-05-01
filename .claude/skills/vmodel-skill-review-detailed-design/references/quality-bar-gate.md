@@ -4,7 +4,7 @@ Two purposes in one file:
 1. Yes/No checklist the review skill walks. Every No → finding.
 2. Canonical catalog of `check_failed` identifiers — stable name space for findings.
 
-This file exceeds the ~100-line soft cap given the identifier density. The catalog tables are load-bearing — keeping them inline rather than splitting them preserves single-source-of-truth discipline. Exception accepted at landing.
+> **Cap exception (~150-line soft cap):** This file is the single source of truth for the canonical `check.*` and `anti-pattern.*` catalog used skill-wide. Splitting would fragment the catalog and break the convention that one file owns one identifier namespace. The file is structured as a TOC + per-section catalog tables for navigation; readers do not need to read end-to-end.
 
 ## Contents
 

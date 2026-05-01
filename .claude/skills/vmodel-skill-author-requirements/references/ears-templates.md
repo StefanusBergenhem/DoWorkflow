@@ -1,20 +1,22 @@
 # EARS templates
 
-EARS = Easy Approach to Requirements Syntax. Five sentence templates that cut most of the ambiguity out of natural-language requirements by forcing the author to classify the requirement before writing it.
+**Contents**
+- [The five patterns](#the-five-patterns) — Ubiquitous, Event-driven, State-driven, Optional-feature, Unwanted-behaviour
+- [Compound templates](#compound-templates)
+- [EARS cargo-culting — the trap to avoid](#ears-cargo-culting--the-trap-to-avoid)
+- [When EARS is not the right fit](#when-ears-is-not-the-right-fit)
 
-Use EARS as the default sentence shape for every functional requirement and every unwanted-behaviour requirement. NFRs use the five-element rule (see `nfr-five-elements.md`); interface requirements use the five dimensions (see `interface-five-dimensions.md`).
+---
+
+EARS five-pattern shape: Ubiquitous / Event-driven / Unwanted-behaviour / State-driven / Optional-feature. Compound-prohibition holds: max one trigger AND one state per statement. Default sentence shape for functional and unwanted-behaviour requirements; NFRs use the five-element rule (`nfr-five-elements.md`), interfaces the five dimensions (`interface-five-dimensions.md`).
 
 ## The five patterns
 
-### 1. Ubiquitous (always-on invariant)
-
-Template:
+### 1. Ubiquitous
 
 ```
 The <system> shall <response>.
 ```
-
-When to use: behaviour that is true without a trigger or state condition. Used for system-wide invariants.
 
 Example:
 
@@ -23,15 +25,11 @@ REQ-001: The session service shall use a cryptographically secure pseudo-random
          number generator for all session token generation.
 ```
 
-### 2. Event-driven (When)
-
-Template:
+### 2. Event-driven
 
 ```
 When <trigger>, the <system> shall <response>.
 ```
-
-When to use: stimulus-response. The trigger is a discrete event; the response fires once per trigger.
 
 Example:
 
@@ -41,15 +39,11 @@ REQ-002: When a user submits a valid credential pair, the session service shall
          session token and its absolute-timeout expiry timestamp.
 ```
 
-### 3. State-driven (While)
-
-Template:
+### 3. State-driven
 
 ```
 While <state>, the <system> shall <response>.
 ```
-
-When to use: behaviour that persists for the duration of a named mode or condition.
 
 Example:
 
@@ -61,15 +55,11 @@ REQ-003: While a session is in the IDLE state, the session service shall reject
 
 **State-driven complementary pair rule.** Every While-statement implicitly raises the question: what does the system do *outside* that state? Either author the complementary pair, or explicitly mark out-of-state as out of scope. → See `statement-quality.md`.
 
-### 4. Optional-feature (Where)
-
-Template:
+### 4. Optional-feature
 
 ```
 Where <feature>, the <system> shall <response>.
 ```
-
-When to use: behaviour conditional on a configuration or deployment variant.
 
 Example:
 
@@ -79,15 +69,11 @@ REQ-004: Where the tenant has enabled multi-factor authentication, the session
          to the ELEVATED state.
 ```
 
-### 5. Unwanted-behaviour (If/then)
-
-Template:
+### 5. Unwanted-behaviour
 
 ```
 If <condition>, then the <system> shall <response>.
 ```
-
-When to use: error paths, fault responses, security violations. Every "shall not" candidate should be rephrased as a positive "shall" under an unwanted condition.
 
 Example:
 
@@ -137,10 +123,4 @@ The remedy is not "write better EARS" but "force the author to pass the box test
 
 ## When EARS is not the right fit
 
-EARS handles functional and unwanted-behaviour requirements well. It is less natural for:
-
-- **NFRs with multi-level targets** — use the five-element rule (`nfr-five-elements.md`) and Planguage's tiered form
-- **Multi-step scenarios with pre- and post-conditions** — Given-When-Then (GWT) is more natural; GWT maps cleanly to EARS (Given ↔ While, When ↔ When, Then ↔ shall)
-- **Temporal/duration expressions beyond simple triggers** — EARS does not forbid "within 5 seconds of …" but their detection and enforcement is author discipline
-
-The default is EARS for the requirement statement; GWT may appear in the optional `acceptance` block when the statement alone leaves conditions ambiguous; Planguage appears inside NFR target specifications. Do not mix two structured forms inside one statement.
+Default: use EARS for functional requirements. Escape hatch: switch to Planguage when targets are tiered (scale / meter / fail / goal / stretch / wish). GWT may appear in the optional `acceptance` block when the statement alone leaves conditions ambiguous. Do not mix two structured forms inside one statement.

@@ -2,6 +2,15 @@
 
 A retrofit Architecture is a **mixed-evidence** document. Decomposition (where boundaries actually run) and interfaces (what each component exposes / consumes) are largely recoverable from code: dependency analysis, package structure, deployment manifests, and runtime call graphs all leave fingerprints. **Rationale** — why boundaries were drawn, which alternatives were rejected, which constraints were binding — is not. The framework rule is explicit: **rationale is human-only**.
 
+## Contents
+
+- `recovery_status` discipline
+- The observed-vs-interpreted split
+- Honest vs laundered — side-by-side
+- Citation form for observed evidence
+- Gap report
+- Pair every `unknown` with a follow-up
+
 ## `recovery_status` discipline
 
 A YAML field on every retrofit-derived block, with three legal values:

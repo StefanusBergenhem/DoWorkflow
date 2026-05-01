@@ -1,6 +1,13 @@
 # Anti-patterns — universal nine + AI-era seven
 
-Sixteen failure modes to detect and rewrite. Each entry has a tell (how to spot it) and a recipe (how to fix). Run this catalog as a sweep before delivering.
+**Contents**
+- [Universal (nine)](#universal-nine) — patterns 1–9 with mechanical tells
+- [AI-era and retrofit (seven)](#ai-era-and-retrofit-seven) — patterns 10–16 needing judgement
+- [Sweep order](#sweep-order)
+
+---
+
+When delivering a requirements document: sweep this catalog. Each entry has a tell and a recipe.
 
 ## Universal (nine)
 
@@ -168,4 +175,4 @@ BAD:  "When the system experiences load, the system shall respond appropriately.
 
 ## Sweep order
 
-When sweeping a draft, work through the catalog top to bottom. Earlier patterns (compound, vague adjective, ambiguous pronoun) are easier to spot mechanically; later patterns (fabricated rationale, laundering) require judgement and benefit from a fresh reader.
+When sweeping a draft, work through the catalog top to bottom. Patterns 1–9 have mechanical tells (regex / structural); a single pass with grep-style attention catches them. Patterns 10, 13, 16 require reading the document end-to-end with a designer or tester perspective, and benefit from a fresh reader.

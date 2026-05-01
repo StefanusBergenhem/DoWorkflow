@@ -1,16 +1,16 @@
 # NFR five-element rule
 
-A non-functional requirement (NFR) that is load-bearing — one a reviewer can approve or reject, not a wish — contains all five elements. Missing elements is the most common NFR failure mode.
+When drafting an NFR: name system / response / metric+unit / target+stat-level / condition. Emit a finding for any missing slot.
 
 ## The five elements
 
 | # | Element | Detail |
 |---|---|---|
-| 1 | **System or subsystem** | Named specifically. Not "the system" generically; the actual subsystem under measurement. |
-| 2 | **Response or behaviour** | What is being measured. Latency? Throughput? Availability? Error rate? |
-| 3 | **Metric with unit** | Milliseconds, requests/second, bytes, nines of availability, percentage, count. |
-| 4 | **Target value** | At the correct statistical level — percentile (p50, p95, p99) for latency; rate over a window for availability; sustained vs peak for throughput. Mean is almost never right for latency. |
-| 5 | **Condition** | Load, environment, operating mode, measurement point. Without a condition, the metric is not reproducible. |
+| 1 | **System or subsystem** | Specific subsystem under measurement |
+| 2 | **Response or behaviour** | What is being measured (latency, throughput, availability, error rate) |
+| 3 | **Metric with unit** | Milliseconds, requests/second, bytes, nines of availability, percentage |
+| 4 | **Target value** | At correct statistical level — percentile (p50/p95/p99) for latency; rate over window for availability; sustained vs peak for throughput |
+| 5 | **Condition** | Load, environment, operating mode, measurement point |
 
 ## Slot-fill template
 
@@ -50,15 +50,7 @@ REQ-015: "The session-validation endpoint           ← 1. system named
               budget (roughly 45 ms each plus overhead)."
 ```
 
-## The condition is the most-omitted element
-
-Without a condition, the metric is not reproducible:
-
-```
-"The system shall respond in ≤ 50 ms"
-```
-
-Can be trivially satisfied under 1% load and trivially failed under 100% load. No test configuration is defensible. Always specify load, environment, and measurement point.
+## Condition slots
 
 Common conditions to spell out:
 
@@ -69,7 +61,7 @@ Common conditions to spell out:
 
 ## Multi-level targets — Planguage
 
-Binary pass/fail NFRs force an all-or-nothing trade-off at implementation time. For attributes where the right target is a range — nearly all performance and availability targets — use Planguage's multi-level form:
+Use Planguage when targets are tiered (scale / meter / fail / goal / stretch / wish).
 
 ```yaml
 availability_session_validation:
@@ -81,16 +73,11 @@ availability_session_validation:
   wish:     "99.99%"       # aspirational; not a commitment
 ```
 
-Two Planguage fields are non-negotiable:
-
-- **scale** — what is being measured
-- **meter** — how and over what window
-
-A target without a scale and a meter is a number, not a measurement.
+`scale` and `meter` are non-negotiable; a target without them is a number, not a measurement.
 
 ## Compliance constraints translate into derived NFRs (and other types)
 
-Regulatory regimes (GDPR, HIPAA, PCI-DSS, WCAG, SOC 2) rarely speak in testable statements. They state obligations that must be translated into requirements the system and its tests can verify. The translation is a **derivation step**, captured explicitly:
+Regulatory regimes (GDPR, HIPAA, PCI-DSS, WCAG, SOC 2) state obligations that must be translated into testable requirements. The translation is a **derivation step**, captured explicitly:
 
 ```yaml
 inherited_constraints:

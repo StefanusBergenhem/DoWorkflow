@@ -4,7 +4,23 @@ Two purposes in one file:
 1. The Yes/No checklist that the review skill walks as part of the final sweep. Every No is a finding.
 2. The canonical catalog of `check_failed` identifiers used across this skill — the stable name space for findings.
 
-This file slightly exceeds the 120-line soft cap given the identifier density. The catalog tables are load-bearing — keeping them inline rather than splitting them preserves single-source-of-truth discipline.
+> **Cap exception (~150-line soft cap):** This file is the single source of truth for the canonical `check.*` and `anti-pattern.*` catalog used skill-wide. Splitting would fragment the catalog and break the convention that one file owns one identifier namespace. The file is structured as a TOC + per-section catalog tables for navigation; readers do not need to read end-to-end.
+
+## Contents
+
+- Quality Bar — Yes/No checklist
+- Canonical `check_failed` identifier catalog
+  - `check.decomposition.*` and `check.responsibility.*`
+  - `check.interface.*`
+  - `check.composition.*`
+  - `check.qa.*`
+  - `check.resilience.*`
+  - `check.security.*` and `check.observability.*`
+  - `check.rationale.*`, `check.adr.*`, `check.traceability.*`, `check.fitness-function.*`
+  - `check.retrofit.*`
+  - `check.spec-ambiguity-test.*`
+  - `anti-pattern.*`
+- Rule for new check identifiers
 
 ## Quality Bar — Yes/No checklist
 

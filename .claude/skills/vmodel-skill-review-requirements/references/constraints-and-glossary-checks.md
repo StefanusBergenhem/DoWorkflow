@@ -1,12 +1,17 @@
 # Constraints and glossary — checks
 
-Two related disciplines: the glossary names the terms requirements are built from; constraints name the bounds the requirements must honour. Both have specific checks.
+**Contents**
+- [Glossary checks](#glossary-checks) — checks 1–5
+- [Inherited-constraint checks](#inherited-constraint-checks) — checks 6–9
+- [Cross-check — Glossary terms vs requirement bodies](#cross-check--glossary-terms-vs-requirement-bodies)
+
+---
+
+Check the glossary exists and every domain term resolves. Flag placeholders, missing entries, multiple words for one concept.
 
 ## Glossary checks
 
 ### Check 1 — Glossary section present
-
-Every non-trivial requirements document opens with a Glossary section. A document with multiple requirements but no glossary is a finding.
 
 - **check_failed**: `check.vocabulary.glossary-missing`
 - **severity**: `soft_reject`
@@ -14,8 +19,6 @@ Every non-trivial requirements document opens with a Glossary section. A documen
 - **recommended_action**: *"Add a Glossary section with one entry per domain term used in the requirements (canonical term, single-meaning definition, optional distinct_from / model_refs)."*
 
 ### Check 2 — Term coverage
-
-Every domain term used in a requirement statement must appear in the glossary. Walk every statement, identify domain-specific nouns / noun-phrases, and check each against the glossary.
 
 A "domain term" is a noun or compound noun specific to the system's problem space. Common-English words (*user*, *request*, *time*) are not domain terms. Domain terms are the system's specific concepts (*Session*, *Idle timeout*, *Elevated session*).
 

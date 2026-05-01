@@ -1,5 +1,13 @@
 # Anti-patterns catalog — sweep targets
 
+**Contents**
+- [Universal nine](#universal-nine) — patterns 1–9 (mechanical tells)
+- [AI-era and retrofit (seven)](#ai-era-and-retrofit-seven) — patterns 10–16 (judgement)
+- [Sweep order](#sweep-order)
+- [Aggregation rule](#aggregation-rule)
+
+---
+
 Sixteen failure modes, each with a tell, a `check_failed` identifier, a severity, and a generic recommended_action. Walk every requirement (and the document as a whole) through this catalog. Every hit becomes a finding.
 
 Patterns 1–9 are universal; patterns 10–16 are AI-era / retrofit-specific. Hard-reject triggers are flagged ★.
@@ -126,6 +134,6 @@ Walk top to bottom. Earlier patterns (1–9) are easier to spot mechanically. La
 
 ## Aggregation rule
 
-Multiple findings of the same anti-pattern across multiple requirements are surfaced as separate findings (one per requirement) — not aggregated into a single finding. This preserves the per-requirement granularity that the author skill needs to act on.
+When tallying findings: surface multiple hits as separate per-requirement findings (one per requirement). Use the precedence in the catalog header. DESIGN_ISSUE > REJECTED > APPROVED.
 
 For document-wide patterns (laundering, level confusion at the artifact level), use `requirement_id: "GLOBAL"`.

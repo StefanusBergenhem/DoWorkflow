@@ -1,6 +1,14 @@
 # NFR five-element rule — checks
 
-A non-functional requirement (NFR) that is load-bearing — one a reviewer can approve or reject, not a wish — contains all five elements. The review skill checks each NFR for element presence and emits a finding for each missing element.
+**Contents**
+- [The five elements](#the-five-elements)
+- [Element-presence checks](#element-presence-checks) — system, response, metric, target, condition
+- [Multi-level targets — Planguage checks](#multi-level-targets--planguage-checks)
+- [Form-mixing check](#form-mixing-check)
+
+---
+
+Five-element rule: every NFR contains system, response, metric+unit, target+stat-level, condition. Emit a finding for any missing slot.
 
 ## The five elements
 
@@ -45,18 +53,12 @@ Is a metric with a unit present? Numbers without units (e.g., "shall respond in 
 
 ### Check 4 — Target value at correct statistical level
 
-Is a target value present, and is the statistical level appropriate?
-
-- For latency: percentile (p50, p95, p99) — not raw mean
-- For availability: rate over a window (e.g., 99.95% over 30-day rolling)
-- For throughput: sustained vs peak distinction
-
-A target without a statistical level (e.g., "≤ 50 ms") is suspect — the implicit "mean" interpretation is almost never what was intended for latency.
+For latency targets, prefer percentile (p50/p95/p99). Flag bare mean. For availability: rate over window. For throughput: sustained vs peak.
 
 - **check_failed**: `check.nfr.missing-target` (no number) or `check.nfr.missing-statistical-level` (number present, level missing or wrong)
 - **severity**: `soft_reject`
 - **evidence shape**: quote the statement; note the missing or incorrect statistical level
-- **recommended_action**: *"Specify the statistical level (e.g., 'at p95', not just '≤ 50 ms'). For latency targets, prefer percentile over mean. See `nfr-five-elements-checks.md` element 4."*
+- **recommended_action**: *"Specify the statistical level (e.g., 'at p95', not just '≤ 50 ms'). See `nfr-five-elements-checks.md` element 4."*
 
 ### Check 5 — Condition
 

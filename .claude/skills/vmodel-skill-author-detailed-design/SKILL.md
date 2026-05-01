@@ -1,6 +1,6 @@
 ---
 name: vmodel-skill-author-detailed-design
-description: Author a detailed design specification document (Markdown with YAML front-matter, embedded YAML blocks, optional Mermaid state diagrams) for one leaf scope. Use when refining a parent Architecture's leaf-allocation into a Detailed Design — the level at which code can be implemented and unit tests can be derived without guessing. Produces one Markdown file with the seven mandatory sections (Metadata, Overview, Public Interface, Data Structures, Algorithms, State, Error Handling), with Design-by-Contract clauses on every public function, invariant-style data structures, result-property algorithms, an error-handling matrix, and rationale captured at decision time. Refuses code-paraphrase, algorithmic postconditions, fabricated retrofit rationale, authoring without a parent Architecture allocation, and shipping when the Spec Ambiguity Test fails. Triggers — write detailed design, draft detailed_design.md, refine this leaf, specify function contracts, design data invariants, document error handling, retrofit DD from code.
+description: Author a detailed design specification document (Markdown with YAML front-matter, embedded YAML blocks, optional Mermaid state diagrams) for one leaf scope. Use when refining a parent Architecture's leaf-allocation into a DD — the level at which code can be implemented and unit tests derived without guessing. Produces one Markdown file with seven mandatory sections (Metadata, Overview, Public Interface, Data Structures, Algorithms, State, Error Handling), Design-by-Contract clauses on every public function, invariant-style data structures, result-property algorithms, an error-handling matrix, and rationale captured at decision time. Refuses code-paraphrase, algorithmic postconditions, fabricated retrofit rationale, authoring without a parent Architecture, and shipping when the Spec Ambiguity Test fails. Triggers — write detailed design, draft detailed_design.md, refine this leaf, specify function contracts, design data invariants, document error handling, retrofit DD from code.
 type: skill
 ---
 
@@ -43,7 +43,7 @@ If the parent Architecture is not provided, **HALT** (see HALT condition #1) —
 
 A single Markdown file using the structure in `templates/detailed-design.md.tmpl`. The file has YAML front-matter, an Overview section, and the six body sections (Public Interface, Data Structures, Algorithms, State, Error Handling — five sections; Metadata is the front-matter, totalling seven addressable areas). Embedded YAML blocks render Public Interface entries (matching `$defs/public_interface_entry`), Data Structure entries (matching `$defs/data_structure_entry`), and Error Handling matrix rows (matching `$defs/error_matrix_row`).
 
-Default output filename: `detailed_design.md`. If the user has a scope-tree convention (e.g. `/specs/{leaf-scope}/detailed_design.md`), follow it.
+Default output filename: `<scope>/detailed_design.md`. Follow the project's scope-tree convention when one exists.
 
 ## Authoring procedure
 

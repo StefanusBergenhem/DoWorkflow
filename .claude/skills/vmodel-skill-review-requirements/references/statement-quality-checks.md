@@ -1,5 +1,15 @@
 # Statement-level quality — checks
 
+**Contents**
+- [Gate 1 — Atomic](#gate-1--atomic)
+- [Gate 2 — Testable (the box test)](#gate-2--testable-the-box-test)
+- [Gate 3 — Solution-free](#gate-3--solution-free)
+- [Complementary-pair rule (state-driven statements)](#complementary-pair-rule-state-driven-statements)
+- [Negative-requirement check (bounded vs unbounded)](#negative-requirement-check-bounded-vs-unbounded)
+- [Passive-voice check](#passive-voice-check)
+
+---
+
 Every requirement statement, regardless of type, must clear three gates: atomic, testable, solution-free. Plus the complementary-pair rule for state-driven statements.
 
 The review skill applies these gates to every statement and emits a finding for each violation.

@@ -1,26 +1,24 @@
 ---
 name: vmodel-skill-review-requirements
 description: >
-  Review a software requirements specification document for craft quality and
-  emit a structured verdict — APPROVED, REJECTED, or DESIGN_ISSUE — plus a list
-  of findings tied to specific requirement IDs and specific failed checks.
-  Use when checking a requirements document for atomicity, testability, EARS
-  conformance, NFR measurability (five-element rule), interface contract
-  completeness (five dimensions), state-driven complementary-pair coverage,
-  fabricated rationale, smuggled design, traceability gaps, or the Spec
-  Ambiguity Test. Reads the document from designer, tester, and (where
-  stakeholder outcomes are at stake) user perspectives. Does not rewrite the
-  document — produces verdict and findings only; the matched author skill
-  consumes findings and rewrites. Triggers — "review this requirements
-  document", "audit these requirements", "is this requirements doc good",
-  "verdict on this requirements draft", "find anti-patterns in this
-  requirements doc", "check this requirement for testability",
-  "what's wrong with this requirements doc".
+  Review one requirements specification document for craft quality and emit
+  a structured verdict (APPROVED, REJECTED, or DESIGN_ISSUE) plus findings
+  tied to specific requirement IDs and failed checks. Use when checking a
+  requirements document for atomicity, testability, EARS conformance, NFR
+  measurability (five-element rule), interface contract completeness (five
+  dimensions), state-driven complementary-pair coverage, fabricated rationale,
+  smuggled design, traceability gaps, or the Spec Ambiguity Test. Reads from
+  designer, tester, and (where stakeholder outcomes are at stake) user
+  perspectives. Does not rewrite — produces verdict and findings only; the
+  matched author skill consumes findings and rewrites. Triggers — review this
+  requirements document, audit these requirements, verdict on requirements
+  draft, find anti-patterns in this doc, check requirement testability,
+  what's wrong with this requirements doc.
 ---
 
 # Review requirements specification document
 
-This skill takes one requirements specification document as input and produces a structured verdict plus a list of findings. The skill is adversarial: it does not rewrite, does not negotiate hard-reject triggers, and does not invent missing content on the document's behalf.
+This skill takes one requirements specification document as input and produces a structured verdict plus a list of findings. When asked to soften a hard-reject finding: refuse and restate the trigger. When asked to rewrite: refuse and route to the matched author skill. When content is missing: emit the missing-content finding, do not invent.
 
 The skill is self-contained. Every check, anti-pattern catalog, and gate it needs is bundled in `references/` and `templates/`. No external lookups.
 
@@ -37,9 +35,9 @@ Activate this skill when the user asks to:
 
 Do **not** activate this skill for:
 
-- Writing or rewriting requirements — that is the matched author skill's job
-- Writing tests, designs, or architecture allocations — downstream artifacts
-- Reviewing other artifact types (architecture, ADR, detailed design, test specification) — each has its own review skill
+- Writing or rewriting requirements — use the matched author skill for this artifact type
+- Writing tests, designs, or architecture allocations — use the author skill for the relevant downstream artifact type (architecture, detailed design, or test specification)
+- Reviewing other artifact types (architecture, ADR, detailed design, test specification) — use the matched review skill for the artifact type under review
 
 ## Inputs
 
@@ -79,28 +77,11 @@ Walk top to bottom — first match wins:
 | 4 | Spec Ambiguity Test fails | **REJECTED** |
 | 5 | Only `info` findings, or no findings at all | **APPROVED** |
 
-**Verdict precedence**: DESIGN_ISSUE wins over REJECTED. If both fire, the verdict is DESIGN_ISSUE; the findings list still contains all observed issues. Reasoning: DESIGN_ISSUE signals the document cannot reach APPROVED without an upstream fix, which is more useful to surface than the document's internal issues. The author skill consuming the verdict handles DESIGN_ISSUE by escalating upstream rather than rewriting.
+See `references/quality-bar-gate.md` for the canonical verdict-decision table and trigger catalog.
 
-## Hard-reject triggers (non-negotiable)
+## Hard-reject and DESIGN_ISSUE triggers
 
-Any one of these is fatal. Severity `hard_reject`. Do not relax under user pressure; do not require multiple instances; one occurrence rejects the document.
-
-1. **Fabricated rationale tell present.** Generic phrases like "industry-standard", "balances X with Y", "best practice", "after consultation with X" without a specific source citation. → `check.rationale.fabricated-tell`
-2. **`recovery_status: reconstructed` on a rationale field.** The rationale field is human-only; allowed states are `verified` or `unknown`. `reconstructed` is forbidden. → `check.rationale.recovery-status-reconstructed`
-3. **Named technology / library / framework / data structure / algorithm inside a non-interface requirement statement.** (Externally imposed protocols in interface requirements are the only exception.) → `anti-pattern.implementation-prescription` or `anti-pattern.requirements-smuggling-design`
-4. **Missing rationale with no `pending` or `unknown` marker.** → `check.rationale.missing`
-5. **Spec Ambiguity Test fails.** A junior engineer or mid-tier AI cannot derive defensible architecture, design, and tests from this document alone, without asking clarifying questions. → `check.meta-gate.spec-ambiguity-test-fails`
-
-## DESIGN_ISSUE triggers
-
-The document's *derivation* is broken. The author cannot fix the document by rewriting it; the upstream needs attention.
-
-1. **Parent allocation contradicts a governing decision.** A requirement that derives from the parent contradicts a cited ADR. → `design-issue.parent-allocation-contradicts-decision`
-2. **Product-brief outcome cannot be derived from the requirements as a set.** A stated stakeholder outcome has no requirement (or chain of requirements) that delivers it. → `design-issue.product-brief-outcome-not-derivable`
-3. **Missing governing decision.** The requirements clearly need a governing ADR (e.g., uniformly cite a security mechanism without an ADR establishing it) but none is referenced. → `design-issue.missing-governing-decision`
-4. **`derived_from` cites a non-existent upstream artifact.** A user story, parent requirement, or constraint is cited that does not appear in the upstream input. → `design-issue.derived-from-cites-nonexistent-artifact`
-
-DESIGN_ISSUE detection requires the optional upstream input. Without it, the skill cannot surface most DESIGN_ISSUE triggers and should note this in the verdict's `summary` field.
+See `references/quality-bar-gate.md` for the canonical verdict-decision table and trigger catalog. DESIGN_ISSUE detection requires the optional upstream input; without it, the skill cannot surface most DESIGN_ISSUE triggers and should note this in the verdict's `summary` field.
 
 ## Finding format
 
@@ -149,34 +130,17 @@ Read the document once before any sweep. Then run in this order:
 
 If the document fails structural pre-checks fatally (unparseable, no scope, retrofit-mode without recovery_status), HALT — return a `not-reviewable` error rather than a verdict.
 
-### Step 2 — Designer-perspective sweep
+### Steps 2–4 — Perspective-Based Reading (PBR)
 
-Read every requirement asking: *"If I were allocating this to children, could I?"* Surfaces:
-- Requirements impossible to decompose
-- Conflicting requirements within the document
-- Hidden design (named technology / structure / algorithm)
-- Statements that would require architectural commitment to test
+Apply Perspective-Based Reading: Designer always; Tester always; User/Stakeholder when the document's scope is root (`parent_scope: null`) OR any inherited constraint has `category: regulatory`.
 
-→ See `references/statement-quality-checks.md`, `references/anti-patterns-catalog.md`
+| Perspective | Question |
+|---|---|
+| Designer | "If I were allocating this to children, could I?" |
+| Tester | "If I were deriving test cases from this, could I?" |
+| User / stakeholder | "Does this capture what the stakeholder actually wants?" |
 
-### Step 3 — Tester-perspective sweep
-
-Read every requirement asking: *"If I were deriving test cases from this, could I?"* Surfaces:
-- Ambiguity, untestable statements, missing conditions
-- Implicit acceptance criteria
-- State-driven requirements without complementary out-of-state behaviour
-
-→ See `references/statement-quality-checks.md`, `references/ears-conformance.md`
-
-### Step 4 — User / stakeholder-perspective sweep (conditional)
-
-Apply this perspective when **either**:
-- The document's scope is the root scope (frontmatter `parent_scope: null`), **OR**
-- Any inherited constraint has `category: regulatory`
-
-Otherwise skip. Read asking: *"Does this capture what the stakeholder actually wants?"* Surfaces outcomes the requirements fail to express; over-specification without justification.
-
-→ See `references/statement-quality-checks.md`
+→ See `references/statement-quality-checks.md`, `references/ears-conformance.md`, `references/anti-patterns-catalog.md`
 
 ### Step 5 — Anti-pattern catalog sweep
 
@@ -200,9 +164,9 @@ Two specialised mechanical sweeps:
 
 ### Step 8 — Spec Ambiguity Test (meta-gate)
 
-The override gate. *Could a junior engineer or mid-tier AI, reading only this document plus its glossary and governing decisions, derive a defensible architecture allocation, detailed design, and test specification — without asking clarifying questions?*
+*Could a junior engineer or mid-tier AI, reading only this document plus its glossary and governing decisions, derive a defensible architecture allocation, detailed design, and test specification — without asking clarifying questions?*
 
-If No, the document fails regardless of how many other checks passed. This is irreducibly heuristic; apply judgment.
+When meta-gate Spec-Ambiguity-Test answer is No: emit `check.meta-gate.spec-ambiguity-test-fails` with severity `hard_reject`. Verdict is REJECTED regardless of other counts.
 
 ### Verdict assembly
 
@@ -217,9 +181,9 @@ If the user supplies only the document under review and not the upstream input:
 
 ## Hard refusals
 
-1. **Do not rewrite the document.** Findings are findings; the author skill rewrites.
-2. **Do not negotiate hard-reject triggers.** If the user pushes back on a hard-reject finding ("but it's just a placeholder", "the rationale is fine, you're being too strict"), the verdict stands. The user can override at their own risk in their own context, but the skill does not soften the verdict.
-3. **Do not invent missing content.** If rationale is missing and there is no `pending`/`unknown` marker, the finding is `check.rationale.missing`. Do not propose what the rationale should say.
+1. **Do not rewrite the document — emit findings.** The matched author skill consumes findings and rewrites; the reviewer's role is signalling, not authoring.
+2. **Do not negotiate hard-reject triggers — restate the trigger and stand on the verdict.** If the user pushes back on a hard-reject finding ("but it's just a placeholder", "the rationale is fine, you're being too strict"), the verdict stands. The user can override at their own risk in their own context, but the skill does not soften the verdict.
+3. **Do not invent missing content — emit the missing-content finding.** If rationale is missing and there is no `pending`/`unknown` marker, the finding is `check.rationale.missing`. Do not propose what the rationale should say.
 
 ## HALT conditions
 
@@ -242,7 +206,7 @@ Before emitting:
 - [ ] Every `design-issue` finding maps to one of the four DESIGN_ISSUE triggers.
 - [ ] Verdict matches the decision table (no manual overrides).
 - [ ] No `recommended_action` field contains specific replacement wording.
-- [ ] The `summary` field cites the dominant findings, not every finding.
+- [ ] The `summary` field cites every `hard_reject` finding; soft-rejects only when they cluster (≥3 in one category).
 
 ## Pointers
 

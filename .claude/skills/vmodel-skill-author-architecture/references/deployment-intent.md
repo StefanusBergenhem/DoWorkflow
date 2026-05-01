@@ -4,6 +4,17 @@ The root-scope Architecture's Composition section carries one concern no branch 
 
 **Branch scopes inherit deployment intent from root** — do not re-state it. SKILL.md Step 8 is skipped at branch scope.
 
+## Contents
+
+- Environments
+- Orchestration target
+- Runtime-unit boundaries
+- IaC as implementation
+- 12-factor stance
+- Cost as a constraint
+- Architecture-as-code tooling
+- Slot-fill check
+
 ## Environments
 
 Every environment the system runs in is named (dev, staging, production, production-EU, customer-tenant-X). Differences across environments are enumerated:

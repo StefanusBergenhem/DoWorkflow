@@ -1,6 +1,6 @@
 # Gap-finding
 
-Active gap-finding is the discipline of raising categories the stakeholder has not volunteered. Stakeholders typically describe what they care about most; a competent architect notices what they have not yet said and probes those gaps before the elicitation session ends.
+Raise categories the stakeholder has not volunteered, before the session ends.
 
 ## The six gap categories
 

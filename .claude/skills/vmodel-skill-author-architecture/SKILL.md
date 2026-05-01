@@ -44,7 +44,7 @@ If any of the four primary inputs is unavailable, **HALT** (see HALT condition #
 
 A single Markdown file using the structure in `templates/architecture.md.tmpl`. The file has YAML front-matter, an Overview, a Structure Diagram (Mermaid), Decomposition (one YAML entry per child), Interfaces (one YAML entry per cross-child or external interface), and a Composition section.
 
-Default output filename: `architecture.md`. If the user has a scope-tree convention (e.g. `/specs/{scope}/architecture.md`, root at `/specs/architecture.md`), follow it.
+Default output filename: `<scope>/architecture.md`. If the user has a scope-tree convention (e.g. root at `<root>/architecture.md`, branches at `<scope>/architecture.md`), follow it.
 
 ## Authoring procedure
 

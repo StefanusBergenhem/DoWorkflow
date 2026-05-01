@@ -1,10 +1,6 @@
 # Stakeholder voice
 
-Stakeholder voice is the discipline of capturing needs in user-realm vocabulary, with no design specifics. The output of this skill — `needs.md` — exists at the layer above design. Design language belongs in downstream artifacts (architecture, ADRs, detailed design), not here.
-
-## Definition
-
-Stakeholder voice = the way the stakeholder would describe the problem to a peer who cares about outcomes, not implementation. It uses business / user / operational language. It says what the system should do for whom, under what circumstances, and what good looks like. It does not say how.
+Capture needs in user-realm vocabulary (what / for whom / under what conditions / what good looks like). Design language belongs in downstream artifacts (architecture, ADRs, detailed design), not in `needs.md`.
 
 ## Tells of design smuggling
 
@@ -18,8 +14,6 @@ When stakeholder material contains any of the following, design has been smuggle
 - **Specific protocol versions** — "REST with OAuth2", "GraphQL over websockets", "HTTP/2 with mTLS"
 - **Specific architectural patterns** — "event-sourced", "microservice per bounded context", "CQRS"
 - **Implementation verbs** — "save to database", "send via webhook", "render in browser"
-
-Stakeholders often use design language because they have an implementation in mind, or because they have heard the terms used in this domain. They are not always wrong about what they want — but the *want* is one layer below the *technology that would deliver it*. The skill's job is to surface that underlying want.
 
 ## The probe pattern
 

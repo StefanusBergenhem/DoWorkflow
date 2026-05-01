@@ -1,22 +1,23 @@
 # Rationale and traceability
 
-Two related lifecycle disciplines: rationale captures the *why* behind each requirement; traceability captures the *what derives from what*. Both keep requirements honest over time.
+**Contents**
+- [Rationale](#rationale)
+- [The no-fabrication rule (hard refusal)](#the-no-fabrication-rule-hard-refusal)
+- [Derived requirements](#derived-requirements)
+- [Traceability](#traceability)
+- [Inspection — Perspective-Based Reading (PBR)](#inspection--perspective-based-reading-pbr)
+
+---
+
+Two related lifecycle disciplines: rationale captures the *why* behind each requirement; traceability captures the *what derives from what*.
 
 ## Rationale
 
-Every requirement has a `rationale` field. The rationale is **not** a restatement of the requirement; it is the *why* — the context, the options considered, the criterion that drove the choice.
+Rationale is the why behind a requirement; never invent it. Tells of fabrication: generic phrasing, no specific source, reasoning-from-statement-not-recall.
 
-### Why rationale matters
+### Capture at decision time
 
-Without rationale, every requirement looks equally non-negotiable. The team that inherits the artifact has to either over-conserve everything (no future change is safe) or guess at what was load-bearing (silent drift away from intent). Good rationale distinguishes essential constraints from accidental ones, which is the distinction that makes future maintenance safe.
-
-### Rationale is captured at decision time
-
-Rationale produced years after the fact is lower-fidelity by an order of magnitude — the options the original author considered have been forgotten, and humans readily invent plausible justifications for whatever decision got made. Three failure modes recur:
-
-1. **Confident invention.** The author (human or agent) writes a plausible-sounding justification that is not grounded in any decision ever made. The rationale *reads* right and is entirely fabricated.
-2. **Test-as-rationale inversion.** A characterisation test written against existing behaviour is treated as the "requirement", and the rationale says "the system shall do X because that is what test T verifies". The test is verifying the current code, not the original intent; the rationale is circular.
-3. **Laundering the current state.** Rationale that explains why the current design is right, rather than why the original choice was made. The current state is a fact; rationale that only defends it is a ratification, not a reason.
+When you cannot recall a specific decision, mark `recovery_status: unknown` — do not reason backward from the statement.
 
 ## The no-fabrication rule (hard refusal)
 
@@ -120,12 +121,12 @@ Missing links in either direction are findings — an orphan requirement is unju
 
 ## Inspection — Perspective-Based Reading (PBR)
 
-Ad-hoc review misses defects the author is blind to. Read the document from three perspectives, each looking for defects the stance makes salient:
+Apply Perspective-Based Reading: read as designer, tester, and (when stakeholder outcomes apply) user.
 
-| Perspective | Question | Finds |
-|---|---|---|
-| **Designer** | "If I were allocating this to children, could I?" | Requirements impossible to decompose; conflicts; hidden design |
-| **Tester** | "If I were deriving test cases from this, could I?" | Ambiguity, untestable statements, missing conditions, implicit acceptance |
-| **User / stakeholder** | "Does this capture what the stakeholder actually wants?" | Outcomes the requirements fail to express; over-specification without justification |
+| Perspective | Focus |
+|---|---|
+| **Designer** | "If I were allocating this to children, could I?" |
+| **Tester** | "If I were deriving test cases from this, could I?" |
+| **User / stakeholder** | "Does this capture what the stakeholder actually wants?" |
 
-Ad-hoc walkthrough catches surface defects; PBR catches the kind of latent ambiguity that cascades into expensive downstream defects. Run at least the Designer and Tester perspectives before delivering. Run the User/Stakeholder perspective whenever a stakeholder-facing outcome is at stake.
+Run Designer and Tester always; User/Stakeholder when a stakeholder-facing outcome is at stake.

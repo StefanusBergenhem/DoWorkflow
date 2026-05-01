@@ -1,27 +1,26 @@
 ---
 name: vmodel-skill-author-requirements
 description: >
-  Author a software requirements specification document (Markdown with YAML
-  front-matter and embedded YAML blocks) for one scope of a system. Use when
-  refining an upstream specification, a product brief, or a parent requirements
-  allocation into atomic, testable, EARS-structured requirement statements with
-  explicit rationale and traceability. Use when translating user stories into
-  formal requirements, splitting compound requirements, making vague NFRs
-  measurable with the five-element rule, adding interface contracts with
-  pre/post/invariants, or surfacing state-driven complementary-pair gaps.
-  Produces one Markdown file with a Glossary section and typed requirement
-  sections (functional, quality-attribute, interface, data, inherited-constraint),
-  with required rationale on every requirement. Refuses to fabricate rationale
-  and refuses to smuggle design (named technologies, libraries, algorithms)
-  into requirement statements. Triggers — "write requirements",
-  "draft requirements.md", "translate this user story into requirements",
-  "split this compound requirement", "make this NFR measurable",
-  "add interface requirements", "review this requirement for testability".
+  Author one requirements specification document (Markdown with YAML
+  front-matter and embedded YAML blocks) for one scope. Use when refining
+  an upstream specification, product brief, or parent requirements allocation
+  into atomic, testable, EARS-structured statements with explicit rationale
+  and traceability — including translating user stories, splitting compound
+  requirements, making vague NFRs measurable (five-element rule), specifying
+  interface contracts (pre/post/invariants), and surfacing state-driven
+  complementary-pair gaps. Produces one Markdown file with a Glossary and
+  typed sections (functional, quality-attribute, interface, data,
+  inherited-constraint), rationale on every requirement. Refuses to fabricate
+  rationale and refuses to smuggle design (named technologies, libraries,
+  algorithms) into statements. Triggers — write requirements, draft
+  requirements.md, translate user story to requirements, split compound
+  requirement, make NFR measurable, add interface requirements, check
+  requirement testability.
 ---
 
 # Author requirements specification document
 
-This skill produces a single Markdown file: a requirements specification document for one scope of a system. The document has a Glossary, five typed requirement sections, and is authored under hard quality gates that prevent the most common requirements-authoring failures.
+This skill produces a single Markdown file: a requirements specification document for one scope of a system. The document has a Glossary, five typed requirement sections, and is authored under hard quality gates that prevent the failure modes catalogued in `references/anti-patterns.md`.
 
 The skill is self-contained. Every reference, template, anti-pattern catalog, and quality-bar checklist it needs is bundled in the `references/` and `templates/` directories. No external lookups are needed.
 
@@ -39,9 +38,9 @@ Activate this skill when the user asks to:
 
 Do **not** activate this skill for:
 
-- Eliciting stakeholder needs from unstructured conversation — interview the stakeholder directly first, then activate this skill on the structured output
-- Reviewing or auditing an existing requirements document — that is a separate review skill's job
-- Writing tests, designs, or architecture allocations — those are downstream artifacts
+- Eliciting stakeholder needs from unstructured conversation — interview the stakeholder directly first (or use a stakeholder-elicitation skill), then activate this skill on the structured output
+- Reviewing or auditing an existing requirements document — use the matched review skill for this artifact type
+- Writing tests, designs, or architecture allocations — use the author skill for the relevant downstream artifact type (architecture, detailed design, or test specification)
 
 ## Inputs
 
@@ -60,7 +59,7 @@ If none of these are provided, **ask the user** what the upstream specification 
 
 A single Markdown file using the structure in `templates/requirements.md.tmpl`. The file has YAML front-matter, a Glossary section, and five typed requirement sections. Every requirement is an embedded YAML block with `id`, `statement`, `rationale`, `derived_from`, and (where relevant) `acceptance`.
 
-Default output filename: `requirements.md`. If the user has a scope-tree convention (e.g. `/specs/{scope}/requirements.md`), follow it.
+Default output filename: `requirements.md`. If the project follows a scope-tree convention (e.g. `<scope>/requirements.md`), follow it.
 
 ## Orchestration
 
@@ -77,15 +76,7 @@ If the upstream input introduces a term you would have to guess at, **ask the us
 
 ### Step 2 — Classify each requirement by type
 
-Every requirement is filed under exactly one of five sections:
-
-1. **Functional** — what the system does in response to stimuli or in a given state
-2. **Quality attribute (NFR)** — measurable non-functional characteristic under specified load/environment
-3. **Interface** — contract with an external caller, dependency, or protocol peer
-4. **Data** — format, retention, privacy, integrity invariants
-5. **Inherited constraint** — bounds imposed from above (parent decisions, regulations, organisational policy)
-
-Use the decision table in `references/requirement-types.md` to classify. Misclassification silently weakens the document; do not skip this step.
+Default to functional. Switch to QA / interface / data / inherited-constraint only when the classification table at `references/requirement-types.md` triggers. Misclassification silently weakens the document; do not skip this step.
 
 ### Step 3 — Draft each requirement statement
 

@@ -2,6 +2,18 @@
 
 Mirrors the author-side `composition-patterns.md`. Composition is the most load-bearing section of an Architecture document; the four hard-reject checks below enforce structural completeness. Soft checks cover the wiring depth that distinguishes a real Composition section from a tick-box one.
 
+## Contents
+
+- `check.composition.missing` (HARD)
+- `check.composition.no-named-pattern` (HARD)
+- `check.composition.no-sequence-diagram` (HARD)
+- `check.composition.deployment-intent-missing` (HARD, root only)
+- `check.composition.middleware-stack-unordered`
+- `check.composition.di-strategy-unnamed`
+- `check.composition.message-bus-topology-unspecified`
+- `check.composition.failure-path-sequence-diagram-missing`
+- `check.composition.no-rationale-on-pattern`
+
 ## check.composition.missing (HARD — refusal C)
 
 **Check that** the document has a Composition section.

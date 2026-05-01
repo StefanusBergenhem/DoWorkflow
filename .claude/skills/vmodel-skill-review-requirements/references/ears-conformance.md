@@ -1,8 +1,6 @@
 # EARS conformance — checks
 
-EARS = Easy Approach to Requirements Syntax. Five sentence templates that cut natural-language ambiguity by forcing the author to classify the requirement before writing.
-
-This reference lists the conformance checks the review skill applies to every functional and unwanted-behaviour requirement. NFRs use the five-element rule (`nfr-five-elements-checks.md`); interface requirements use the five-dimensions checks (`interface-five-dimensions-checks.md`).
+Apply EARS five-pattern conformance. Emit findings per checks below. NFRs use `nfr-five-elements-checks.md`; interfaces use `interface-five-dimensions-checks.md`.
 
 ## The five patterns
 
@@ -74,16 +72,13 @@ Do not "rewrite to better EARS" — the cargo-cult problem is not solvable by te
 
 ## When EARS is not the right tool
 
-Some requirement types do not fit EARS:
+Default: expect EARS. Escape hatch: accept Planguage syntax for tiered NFR targets — emit no finding. For other forms (GWT, narrative), emit `check.ears.non-conformant`.
 
-| Type | Use instead |
+| Type | Accepted form |
 |---|---|
-| NFR with measurable target | Five-element rule (see `nfr-five-elements-checks.md`); Planguage tiered targets where range applies |
-| Interface contract | Five-dimensions form (see `interface-five-dimensions-checks.md`) |
-| Multi-step scenario with pre/post conditions | Given-When-Then (in optional `acceptance` block) |
-| Inherited constraint | Source citation + cost-of-relaxing (see `constraints-and-glossary-checks.md`) |
-
-Reject any statement that mixes two structured forms inside one sentence (e.g., EARS + GWT inline). The optional `acceptance` block is the right place for GWT when the statement alone leaves conditions ambiguous.
+| NFR | Planguage; or five-element flat |
+| Interface | Five-dimensions form |
+| GWT in `acceptance` block | Allowed only there, not in `statement` |
 
 - **check_failed**: `check.ears.mixed-structured-forms`
 - **severity**: `soft_reject`

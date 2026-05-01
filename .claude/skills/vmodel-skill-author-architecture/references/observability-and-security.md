@@ -2,6 +2,15 @@
 
 Cross-cutting concerns that teams try to bolt on post-hoc are the ones most punished for the effort. The Architecture artifact specifies **where they enter**.
 
+## Contents
+
+- Observability — telemetry emergence points (logs / metrics / traces / OpenTelemetry default)
+- Security — trust zones
+- STRIDE (per zone crossing)
+- Secrets flow
+- Authentication and authorisation as interface concerns
+- Citations
+
 ## Observability — telemetry emergence points
 
 Three axes; the architectural decision is **where each enters and who consumes it**.

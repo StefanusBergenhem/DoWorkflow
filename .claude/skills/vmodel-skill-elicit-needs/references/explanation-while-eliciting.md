@@ -1,8 +1,6 @@
 # Explanation while eliciting
 
-The skill regularly needs to raise architect concepts (non-functional concerns, edge cases, integrations, error paths, scale, regulatory) that a stakeholder may not have thought about. Architects use jargon for these concepts; stakeholders typically do not. The discipline is: never use architect jargon in a question without translating it into stakeholder language first.
-
-The rule: explanation precedes elicitation. Translate the concept, then ask the question, in the same turn. Do not assume the stakeholder will Google the term mid-session.
+When raising an architect concept (NFRs, edge cases, integrations, error paths, scale, regulatory) in a question, translate it into stakeholder language in the same turn before asking. Do not assume the stakeholder will Google the term mid-session.
 
 ## Architect-concept trigger list
 
@@ -76,4 +74,4 @@ For each concept: a short architect framing, the stakeholder-facing translation 
 
 ## The rule
 
-Explanation precedes elicitation. Never use the architect term without first translating it. The stakeholder cannot answer a question they do not understand, and "let me google `availability SLA`" is not engagement — it's asking the stakeholder to do the architect's job.
+When using an architect term in a question, translate it first. Untranslated, the stakeholder cannot answer.

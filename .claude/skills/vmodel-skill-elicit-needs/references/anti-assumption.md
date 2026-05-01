@@ -1,8 +1,14 @@
 # Anti-assumption
 
-Anti-assumption is the discipline of detecting ambiguity in stakeholder material and surfacing every detection as a structured clarification question. The opposite is silent gap-fill — making the assumption look like consensus by quietly resolving it in the draft without telling the stakeholder.
+## Contents
 
-Hard Refusal #2: never silently fill an ambiguity gap. Raising many clarifications during a session is fine — silent fill is not.
+- Ambiguity tells (six tells with starter questions)
+- The four-line clarification template
+- Worked example
+- The 2-to-4 options rule
+- The discipline
+
+Anti-assumption is the named discipline behind Hard Refusal #2: detect every ambiguity tell in stakeholder material and surface it as a structured clarification question. Never silently fill the gap.
 
 ## Ambiguity tells
 
@@ -75,8 +81,6 @@ How should I proceed? Please pick one:
 - <option C — concrete>
 - something else — please describe
 ```
-
-The structure is adapted from a recognised human-in-the-loop rejection-feedback pattern. It works because it makes the gap explicit (Expected vs Found), motivates the stakeholder to engage (Why this matters), and constrains the response space (How should I proceed) — preventing both silent fill from the model and open-ended drift from the stakeholder.
 
 ## Worked example
 

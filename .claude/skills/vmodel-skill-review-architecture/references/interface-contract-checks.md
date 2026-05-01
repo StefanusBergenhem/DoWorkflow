@@ -2,6 +2,20 @@
 
 Mirrors the author-side `interface-contracts.md`. Walk every Interface entry against the eleven checks below. The last check (`check.interface.implementation-leak`) is HARD; the rest are soft-reject.
 
+## Contents
+
+- `check.interface.missing-precondition`
+- `check.interface.missing-postcondition`
+- `check.interface.missing-invariant`
+- `check.interface.missing-typed-error`
+- `check.interface.missing-quality-attribute`
+- `check.interface.missing-authn-authz`
+- `check.interface.fat-god-interface`
+- `check.interface.missing-versioning-policy`
+- `check.interface.missing-rationale`
+- `check.interface.protocol-not-cited-by-spec`
+- `check.interface.implementation-leak` (HARD)
+
 ## check.interface.missing-precondition (soft)
 
 **Check that** every Interface entry has a non-empty `preconditions:` block stating what the caller must satisfy.

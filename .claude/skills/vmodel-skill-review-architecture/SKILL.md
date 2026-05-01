@@ -1,21 +1,19 @@
 ---
 name: vmodel-skill-review-architecture
 description: >
-  Review a software architecture specification document for craft quality and
-  emit a structured verdict — APPROVED, REJECTED, or DESIGN_ISSUE — plus
-  findings tied to specific architectural elements and failed checks. Use
-  when checking decomposition discipline (information hiding, cohesion,
-  bounded contexts), interface contract completeness (Design-by-Contract
-  clauses, segregation, versioning), composition completeness (named runtime
-  pattern, middleware stack, sequence diagrams, deployment intent at root),
-  quality-attribute allocation, resilience coverage, security and
-  observability at boundaries, retrofit honesty (recovery_status, no
-  laundering, no fabricated rationale), traceability (governing_adrs
-  resolve), or the Spec Ambiguity Test meta-gate. Reads from architect,
+  Review one architecture specification document for craft quality and emit
+  a structured verdict — APPROVED, REJECTED, or DESIGN_ISSUE — plus findings
+  tied to specific architectural elements and failed checks, including
+  decomposition discipline, Design-by-Contract interface contracts,
+  Composition completeness (named runtime pattern, sequence diagrams,
+  deployment intent at root), quality-attribute allocation, resilience,
+  security and observability at boundaries, retrofit honesty
+  (recovery_status, no laundering, no fabricated rationale), governing_adrs
+  resolution, and the Spec Ambiguity Test meta-gate. Reads from architect,
   integrator, and operator perspectives. Does not rewrite — produces verdict
   and findings only. Triggers — review this architecture, audit architecture
   document, verdict on architecture draft, find anti-patterns, check
-  composition section, validate decomposition, audit interface contracts.
+  composition, validate decomposition, audit interface contracts.
 type: skill
 ---
 

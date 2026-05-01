@@ -1,5 +1,14 @@
 # Interface five dimensions — checks
 
+**Contents**
+- [The five dimensions](#the-five-dimensions)
+- [Dimension-presence checks](#dimension-presence-checks) — protocol, message structure, timing, error handling, startup
+- [Design by Contract checks](#design-by-contract-checks)
+- [Versioning check](#versioning-check)
+- [Protocol-citation check](#protocol-citation-check)
+
+---
+
 Interface requirements are the most commonly under-specified type — typically *syntax without semantics* (a function signature or schema with no statement of what actually happens). The review skill checks every interface requirement for all five dimensions, plus DbC, plus versioning.
 
 ## The five dimensions
@@ -55,18 +64,16 @@ This is the most-omitted dimension. Interfaces silent here have latent bugs that
 
 ## Design by Contract checks
 
-For each externally-callable operation in the interface requirement, check that pre-/post-conditions and invariants are stated.
+Apply Meyer's Design-by-Contract checks: each interface requirement names preconditions, postconditions, invariants. Emit a finding per missing clause.
 
 ### Check 6 — Preconditions
-
-What the caller must guarantee. Each precondition branch is a test-case class.
 
 - **check_failed**: `check.interface.missing-precondition`
 - **severity**: `soft_reject`
 
 ### Check 7 — Postconditions
 
-What the system guarantees if preconditions hold. Both success and error variants should be specified.
+Both success and error variants should be specified.
 
 - **check_failed**: `check.interface.missing-postcondition`
 - **severity**: `soft_reject`
@@ -74,7 +81,7 @@ What the system guarantees if preconditions hold. Both success and error variant
 
 ### Check 8 — Invariants
 
-Conditions true before and after, always. Examples: idempotency, non-disclosure, monotonicity.
+Examples: idempotency, non-disclosure, monotonicity.
 
 - **check_failed**: `check.interface.missing-invariants`
 - **severity**: `soft_reject`
@@ -83,13 +90,11 @@ Conditions true before and after, always. Examples: idempotency, non-disclosure,
 
 ### Check 9 — Versioning policy
 
-Every versioned interface specifies:
+Check version policy. Flag unversioned interfaces. Each policy includes:
 
 - **Version label** — v1, 2026-04, semver
 - **Compatibility regime** — semver, date-based, additive-only-within-major
 - **Deprecation policy** — minimum availability of older versions, how callers are notified
-
-An interface without a versioning policy has implicitly committed to never-changing — which is a commitment the system cannot keep.
 
 - **check_failed**: `check.interface.missing-versioning`
 - **severity**: `soft_reject`

@@ -1,8 +1,6 @@
 # Readback protocol
 
-Readback-for-joint-agreement is the load-bearing discipline of this skill. Every entry in `needs.md` is preceded by a readback turn and a confirmation turn. If the chain breaks, the entry does not commit.
-
-This is a fragile contract. The format is fixed; the response classification is rule-based; the failure modes are explicit.
+Every entry in `needs.md` is preceded by a readback turn and an explicit-confirmation turn. The format is fixed; classification is rule-based; failure modes are enumerated. If the chain breaks at any point, restart from DRAFT — the entry does not commit.
 
 ## The four-part readback message
 

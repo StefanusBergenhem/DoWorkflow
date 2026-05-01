@@ -2,6 +2,16 @@
 
 Resilience is a property of **composition**, not of components. A component that behaves correctly in isolation can bring down a system when composed with others under load or partial failure. Six patterns are baseline architectural vocabulary; the Architecture artifact names which apply where and why.
 
+## Contents
+
+- Bulkhead
+- Circuit breaker
+- Retry with backoff and jitter
+- Graceful degradation vs fallback (prefer degradation)
+- Failure domain design
+- Common-cause failure (the redundancy honesty test)
+- Citations
+
 ## Bulkhead
 
 Partition a shared resource so failure in one partition cannot starve others. Classic form: per-dependency thread and connection pools.
