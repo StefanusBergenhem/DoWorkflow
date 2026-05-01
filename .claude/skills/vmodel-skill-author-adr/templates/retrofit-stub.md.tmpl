@@ -1,0 +1,52 @@
+---
+id: ADR-NNN-<retrofit-slug>
+artifact_type: adr
+title: "<title> (retrofit)"
+status: accepted
+date: YYYY-MM-DD                  # date of the retrofit record, NOT a guessed decision date
+scope_tags: ["<scope>"]
+recovery_status:                  # map form — refusal A: "reconstructed" is schema-banned on these four fields
+  context: unknown                # human-only — leave as unknown unless a human supplies content
+  alternatives_considered: unknown
+  rationale: unknown
+  consequences: unknown           # if anticipated consequences are lost; observable consequences appear in body
+---
+
+# ADR-NNN: <Title> (retrofit)
+
+## Context
+
+unknown — no preserved design notes, no accessible deciders as of <date>.   <!-- HUMAN-ONLY: leave as unknown unless a human supplies content -->
+
+## Decision (observed from code)
+
+<Observed behaviour with file path reference, e.g., "The service uses Postgres with `FOR UPDATE SKIP LOCKED` as its async job queue. See `src/queue/postgres_worker.py`.">
+
+## Alternatives considered
+
+unknown.   <!-- HUMAN-ONLY: leave as unknown unless a human supplies content -->
+
+## Rationale
+
+unknown.   <!-- HUMAN-ONLY: leave as unknown unless a human supplies content -->
+
+## Consequences (observable)
+
+- <Observed property with evidence, e.g., "Throughput observed in production ~800 jobs/sec; no stress test on record.">
+- <Observed property, e.g., "Durability of queued jobs matches the primary database's durability.">
+
+**Reversibility.** Unknown at retrofit time; a forward ADR is required before any migration is attempted. Owner: @<role-or-username>.
+
+## Propagation
+
+(none materialised at retrofit time — a forward ADR captures propagation when the decision is next revisited)
+
+<!--
+Skill discipline reminders:
+
+- Refusal A: do NOT populate Context, Alternatives, Rationale, anticipated Consequences with AI-inferred content.
+- The four human-only fields are off-limits to AI inference. Schema bans `recovery_status: reconstructed` on them.
+- The honest record is: Decision (observed from code, with file path) + Observable Consequences + `unknown` on the rest.
+- A "forward ADR required before any migration" closing note + named owner is mandatory on retrofit.
+- Posture conflict (declared recovery_status with no source-code references, or vice versa) → HALT.
+-->

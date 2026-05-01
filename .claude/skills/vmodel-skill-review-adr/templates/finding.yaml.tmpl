@@ -1,0 +1,83 @@
+- id: F-NNN
+  # Sequential within this review (F-001, F-002, ...). Stable for a single review run.
+
+  section: <Context | Decision | Alternatives | Rationale | Consequences | FRONTMATTER | GLOBAL>
+  # The specific ADR section the finding applies to.
+  # Examples:
+  #   - "Context"        — context-completeness findings
+  #   - "Alternatives"   — option-space-integrity findings
+  #   - "Consequences"   — both-signs / Reversibility findings
+  #   - "FRONTMATTER"    — front-matter-level findings (id pattern, status enum,
+  #                         scope_tags empty, recovery_status discipline)
+  #   - "GLOBAL"         — document-wide findings (orphan-ADR, Spec Ambiguity Test,
+  #                         laundering-current-state at document level)
+
+  check_failed: <dotted catalog identifier>
+  # Must appear in `references/quality-bar-gate.md` (for `check.*`) or
+  # `references/anti-patterns-catalog.md` (for `anti-pattern.*`). Examples:
+  #   - check.front-matter.required-field-missing
+  #   - check.front-matter.id-pattern-invalid
+  #   - check.status.invalid-lifecycle-state
+  #   - check.threshold.routine-choice
+  #   - check.alternatives.fewer-than-two-real
+  #   - check.decision.section-missing-or-empty
+  #   - check.consequences-discipline.section-missing
+  #   - check.consequences-discipline.reversibility-unanswered
+  #   - check.consequences-discipline.reversibility-hedged
+  #   - check.linkage.scope-tags-empty
+  #   - check.retrofit-honesty.reconstructed-on-human-only
+  #   - check.spec-ambiguity-test.fail
+  #   - anti-pattern.single-option
+  #   - anti-pattern.missing-reversibility
+  #   - anti-pattern.routine-choice
+  #   - anti-pattern.orphan-adr
+  #   - anti-pattern.llm-confident-invention
+  # Do not invent ad-hoc strings. If the check is genuinely new, surface it as a
+  # self-review note rather than minting a new identifier mid-review.
+
+  severity: <hard_reject | soft_reject | info>
+  # hard_reject — fatal; one occurrence triggers REJECTED (or DESIGN_ISSUE if
+  #   the meta-gate fires upstream-traceably). Maps to refusal A / B / C / D /
+  #   E / broken-reference, or to the meta-gate.
+  # soft_reject — Quality Bar No or anti-pattern hit other than the hard-reject ones;
+  #   accumulates to REJECTED.
+  # info — observation worth surfacing but does not affect verdict.
+
+  category: <shape | context | alternatives | decision-rationale | consequences-reversibility | propagation-completeness | linkage-lineage | retrofit | threshold | meta-gate>
+  # Top-level category — matches the namespaces in `quality-bar-gate.md` and the
+  # eight-step review sweep in SKILL.md.
+
+  evidence: |
+    <verbatim quote from the document, OR a specific structural observation>
+    # Examples:
+    # - "Front-matter declares `scope_tags: []` — orphan-ADR; broken-reference."
+    # - "Alternatives section: 'Don't use a queue.' — single real option;
+    #    refusal C."
+    # - "Consequences: '**Reversibility.** Partially reversible.' — hedged
+    #    answer without separating reversible from irreversible parts;
+    #    refusal B."
+    # - "Decision: 'We will use Redis because it is more modern and flexible.'
+    #    — generic justification; aliases anti-pattern.generic-justification."
+    # - "Front-matter: `recovery_status.rationale: reconstructed` — schema-
+    #    banned on the rationale human-only field; refusal A."
+    # - "Decision is for naming convention 'use camelCase for JSON keys'
+    #    — routine-choice; refusal E."
+
+  recommended_action: |
+    <generic pointer; never specific replacement wording>
+    # Acceptable:
+    # - "Set `scope_tags` to the scope(s) the decision applies to. See
+    #    `linkage-and-lineage-checks.md` (orphan-ADR; broken-reference)."
+    # - "Surface ≥2 real alternatives with concrete context-specific
+    #    rejection reasons. See `alternatives-checks.md` (refusal C)."
+    # - "Answer the Reversibility prompt directly: yes → state rollback path;
+    #    no → state recovery plan and named signoff. See
+    #    `consequences-and-reversibility-checks.md` (refusal B)."
+    # - "Replace `reconstructed` with `verified` or `unknown` on the human-
+    #    only field; AI cannot reconstruct rationale. See
+    #    `retrofit-discipline-checks.md` (refusal A)."
+    # NOT acceptable:
+    # - "Rewrite to: '**Reversibility.** Reversible. Rollback path: ...'"
+    # - "Add `scope_tags: [app/jobs]`"
+    # - The matched author skill rewrites; this skill points to the rule, not
+    #   the replacement text.

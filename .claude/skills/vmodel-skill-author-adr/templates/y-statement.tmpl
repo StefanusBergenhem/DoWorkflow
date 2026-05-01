@@ -1,0 +1,19 @@
+# Y-statement — optional compact form. Goes at the top of the ADR body, above Context.
+# Five anchors map to: Context (situation, concern), Decision (option), Rationale (quality), and chief negative consequence (downside).
+# Use it as an abstract one-liner; it does not replace the body sections.
+
+**Y-statement.** In the context of <situation>, facing <concern>, we decided for <option>, to achieve <quality>, accepting <downside>.
+
+# Example (good):
+# **Y-statement.** In the context of the app's background job processing, facing the need
+# for at-least-once delivery with operationally cheap retries, we decided for Postgres
+# (via SKIP LOCKED) as the queue backing store, to achieve transactional job enqueue with
+# the same durability guarantees as the rest of our data, accepting lower peak throughput
+# than a dedicated broker.
+
+# Shape check (review-side fires `check.y-statement.shape-malformed` on malformations):
+# - "In the context of …" present
+# - "facing …" present
+# - "we decided for …" / "we chose …" present
+# - "to achieve …" present
+# - "accepting …" present

@@ -1,0 +1,34 @@
+# Reversibility sub-prompt — verbatim, last paragraph of Consequences.
+# Refusal B: refuse to ship without a non-empty answer. Hedged answers refused — split the parts.
+
+**Reversibility.** *(Prompt verbatim: "Is this decision reversible? If yes: state the rollback path. If no: state the recovery plan and name who must sign off before implementation.")*
+
+# === Branch: Reversible (yes) ===
+# Use this shape when rollback is feasible.
+
+Reversible.
+
+Rollback path: <concrete steps describing how the system gets back to the prior state — name the seam (interface adapter, feature flag, dual-run window) that makes rollback feasible>.
+
+Migration cost estimate: <effort, e.g., "~1 engineer-week">.
+
+Risk during rollback: <what is at stake while rolling back — data shape, downtime, dual-run window>.
+
+# === Branch: Irreversible (no) ===
+# Use this shape when reversing means a rewrite or persistent posture change.
+
+Irreversible.
+
+Reversing this means <one sentence on what reversing entails and why it costs more than a sprint>.
+
+Recovery plan: <what is done if the decision turns out to be wrong — recovery posture, not rollback. Often involves data migration, parallel rebuild, or a rewrite>.
+
+Required sign-off before implementation: <@username or named role>. The sign-off binds; the named human is on the hook.
+
+# === Branch: Mixed (split the parts) ===
+# Use this shape only after splitting reversible and irreversible parts onto their own lines.
+# Refusal B fires on hedged answers ("partially reversible") that do not split.
+
+Mixed — split:
+- The <part A> is reversible. Rollback path: <concrete>; ~<effort>.
+- The <part B> is irreversible. Recovery plan: <concrete>. Required sign-off before <part B> ships: <@username or role>.

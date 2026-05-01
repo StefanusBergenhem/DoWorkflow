@@ -1,0 +1,18 @@
+# Alternatives section slot-fill.
+# Refusal C: at least two real alternatives. "Do nothing" and straw men do not count.
+# Each rejection reason is concrete and context-specific, anchored to a driver named in Context.
+
+## Alternatives considered
+
+- **<Option name>.** Rejected: <concrete reason that names a driver from this ADR's Context>.
+  *Bad example (generic): "Rejected: more complex."*
+  *Good example (context-specific): "Rejected: introduces a second stateful system; ops team familiarity is zero; durability story is weaker without AOF tuning the team does not currently do."*
+
+- **<Option name>.** Rejected: <concrete reason that names a driver from this ADR's Context>.
+
+- **<Option name>.** Rejected: <concrete reason that names a driver from this ADR's Context>.
+
+# Smell test before shipping:
+#   Would any rejected alternative have produced a materially different design?
+#   If no — every rejection collapses to the chosen design — the option space was already
+#   collapsed before the ADR. Refusal C trips (anti-pattern.single-option).

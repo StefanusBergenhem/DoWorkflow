@@ -1,0 +1,81 @@
+```yaml
+review:
+  document: <document identifier or path>
+  reviewer: vmodel-skill-review-adr
+  date: <YYYY-MM-DD>
+
+  verdict: <APPROVED | REJECTED | DESIGN_ISSUE>
+  # Decision-table outcome — see SKILL.md "Verdict decision table".
+  # Precedence: DESIGN_ISSUE wins over REJECTED, which wins over APPROVED.
+  # The meta-gate routes per upstream-traceability: if
+  # `check.spec-ambiguity-test.fail` fires AND the failure is upstream-
+  # traceable (parent Architecture's stub under-specified the decision; an
+  # upstream policy ADR is missing the load-bearing constraint; the Product
+  # Brief outcome the decision serves is itself ambiguous), verdict is
+  # DESIGN_ISSUE. Otherwise REJECTED.
+
+  inputs_provided:
+    adr_document: true
+    supersedes_target: <true | false | n/a>     # n/a when supersedes not set
+    superseded_by_target: <true | false | n/a>  # n/a when superseded_by not set
+    citing_artifacts: <true | false | partial>  # for back-resolution flag
+  # When supersedes/superseded_by is set but the cross-reference is not
+  # provided as input AND the chain cannot be resolved, halt with
+  # `missing-inputs` rather than approve blind.
+
+  perspectives_applied:
+    - architect           # threshold, alternatives discipline, decision-rationale clarity
+    - integrator          # propagation, completeness, linkage integrity
+    - historian           # retrofit honesty — only when `recovery_status:` declared
+
+  findings:
+    # Zero or more findings, one per failed check.
+    # Each follows finding.yaml.tmpl.
+    - id: F-001
+      section: <Context | Decision | Alternatives | Rationale | Consequences | FRONTMATTER | GLOBAL>
+      check_failed: <dotted catalog identifier>
+      severity: <hard_reject | soft_reject | info>
+      category: <shape | context | alternatives | decision-rationale | consequences-reversibility | propagation-completeness | linkage-lineage | retrofit | threshold | meta-gate>
+      evidence: |
+        <verbatim quote or location reference from the artifact under review>
+      recommended_action: |
+        <generic pointer; never specific replacement wording>
+
+    # ... more findings ...
+
+  summary: |
+    # 2-4 sentences. Cite the dominant findings, not every finding.
+    # Verdict justification: which trigger fired, why DESIGN_ISSUE vs REJECTED if
+    # applicable, whether all inputs were provided.
+    # When DESIGN_ISSUE: name the upstream artifact (parent Architecture's stub /
+    # upstream policy ADR / Product Brief outcome) that needs to revise before
+    # this ADR can reach APPROVED.
+    # When REJECTED for a hard-reject: name the refusal class (A / B / C / D /
+    # E / broken-reference).
+
+  recommended_next_action: |
+    # APPROVED  → "Proceed to Architecture/DD authoring against this ADR."
+    # REJECTED  → "Hand findings to the matched author skill for rewrite."
+    # DESIGN_ISSUE → "Escalate to <upstream artifact name>; rewriting this
+    #                 ADR in place will not resolve the upstream gap."
+
+  counts:
+    hard_reject: <integer>
+    soft_reject: <integer>
+    info: <integer>
+    design_issue: <integer>      # count of meta-gate findings; usually 0 or 1
+```
+
+## Notes for emitting the verdict
+
+- `verdict` matches the decision table in SKILL.md exactly. Do not override.
+- If the document is APPROVED but the review surfaced `info` findings, list them — they are useful observations even though they do not affect the verdict.
+- The `summary` field should be the first thing a human reader sees. Aim for: *"Verdict: \<X>. Trigger: \<dominant cause>. Inputs: \<provided / partial / missing — implications>."*
+- For DESIGN_ISSUE verdicts, name the upstream artifact in `summary` and `recommended_next_action`. Do not name the matched author skill explicitly — say "the matched author skill".
+- For REJECTED verdicts triggered by a hard-reject finding, the `summary` names the refusal class so the consumer knows the shape of the rewrite:
+  - A — fabricated retrofit content (`reconstructed` on human-only fields, AI-fabricated rationale, test-as-requirement inversion, laundered current state)
+  - B — Reversibility sub-prompt unanswered or hedged
+  - C — Decision or Consequences absent, both signs empty, fewer than two real alternatives
+  - D — Spec Ambiguity Test failed (not upstream-traceable)
+  - E — routine-choice ADR
+  - broken-reference — required front-matter field missing, id pattern invalid, status enum invalid, `scope_tags` empty (orphan-ADR)

@@ -1,0 +1,69 @@
+---
+id: ADR-NNN-<kebab-slug>
+artifact_type: adr
+title: "<active-voice noun phrase naming the decision>"
+status: proposed   # → accepted → superseded
+date: YYYY-MM-DD
+scope_tags: ["<scope>"]   # non-empty
+# Optional:
+# affected_scopes: ["<scope>", ...]
+# supersedes: ADR-NNN-<old-slug>
+# superseded_by: ADR-NNN-<new-slug>
+# recovery_status: unknown   # retrofit only — see retrofit-stub.md.tmpl for map form
+---
+
+# ADR-NNN: <Title>
+
+**Y-statement.** *(Optional one-liner.)* In the context of <situation>, facing <concern>, we decided for <option>, to achieve <quality>, accepting <downside>.
+
+## Context
+
+<The specific situation that forced this decision now — not a generic problem-domain statement.>
+
+<Name the forces (constraints, deadlines, dependencies) explicitly. List drivers by name so the Rationale can cite them.>
+
+### Drivers
+- **<Driver name>.** <One-line description tying it to the situation.>
+- **<Driver name>.** <One-line description.>
+
+### Assumptions (revisit triggers)
+- <One sentence: "if this changes, revisit.">
+- <One sentence: "if this changes, revisit.">
+
+## Decision
+
+We will <chosen option, named explicitly, in active voice>.
+
+## Alternatives considered
+
+- **<Option name>.** Rejected: <concrete, context-specific reason anchored to a driver named in Context>.
+- **<Option name>.** Rejected: <concrete, context-specific reason anchored to a driver named in Context>.
+- **<Option name>.** Rejected: <concrete, context-specific reason anchored to a driver named in Context>.
+
+## Rationale
+
+<Cite the drivers from Context by name. Explain why the chosen option wins against each one. The 20-ADRs paste test: this paragraph should not survive being pasted unchanged into 20 unrelated ADRs.>
+
+## Consequences
+
+**Positive**
+- <Concrete gain — operational, architectural, capability.>
+- <Concrete gain.>
+
+**Negative**
+- <Concrete cost — what is given up, the new failure mode, the upper bound at which the decision is revisited.>
+- <Concrete cost.>
+
+**Reversibility.** *(Verbatim prompt: "Is this decision reversible? If yes: state the rollback path. If no: state the recovery plan and name who must sign off before implementation.")*
+
+<Answer per the relevant branch in `templates/reversibility-block.tmpl`. Reversible: rollback path + cost estimate. Irreversible: recovery plan + named sign-off. No hedging — split the parts if the answer is mixed.>
+
+## Propagation
+
+- **Consequence:** *"<consequence sentence>"*
+  Route: <new requirement at this scope | governing_adrs from child design | both | revisit-trigger only>.
+  <If "new requirement": Materialised as: REQ-... — "<requirement statement>".>
+  <If "governing_adrs from child": Bound by: <child artifact id> (carries `governing_adrs: [<this-ADR-id>]`).>
+
+- **Consequence:** *"<consequence sentence>"*
+  Route: ...
