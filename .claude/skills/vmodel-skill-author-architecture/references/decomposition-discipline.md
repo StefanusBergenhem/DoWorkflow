@@ -79,9 +79,9 @@ For each child, fill these slots. If any slot can't be filled, the boundary is w
 - responsibilities:      <<≤3 architectural-level items>>
 - allocates:             <<≥1 parent requirement id>>
 - likely-change driver:  <<one specific anticipated change this child absorbs alone>>
-- bounded-context line:  <<which linguistic fracture this boundary tracks, or 'n/a'>>
-- owning team type:      <<stream-aligned | platform | complicated-subsystem | enabling>>
 ```
+
+Banned fields (Rule 8). Decomposition entries must NOT carry `bounded_context_line`, `owning_team_type`, or `test_seam`. These were team-topology-derived shapes; not load-bearing for AI-first frameworks where Conway's-law concerns do not apply. Test-design content (test surface, fake strategy, port enumeration) lives in TestSpec at the corresponding scope.
 
 ## Anti-patterns local to this discipline
 

@@ -76,6 +76,10 @@ Slot-fill check: an entry missing #1-5 is incomplete. Entries missing #6-7 drift
 
 Source: Clements, Bachmann, Bass, Garlan et al., *Documenting Software Architectures: Views and Beyond* (SEI/Addison-Wesley, 2nd ed., 2011).
 
+### Authoring shape — single-file or helicopter+bundle (Rule 8)
+
+For small architectures (≤4 interfaces, modest DbC volume), author each interface inline with full DbC clauses. For larger architectures where the artifact would otherwise breach the working token budget, MAY author in helicopter+detail-bundle form: keep the slim form (`name, from, to, protocol, contract.operation, contract.summary_postcondition, contract.key_invariants, contract.rationale, detail`) in `architecture.md` and move the full preconditions, postconditions (multi-branch), invariants, errors, quality_attributes, authentication, authorisation, version, deprecation_policy to `architecture/interfaces/<NAME>.md`. `summary_postcondition` is one sentence summarising the success guarantee plus halt/error behaviour; `key_invariants` is 1–3 IDs (REQ / IC / ADR) the seam structurally enforces. The framework treats helicopter + bundle as one logical artifact.
+
 ## Interface Segregation Principle (ISP, Martin)
 
 No component should depend on an interface method it does not use. Fat interfaces couple consumers to changes they do not care about.

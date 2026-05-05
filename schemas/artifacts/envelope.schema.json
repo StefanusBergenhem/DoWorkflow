@@ -55,6 +55,23 @@
     "superseded_by": {
       "description": "Artifact ID that replaces this artifact. Set when status transitions to superseded.",
       "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/artifact_id_ref"
+    },
+
+    "belongs_to": {
+      "description": "Bundle back-link. Set on detail-file artifacts (e.g. architecture-interface-detail) to point at the helicopter artifact whose bundle they belong to. Tooling treats helicopter + bundle detail files as one logical artifact. Absent on standalone artifacts (Rule 8 in docs/authoring-discipline.md).",
+      "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/artifact_id_ref"
+    },
+
+    "kind": {
+      "description": "Bundle-detail subtype discriminator. Required on detail-file artifacts; mirrors the artifact_type field for the bundle case. Example: 'architecture-interface-detail'. Free-string at envelope level so future bundle subtypes can be added without envelope edits; per-artifact schemas pin the const value.",
+      "type": "string",
+      "minLength": 1
+    },
+
+    "subject": {
+      "description": "Bundle-detail subject. Required on detail-file artifacts; identifies which element of the helicopter this detail file documents. Example: for architecture-interface-detail, the interface name (IValidate). Free-string here; per-artifact schemas tighten the pattern when applicable.",
+      "type": "string",
+      "minLength": 1
     }
   },
 

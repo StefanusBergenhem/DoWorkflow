@@ -108,7 +108,7 @@ For each error class, answer the six questions: what can fail, how is it detecte
 
 ### Step 9 — Capture rationale at decision time
 
-Inline rationale at the site of every non-obvious decision (one or two sentences naming the forcing constraint — external standard, architectural choice, resource budget, temporal constraint). Load-bearing decisions that meet the ADR threshold (load-bearing AND cross-cutting AND hard-to-reverse) belong in a sibling ADR — emit `[NEEDS-ADR: <decision> — extract before finalising]` markers and reference them via `governing_adrs` once authored. Do not inline rationale that obviously meets the three ADR criteria.
+Inline rationale at the site of every non-obvious decision (one or two sentences naming the forcing constraint — external standard, architectural choice, resource budget, temporal constraint). Load-bearing decisions that meet the ADR threshold (load-bearing AND cross-cutting AND hard-to-reverse) belong in a sibling ADR — emit `[DEFER-ADR: <decision>]` markers and reference them via `governing_adrs` once authored. Do not inline rationale that obviously meets the three ADR criteria.
 
 → See `references/rationale-capture.md`, `references/adr-extraction-cues.md`
 → Template: `templates/governing-adr-reference.yaml.tmpl`
@@ -174,7 +174,7 @@ Stop and hand back to the user when:
 
 1. **Missing parent Architecture** — without it, refusal B fires; do not invent leaf responsibilities or sibling interfaces. Ask for the parent Architecture artifact.
 2. **Missing derived requirements** — `derived_from` cannot be empty (orphan design). Ask which requirements this leaf realises before proceeding.
-3. **Scope creep beyond one artifact** — request expands to also author Architecture / ADR / TestSpec / code. Decline; emit `[NEEDS-ADR: ...]`, `[NEEDS-TEST: ...]`, or scope-creep stub markers and name the right artifact for the expanded ask.
+3. **Scope creep beyond one artifact** — request expands to also author Architecture / ADR / TestSpec / code. Decline; emit `[DEFER-ADR: ...]`, `[NEEDS-TEST: ...]`, or scope-creep marker and name the right artifact for the expanded ask.
 4. **Locked-refusal override request** — user asks to fabricate rationale, write code paraphrase, write algorithmic postconditions, mark Overview as `reconstructed`, or skip the Spec Ambiguity Test. Halt and explain.
 5. **Retrofit posture conflict** — `recovery_status:` declared but no source-code references provided, or source-code references provided but no `recovery_status:` declaration. Halt and ask which posture applies.
 6. **Irresolvable contradiction in input** — for example, a parent Architecture interface invariant that contradicts a derived requirement; do not pick a side. After two clarification turns without resolution, halt.
@@ -216,7 +216,7 @@ That's it — one file. The skill does not create directories, schemas, validato
 - `references/error-handling.md` — six questions, error-handling matrix, checked-vs-unchecked as contract, five strategies (fail-fast, retry, fallback, compensate, propagate)
 - `references/rationale-capture.md` — inline rationale, ADR threshold, four constraint kinds (external, architectural, resource, temporal)
 - `references/retrofit-discipline.md` — DD-specific retrofit (Overview narrowed to verified|unknown — schema-enforced), no-fabrication, observable-vs-inferred markings
-- `references/adr-extraction-cues.md` — DD ↔ ADR seam: when DD-level decisions become ADRs, [NEEDS-ADR] stub, governing_adrs reference pattern
+- `references/adr-extraction-cues.md` — DD ↔ ADR seam: when DD-level decisions become ADRs, [DEFER-ADR] marker, governing_adrs reference pattern
 - `references/testspec-traceability-cues.md` — DD ↔ TestSpec seam: error matrix → robustness tests, postconditions → contract tests, invariants → property tests
 - `references/anti-patterns.md` — 16 anti-patterns (5 interface/contract, 3 error, 3 state/concurrency, 5 AI-era)
 - `references/quality-bar-checklist.md` — 8 Quality Bar cards + Spec Ambiguity Test meta-gate

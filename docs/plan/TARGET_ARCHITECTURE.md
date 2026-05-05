@@ -127,9 +127,11 @@ Six artifact types plus one cross-cutting:
 | **Product Brief** | Root only | Anchor: why, for whom, what problem | Stakeholder review |
 | **Requirements** | Non-leaf scopes | Testable behavior specifications | Acceptance / integration tests |
 | **Architecture** | Non-leaf scopes | Decomposition + composition pattern | Integration tests |
-| **ADR** | Cross-cutting | Justify individual load-bearing decisions | Review |
-| **Detailed Design** | Leaf scopes | Internal logic, contracts, algorithms | Unit tests |
+| **ADR** | Cross-cutting (per scope; lives at the scope where the decision was taken) | Justify individual load-bearing decisions | Review |
+| **Detailed Design** | Leaf scopes (mandatory for every leaf in the parent Architecture's decomposition) | Internal logic, contracts, algorithms | Unit tests |
 | **TestSpec** | Every scope | Test specification for this scope | (its own test code) |
+
+**Footnote on Architecture authoring shape.** Architecture at a non-leaf scope MAY be authored as a single `architecture.md` file or as a helicopter file plus a detail bundle (`architecture/` subdirectory holding per-interface DbC detail at `architecture/interfaces/<NAME>.md`). The bundle form is governed by [authoring-discipline Rule 8](../authoring-discipline.md). Detail files are bundle sub-artifacts — not standalone artifact types — and tooling treats helicopter + detail as one logical Architecture artifact.
 
 ### 5.3 Per-artifact structure
 
@@ -158,22 +160,29 @@ Six artifact types plus one cross-cutting:
 - `rationale` — required (can be terse; keeps human-in-loop anchor, enables trade-offs, preserves "why" in retrofit).
 - `acceptance` — optional; required only when the statement alone leaves test conditions ambiguous.
 
-#### Architecture (non-leaf scopes) — 6 sections, all mandatory
+#### Architecture (non-leaf scopes) — sections all mandatory
+
+Helicopter shape (single file `architecture.md`, or helicopter-plus-detail-bundle per Rule 8):
 
 1. **Metadata** — scope, parent, derived_from, governing ADRs.
 2. **Overview** — 2–3 paragraphs: what this scope is, what slice of the parent it realises, high-level approach.
 3. **Structure Diagram** — Mermaid; children + connections.
 4. **Decomposition** — per-child entries.
-5. **Interfaces** — contracts between children.
+5. **Interfaces** — slim helicopter roster (per-interface DbC detail moves to the bundle; see below).
 6. **Composition** — runtime pattern (event-driven / request-response / pipeline / …), wiring approach (message bus topology, DI strategy, middleware stack), key sequence diagrams (Mermaid), and, at root scope only, deployment intent (environments, orchestration target, boundaries between runtime units). **Minimum bar: a developer reading this could decide what files/configs to create without re-deciding any patterns.**
+7. **Quality Attributes**, **Resilience**, **Observability + Security**, **Evolution + fitness functions** — load-bearing cross-cutting properties carried in the helicopter so reviewers see them at one zoom level.
 
-**Per child** (in Decomposition): `id`, `purpose` (one line), `responsibilities` (architecture-level, not implementation), `allocates` (list of REQ-IDs).
+**Per child** (in Decomposition): `id`, `purpose` (one line), `responsibilities` (architecture-level, not implementation), `allocates` (list of REQ-IDs), optional `likely_change_driver` and `rationale`.
 
-**Per interface:** `name`, `from`, `to`, `protocol`, `contract` (reference).
+**Banned decomposition fields.** Decomposition entries MUST NOT carry `bounded_context_line`, `owning_team_type`, or `test_seam` (and its sub-fields `driving_ports`, `driven_ports`, `fake_strategy`). Rationale: these are team-topology-derived. In an AI-first authoring context Conway's-law concerns do not apply, and test-surface content belongs in the TestSpec at the corresponding scope, not on the architecture artifact.
+
+**Per interface (slim helicopter form, Rule 8):** `name`, `from`, `to`, `protocol`, `contract.operation`, `contract.summary_postcondition` (one-line success guarantee + halt/error behaviour), `contract.key_invariants` (1–3 IDs), `contract.rationale`, `detail` (relative path to the per-interface detail file at `architecture/interfaces/<NAME>.md`). Full DbC clauses (`preconditions`, `postconditions`, `invariants`, `errors`, `quality_attributes`, `authentication`, `authorisation`, `version`, `deprecation_policy`) live in the detail file, not on the helicopter entry. Helicopter and detail together are one logical artifact; tooling treats them as such.
+
+**Interface contracts are frozen at Architecture scope.** Leaf Detailed Designs implement contracts; they do not refine them. The DD's Public Interface section names the actual functions that satisfy the architectural contract; the architectural interface entry remains the single source of truth.
 
 **Mermaid is the default diagram format** (text-based, version-controllable, AI-readable). Embedded images are permitted where Mermaid is insufficient.
 
-**ADRs are pulled out** as cross-cutting separate artifacts — not inlined in Architecture.
+**ADRs are pulled out** as cross-cutting separate artifacts — not inlined in Architecture. ADRs live at the scope where the decision was taken (every scope can have its own `adrs/`); see *Scope tree convention* below.
 
 #### ADR (cross-cutting)
 
@@ -256,26 +265,34 @@ notes: <optional>
 - YAML front-matter for metadata + outgoing links.
 - Body: prose sections + embedded YAML blocks for repeated structured items (per-req, per-child, per-test-case, per-function) + Mermaid for diagrams.
 
-**Directory layout** — scope tree mirrors directory tree, under a configurable `/specs/` root:
+**Directory layout** — scope tree mirrors directory tree, under a configurable `/specs/` root. ADRs live at the scope where the decision was taken (every scope owns its own `adrs/`). Architecture at any non-leaf scope MAY be authored as a single file or as a helicopter + detail bundle (see Rule 8):
 
 ```
 /specs/
   product_brief.md            # root scope
+  needs.md                    # root scope (optional — elicit-needs prototype output)
   requirements.md             # root scope
-  architecture.md             # root scope
+  architecture.md             # root scope (helicopter)
+  architecture/               # root scope detail bundle (Rule 8, optional)
+    interfaces/
+      ICheckoutFinalise.md    # per-interface DbC detail
   testspec.md                 # root scope
-  /adrs/                      # flat, cross-cutting
+  adrs/                       # root-scope ADRs
     adr-001-use-postgres.md
-  /app/                       # branch scope
+  app/                        # branch scope
     requirements.md
     architecture.md
+    architecture/             # branch-scope detail bundle (optional)
+      interfaces/
+        ICartReserve.md
     testspec.md
-    /checkout/                # leaf scope
+    adrs/                     # branch-scope ADRs (only if any decisions taken at this scope)
+    checkout/                 # leaf scope
       detailed_design.md
       testspec.md
 ```
 
-Root-scope artifacts live directly at `/specs/`. "Root" is implicit — not a directory name. ADRs flat in `/specs/adrs/`.
+Root-scope artifacts live directly at `/specs/`. "Root" is implicit — not a directory name. The full scope-tree rules (reserved directory names, child-vs-bundle disambiguation, ADR placement) are stated in the next section.
 
 **Filenames** — snake_case canonical per artifact type: `product_brief.md`, `requirements.md`, `architecture.md`, `detailed_design.md`, `testspec.md`, `adr-NNN-{slug}.md`. **Scope directories** use kebab-case.
 
@@ -292,6 +309,36 @@ Root-scope artifacts live directly at `/specs/`. "Root" is implicit — not a di
 | ADR | `ADR-{seq}-{slug}` | `ADR-012-use-postgres` |
 
 Traceability links reference IDs, not paths.
+
+### 5.5 Scope tree convention
+
+The spec tree is a **strict hierarchy**: each scope is a directory; its children are subdirectories of that directory. There is exactly one rule for distinguishing a child scope from a non-scope subdirectory: **reserved names**.
+
+**Reserved directory names** (cannot be used as a child scope ID at any scope):
+
+```
+architecture, architecture-and-design, requirements, testspec,
+adrs, needs, product_brief, detailed_design
+```
+
+A subdirectory inside a scope is a **child scope** iff its name is **not** in the reserved list; otherwise it is an artifact bundle (e.g., `architecture/` for the Rule-8 detail bundle) or a fixed structural directory (e.g., `adrs/`). The reserved list is closed; new names enter only by amendment of this section.
+
+**Canonical filenames per scope role:**
+
+| Scope role | Mandatory artifacts | Optional artifacts |
+|---|---|---|
+| Root | `product_brief.md`, `requirements.md`, `architecture.md` (+ optional `architecture/` bundle), `testspec.md` | `needs.md` (elicit-needs output), `adrs/<adr-files>` |
+| Branch (non-leaf) | `requirements.md`, `architecture.md` (+ optional `architecture/` bundle), `testspec.md` | `adrs/<adr-files>` |
+| Leaf | `detailed_design.md`, `testspec.md` | `adrs/<adr-files>` |
+
+**ADR placement.** ADRs live at the scope where the decision was taken — every scope can have its own `adrs/` directory. ADRs are still cross-cutting in the link sense (`scope_tags` may name multiple scopes; `governing_adrs` may reference an ADR taken at a different scope), but their *file home* is the scope of authorship. This replaces the earlier "flat at `/specs/adrs/`" convention.
+
+**Marker semantics inside artifacts.** When authoring an upstream artifact reveals a downstream gap, mark it with one of two forms:
+
+- `[DEFER-DD: …]` — the gap belongs in a leaf component's Detailed Design. Markers do **not** create the existence of a DD; every leaf in the parent Architecture's decomposition gets a DD by mandate. The marker only describes content that will land in that DD when it is authored.
+- `[DEFER-ADR: …]` — the gap is a cross-cutting decision-shaped item with at least two named alternatives. The marker reserves the ADR slot; the ADR itself is authored when the decision is taken.
+
+Cross-cutting items **without** named alternatives are not ADR material; they go inline into existing root-Architecture sections (deployment intent, fitness functions, observability + security). Parametric gaps that belong to the artifact being authored use inline `<TBD>` rather than a defer marker.
 
 ---
 
@@ -319,7 +366,7 @@ A concrete Yes/No checklist grouped by concern, subject to the **Spec Ambiguity 
 |---|---|
 | Product Brief | Stakeholder completeness, problem evidence, outcome specificity, non-goals explicit, success criteria measurable |
 | Requirements | EARS where apt, rationale present, QAs measurable, interface contracts, constraint inheritance traced |
-| Architecture | Composition section complete (runtime patterns have rationale; deployment intent resolves to concrete IaC artifacts; runtime-unit boundaries have integration-test targets), every child allocated, every req allocated, ADRs linked, interfaces contracted |
+| Architecture | Composition section complete (runtime patterns have rationale; deployment intent resolves to concrete IaC artifacts; runtime-unit boundaries have integration-test targets), every child allocated, every req allocated, ADRs linked, interfaces contracted (slim helicopter + per-interface detail per Rule 8 when bundle form is used), banned decomposition fields absent, interface contracts not refined downstream |
 | ADR | Context specific, ≥ 2 alternatives, reversibility sub-prompt answered, affected scopes listed |
 | Detailed Design | Junior-implementable, contracts on every public function, state machines explicit, error handling complete, language-portable |
 | TestSpec | Derivation strategies applied (requirement-based, equivalence class, boundary, state transitions, error paths, fault injection), coverage targets declared, every spec element has ≥ 1 test |
@@ -419,6 +466,7 @@ Input: parent allocation (or Product Brief at root)
 - Traceability validation passes for the scope.
 - Every TestSpec case has non-empty `verifies`.
 - No `recovery_status: unknown` on any blocking field.
+- **Every leaf in the parent Architecture's decomposition has a Detailed Design.** This is mandatory; it is independent of whether `[DEFER-DD: …]` markers were filed during upstream authoring. Markers describe gaps inside DDs, not DD existence — every leaf has a DD regardless of marker presence.
 
 Anyone can query this. The Specification workflow emits it *at nobody*.
 

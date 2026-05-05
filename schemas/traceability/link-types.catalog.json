@@ -121,6 +121,20 @@
       "granularity": "artifact",
       "status": "reserved",
       "notes": "Forward-compatibility hook per TARGET §7 and §8.4. Activated when the Build workflow is designed."
+    },
+    {
+      "name": "belongs_to",
+      "description": "Bundle composition link. A detail-file artifact (architecture-interface-detail today; future bundle subtypes added) belongs to one helicopter artifact. Tooling treats helicopter + all detail files referencing it as one logical artifact for graph construction, Spec Ambiguity Test, and review.",
+      "source_kind": "artifact",
+      "source_artifact_types": ["architecture-interface-detail"],
+      "source_carrier": "front_matter",
+      "target_kind": "artifact",
+      "target_artifact_types": ["architecture"],
+      "cardinality": "single",
+      "required_on_source": true,
+      "granularity": "artifact",
+      "status": "active",
+      "notes": "Phase 6 multi-file architecture bundle (Rule 8 in docs/authoring-discipline.md). Complements the helicopter's per-interface 'detail' field which forward-points to the detail file path; this link is the front-matter back-reference. Bi-directional consistency (helicopter's detail: resolves to a file whose belongs_to points back to the helicopter) is checked at validation time, not by this catalog."
     }
   ],
 
@@ -142,6 +156,12 @@
       "from": "realizes",
       "stored": false,
       "description": "Inverse of realizes — a spec-side artifact lists the build-side artifacts that implement or exercise it. Tool-computed; empty today until the Build workflow lands."
+    },
+    {
+      "name": "owns_details",
+      "from": "belongs_to",
+      "stored": false,
+      "description": "Inverse of belongs_to — a helicopter architecture lists the detail files in its bundle. Tool-computed from the forward graph; the helicopter's per-interface 'detail' fields are the authored forward pointers, but the canonical bundle membership comes from belongs_to back-links to avoid drift."
     }
   ]
 }

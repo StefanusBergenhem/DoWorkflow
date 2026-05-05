@@ -63,7 +63,6 @@ Two purposes in one file:
 - [ ] No generic-principle invocation (soft greenfield; HARD retrofit)
 - [ ] `governing_adrs:` resolves (HARD if dangling) and is body-cited
 - [ ] Load-bearing + cross-cutting + hard-to-reverse decisions extracted to ADR
-- [ ] No `[NEEDS-ADR: ...]` or `[NEEDS-TEST: ...]` stubs in finalised artifacts
 
 ### Retrofit honesty (retrofit only)
 

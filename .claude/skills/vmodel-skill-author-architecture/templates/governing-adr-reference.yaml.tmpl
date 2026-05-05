@@ -25,11 +25,15 @@ governing_adrs:
 #   purpose: "Boundary with the payment service provider (per ADR-019: PCI scope isolation)."
 
 
-# === STUB FOR DECISIONS NOT YET ADR'D ===
+# === MARKER FOR DECISIONS NOT YET ADR'D ===
 # When authoring surfaces a load-bearing + cross-cutting + hard-to-reverse decision that has no preserved ADR,
-# do not inline a justification — emit a stub marker:
+# do not inline a justification — emit a deferred-decision marker:
 
-# [NEEDS-ADR: <decision summary> — extract before finalising]
+# [DEFER-ADR: <decision summary>]
 #
 # Example:
-# [NEEDS-ADR: choice between modular monolith and microservices for checkout — extract before finalising]
+# [DEFER-ADR: choice between modular monolith and microservices for checkout]
+#
+# Under Rule 6, the marker can persist in active artifacts because the decision is parked at its right
+# home (the ADR). When the ADR is later authored, replace the marker with `governing_adrs:` plus the
+# body-citation pattern above.

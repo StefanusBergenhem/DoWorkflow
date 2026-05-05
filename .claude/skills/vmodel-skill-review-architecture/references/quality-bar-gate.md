@@ -19,6 +19,7 @@ Two purposes in one file:
   - `check.rationale.*`, `check.adr.*`, `check.traceability.*`, `check.fitness-function.*`
   - `check.retrofit.*`
   - `check.spec-ambiguity-test.*`
+  - `check.discipline.*` and `check.bundle.*`
   - `anti-pattern.*`
 - Rule for new check identifiers
 
@@ -220,7 +221,16 @@ Stable identifiers used across all findings. Two namespaces visible here:
 
 The override is the meta-gate. If the artifact fails this test, the verdict is set by the precedence rule regardless of how many other items passed. Apply judgment: an artifact that passes every Yes/No box but cannot be acted on by a junior engineer has not done the job Architecture exists to do.
 
-### `anti-pattern.*` (the 10 — see `anti-patterns-catalog.md` for full entries)
+### `check.discipline.*` and `check.bundle.*` (cross-cutting authoring discipline + bundle integrity)
+
+| Identifier | Severity | Conditional gating |
+|---|---|---|
+| `check.discipline.architecture-bundle-shape` | soft_reject | Rule 8 — banned decomposition fields, or helicopter form incomplete |
+| `check.discipline.scope-tree-shape` | soft_reject | Rule 7 — child scope ID collides with reserved subdirectory name |
+| `check.bundle.detail-link-broken` | **hard_reject** ★ | helicopter form — `detail:` path does not resolve |
+| `check.bundle.belongs-to-mismatch` | **hard_reject** ★ | helicopter form — detail file `belongs_to` / `subject` does not match helicopter back-link |
+
+### `anti-pattern.*` (see `anti-patterns-catalog.md` for full entries)
 
 | Identifier | Severity |
 |---|---|
@@ -234,6 +244,8 @@ The override is the meta-gate. If the artifact fails this test, the verdict is s
 | `anti-pattern.fabricated-decomposition-rationale` | **hard_reject** ★ (refusal A) |
 | `anti-pattern.ad-hoc-composition` | soft_reject |
 | `anti-pattern.dd-content-in-architecture` | **hard_reject** ★ (refusal B) |
+| `anti-pattern.team-topology-fields-in-architecture` | soft_reject |
+| `anti-pattern.helicopter-without-detail` | **hard_reject** ★ (broken-reference integrity, Rule 8) |
 
 ★ marks hard-reject triggers (one occurrence rejects the document, except `check.spec-ambiguity-test.fail` which routes per precedence rule).
 

@@ -19,7 +19,7 @@
     },
 
     "artifact_type": {
-      "description": "Discriminator for the six V-Model artifact types.",
+      "description": "Discriminator for V-Model artifact types. The six core artifact types plus bundle detail types. Detail types (architecture-interface-detail, …) are sub-artifacts that compose with a helicopter parent into one logical artifact (Rule 8 in docs/authoring-discipline.md).",
       "type": "string",
       "enum": [
         "product-brief",
@@ -27,7 +27,23 @@
         "architecture",
         "adr",
         "detailed-design",
-        "test-spec"
+        "test-spec",
+        "architecture-interface-detail"
+      ]
+    },
+
+    "reserved_scope_name": {
+      "description": "Names reserved at every scope level for canonical artifact files or artifact-bundle subdirectories. A child scope may not use any of these as its ID. Enforced by traceability rule TRV-SCOPE-001 against the scope tree, not by per-artifact front-matter validation. See Rule 7 in docs/authoring-discipline.md.",
+      "type": "string",
+      "enum": [
+        "architecture",
+        "requirements",
+        "testspec",
+        "adrs",
+        "needs",
+        "product_brief",
+        "detailed_design",
+        "architecture-and-design"
       ]
     },
 

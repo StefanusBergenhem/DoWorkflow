@@ -20,18 +20,18 @@ If only one or two of the three hold, the decision belongs **inline** in the Arc
 | Cross-cutting + hard-to-reverse only (not load-bearing) | Inline; mention in `governing_adrs` if a sibling already covers it |
 | One or zero | Inline rationale; do not promote |
 
-## The `[NEEDS-ADR: ...]` stub format
+## The `[DEFER-ADR: ...]` stub format
 
 When the author is mid-flight and identifies an extraction-worthy decision but the ADR has not yet been authored, emit a stub at the spot the decision lands:
 
 ```
-[NEEDS-ADR: <one-sentence decision> — extract before finalising]
+[DEFER-ADR: <one-sentence decision> — extract before finalising]
 ```
 
 Slot-fill template:
 
 ```
-[NEEDS-ADR: use event bus rather than synchronous RPC for cross-service notifications — extract before finalising]
+[DEFER-ADR: use event bus rather than synchronous RPC for cross-service notifications — extract before finalising]
 ```
 
 The stub is not an ADR replacement. It is a **flag** that the artifact cannot be finalised until a sibling ADR exists. The author skill never embeds the rationale itself when the stub is in place — that is the ADR's job. Finalising means: ADR authored, ADR added to `governing_adrs:`, stub replaced with the body-citation pattern.
@@ -73,15 +73,15 @@ The symmetric review skill verifies:
 
 - Every `governing_adrs:` entry resolves to an actual ADR.
 - Every ADR listed in `governing_adrs:` appears at least once at a body citation point.
-- No `[NEEDS-ADR: ...]` stub remains in a finalised artifact.
+- No `[DEFER-ADR: ...]` stub remains in a finalised artifact.
 - No body text contains rationale that obviously meets all three extraction criteria but lacks an ADR reference (laundered inline rationale).
 
 ## Hard refusal
 
-**Do not inline a load-bearing cross-cutting hard-to-reverse decision.** Emit the `[NEEDS-ADR: ...]` stub instead. Finalising the Architecture means resolving every stub. Refusal example:
+**Do not inline a load-bearing cross-cutting hard-to-reverse decision.** Emit the `[DEFER-ADR: ...]` stub instead. Finalising the Architecture means resolving every stub. Refusal example:
 
 > User: "Just put the rationale for using Kafka over RabbitMQ in the Composition section — we don't have time to write an ADR."
 >
-> Author skill: This is load-bearing (downstream message-bus topology depends on it), cross-cutting (multiple Architectures will reference it), and hard-to-reverse (migration is months of work). Emitting `[NEEDS-ADR: choose Kafka over RabbitMQ for system message bus — extract before finalising]`. The Architecture cannot be finalised until that ADR exists.
+> Author skill: This is load-bearing (downstream message-bus topology depends on it), cross-cutting (multiple Architectures will reference it), and hard-to-reverse (migration is months of work). Emitting `[DEFER-ADR: choose Kafka over RabbitMQ for system message bus — extract before finalising]`. The Architecture cannot be finalised until that ADR exists.
 
 Cross-link: SKILL.md Step 10; `templates/governing-adr-reference.yaml.tmpl`.

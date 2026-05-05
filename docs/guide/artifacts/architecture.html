@@ -109,7 +109,7 @@ flowchart TD
     <h3>What an Architecture artifact is not</h3>
     <ul>
       <li><strong>Not a Requirements document.</strong> Requirements say <em>what</em> the system must do. Architecture says <em>how it is organised</em> to do it. The two are cleanly separated; behaviour statements belong in Requirements, and structural statements belong here.</li>
-      <li><strong>Not a Detailed Design.</strong> Architecture stops at the interface between children. What happens <em>inside</em> a child &mdash; algorithms, data structures, error handling within the box &mdash; is Detailed Design territory. Crossing that line converts Architecture from a coordination document into a per-child blueprint that will be wrong before anyone reads it.</li>
+      <li><strong>Not a Detailed Design.</strong> Architecture stops at the interface between children. What happens <em>inside</em> a child &mdash; algorithms, data structures, error handling within the box &mdash; is Detailed Design territory. Crossing that line converts Architecture from a coordination document into a per-child blueprint that will be wrong before anyone reads it. The relationship is asymmetric: <em>interface contracts are frozen at Architecture and the leaf DDs implement them, never refine them</em>. The DD's Public Interface section names the actual functions that satisfy the architectural contract; it does not re-derive or extend the contract clauses themselves.</li>
       <li><strong>Not a collection of ADRs.</strong> ADRs justify individual load-bearing decisions. Architecture <em>applies</em> those decisions to a specific scope: the ADR says "we use an event bus for cross-service notifications"; the Architecture says "in this scope, the pricing component publishes <code>PriceChanged</code> events consumed by the cart component over the bus described in ADR-017." ADRs are referenced via <code>governing_adrs</code>, not inlined.</li>
       <li><strong>Not a deployment runbook.</strong> Deployment <em>intent</em> &mdash; environments, orchestration target, runtime-unit boundaries &mdash; lives in the root-scope Composition section. Deployment <em>procedure</em> (step-by-step, rollback playbook, on-call response) lives in operational documentation outside this framework.</li>
       <li><strong>Not a C4 diagram on its own.</strong> A box-and-line drawing without per-child responsibilities, interface contracts, a stated composition pattern, and traceability links back to requirements is not an Architecture artifact &mdash; it is a picture. Most teams stop at the picture. This framework does not.</li>
@@ -140,6 +140,39 @@ recovery_status: reconstructed      # omitted on greenfield
 ---</code></pre>
 
     <p>The mandatory section structure of the body is specified in <a href="../index.html#framework">TARGET_ARCHITECTURE &sect;5.3</a>: Metadata, Overview (2&ndash;3 paragraphs), Structure Diagram (Mermaid), Decomposition (one entry per child), Interfaces (one entry per cross-child or external interface), Composition (runtime pattern, wiring, key sequence diagrams, deployment intent at root). All six sections are mandatory; a Composition section that is empty or reduced to a sentence is a Quality Bar failure regardless of the quality of the other sections.</p>
+
+    <h4>Helicopter + detail bundle authoring (Rule 8)</h4>
+    <p>An Architecture artifact at any non-leaf scope MAY be authored as a single Markdown file or as a <strong>helicopter file plus a detail bundle</strong>. Both forms are valid; the bundle form earns its keep when interface DbC content makes the helicopter unreadable at one zoom level. Tooling treats both forms as one logical artifact.</p>
+    <p>In the bundle form the helicopter file (<code>architecture.md</code>) carries Overview, Structure Diagram, Decomposition, the slim Interface roster, Composition, Quality Attributes, Resilience, Observability + Security, and Evolution + fitness functions &mdash; everything a reviewer needs at the scope level. The per-interface DbC detail moves to <code>architecture/interfaces/&lt;NAME&gt;.md</code>, one file per interface, linked from the helicopter via the entry's <code>detail</code> field.</p>
+    <p>The slim helicopter interface entry keeps a fixed shape: <code>name</code>, <code>from</code>, <code>to</code>, <code>protocol</code>, <code>contract.operation</code>, <code>contract.summary_postcondition</code> (one-line success guarantee plus halt/error behaviour), <code>contract.key_invariants</code> (1&ndash;3 IDs of load-bearing invariants the interface preserves), <code>contract.rationale</code>, and <code>detail</code> (relative path to the detail file). Full DbC clauses &mdash; <code>preconditions</code>, <code>postconditions</code>, <code>invariants</code>, <code>errors</code>, <code>quality_attributes</code>, <code>authentication</code>, <code>authorisation</code>, <code>version</code>, <code>deprecation_policy</code> &mdash; live in the detail file.</p>
+
+    <pre><code># Slim helicopter interface entry (Rule 8 form)
+interfaces:
+  - name: IValidate
+    from: cli-adapter
+    to: validation-engine
+    protocol: "in-process call."
+    contract:
+      operation: "Validate(set ArtifactSet, graph TraceabilityGraph, mode ValidationMode) (&lt;-chan Finding, error)"
+      summary_postcondition: "Streams REQ-026-shaped findings on a channel that is closed on completion; halts with typed system-error per REQ-004 on downstream failure."
+      key_invariants: [REQ-029, REQ-031, IC-002]
+      rationale: "Channel matches the language idiom and lets the emitter own stable ordering (REQ-029)."
+    detail: ./architecture/interfaces/IValidate.md
+</code></pre>
+
+    <p>The single-file form (everything in <code>architecture.md</code>, full DbC clauses inline on each interface entry) is still valid for small architectures or when no interface has enough contract surface to warrant a detail file. <strong>The choice of form is per-artifact, not per-interface</strong>: do not mix slim and full entries in one helicopter.</p>
+
+    <h4>Banned decomposition fields</h4>
+    <p>Decomposition entries MUST NOT carry <code>bounded_context_line</code>, <code>owning_team_type</code>, or <code>test_seam</code> (with its sub-fields <code>driving_ports</code>, <code>driven_ports</code>, <code>fake_strategy</code>). Two reasons. First, <em>team_topology</em>-derived fields make assumptions about Conway's-law dynamics that do not apply when the agents authoring and implementing the architecture are AI; carrying the fields creates noise without signal. Second, test-surface content (what fakes exist, which seams are exercised by which tests) belongs in the TestSpec at the corresponding scope, where it can be authored from the layer's spec rather than copied into the architecture and forced to drift.</p>
+    <p>The <em>concepts</em> these fields encoded &mdash; bounded contexts as decomposition input, the difference between driving and driven ports &mdash; remain useful and are taught in &sect;2.1 (decomposition discipline) and &sect;2.4 (composition patterns: hexagonal). They inform the decomposition decision; they do not appear as fields on the artifact.</p>
+
+    <h4>Marker syntax inside the artifact</h4>
+    <p>When authoring the architecture surfaces a downstream gap, mark it with one of two forms:</p>
+    <ul>
+      <li><code>[DEFER-DD: &lt;short description&gt;]</code> &mdash; the gap belongs in a leaf component's Detailed Design. The marker does <em>not</em> create the existence of the DD; every leaf in this scope's decomposition gets a DD regardless. It only describes content that will land inside that DD when the leaf is authored.</li>
+      <li><code>[DEFER-ADR: &lt;decision&gt;]</code> &mdash; the gap is a cross-cutting decision-shaped item with at least two named alternatives. The marker reserves the ADR slot; the ADR is authored when the decision is taken.</li>
+    </ul>
+    <p>Cross-cutting items <em>without</em> named alternatives are not ADR material; they go inline into the relevant Architecture section (deployment intent, fitness functions, observability + security). Parametric gaps that belong to the Architecture itself use inline <code>&lt;TBD&gt;</code> rather than a defer marker.</p>
 
     <h3 id="arch-bp-1">2.1 &nbsp; Decomposition discipline</h3>
     <p>Decomposition is the primary architectural decision at any non-leaf scope. A wrong decomposition cannot be rescued by clever interfaces, resilient composition, or strong tests &mdash; it leaks entropy into every downstream artifact. Five principles, in order of precedence.</p>
@@ -332,6 +365,13 @@ recovery_status: reconstructed      # omitted on greenfield
       <li><strong>Ad-hoc composition.</strong> The Composition section is a sentence or a single diagram with no stated pattern, no wiring strategy, no runtime-unit boundaries, and no deployment intent at root. The system is "a bunch of services that talk to each other". Symptom: every incident post-mortem names a different emergent behaviour; nobody can predict cascade paths; capacity planning is guesswork. Tell: the Composition section is shorter than a single Decomposition entry; no named runtime pattern; no sequence diagrams.</li>
       <li><strong>Missing composition spec.</strong> The Decomposition and Interfaces are thorough; Composition is empty or reduced to "see deployment config". Teams build the system, discover the composition at integration time, and hardcode whichever quirk of the orchestration they first got to work. The document exists but abdicates the most load-bearing section. This is the most common failure mode in Architectures produced by engineers who are fluent in component design but treat runtime as "someone else's problem"; mandate a non-trivial Composition section at the Quality Bar and reject the artifact when it is absent.</li>
     </ol>
+
+    <h3>Authoring-discipline failures (three)</h3>
+    <ol start="11">
+      <li><strong>Defending absences with <code>n/a + justification</code> entries.</strong> An artifact pads its body with sections or fields that say <em>n/a, because&hellip;</em> rather than omitting them. The justification reads as compliance theatre and adds no signal. The framework's <a href="../authoring-discipline.md">authoring discipline</a> Rule 0 is product-shape only: if a section or field is not load-bearing for this artifact, it does not appear at all. Tell: an Interface entry whose <code>preconditions</code> field reads "n/a — internal call"; a Decomposition entry whose <code>likely_change_driver</code> reads "n/a — stable component".</li>
+      <li><strong>Restating interface DbC content at DD scope.</strong> A leaf DD's Public Interface section reproduces the parent Architecture's interface contract (preconditions, postconditions, invariants, errors). Two places for one fact &mdash; they will drift, and the architectural contract loses its single-source-of-truth status. Tell: a DD entry whose Postconditions paragraph reads identically to the parent Architecture's interface entry; a DD that carries quality-attribute budgets that already live in the Architecture interface contract. The DD names the implementing function and references the architectural interface entry by ID; it does not re-derive the contract.</li>
+      <li><strong>Carrying team-topology fields on Decomposition entries.</strong> Decomposition entries with <code>bounded_context_line</code>, <code>owning_team_type</code>, or <code>test_seam</code> sub-trees. These fields are derived from Conway's-law concerns that do not apply when the artifact's authors and implementers are AI agents, and they push test-surface content into the wrong artifact (it belongs in the corresponding TestSpec, where it can be derived from the layer's spec). Tell: any Decomposition entry that carries the banned fields; any "test seam" content reproduced both in Architecture and in the sibling TestSpec.</li>
+    </ol>
   </section>
 
   <!-- ===================== SECTION 4: EXAMPLES ===================== -->
@@ -465,7 +505,70 @@ decomposition:
       rationale: "REST over JSON chosen for the gateway boundary (see ADR-008). Idempotency key mandated by REQ-028 (at-least-once order-placement semantics over unreliable clients)."
 </code></pre>
 
-    <p>The contract is a full Design-by-Contract specification of one interface: preconditions the caller must satisfy, typed postconditions on success / precondition-failure / downstream-failure, invariants across repeat calls, a typed error enum with HTTP mapping, and quality attributes that carry budget obligations into this boundary. A reader could write the integration test suite from this entry without looking at any other artifact.</p>
+    <p>The contract is a full Design-by-Contract specification of one interface: preconditions the caller must satisfy, typed postconditions on success / precondition-failure / downstream-failure, invariants across repeat calls, a typed error enum with HTTP mapping, and quality attributes that carry budget obligations into this boundary. A reader could write the integration test suite from this entry without looking at any other artifact. <strong>This is the single-file form</strong> &mdash; the entire DbC contract lives on the helicopter entry. It remains valid for small architectures where no interface has enough surface to warrant a detail file.</p>
+
+    <h3>4.3b &nbsp; Helicopter + detail bundle &mdash; same interface, slim helicopter form</h3>
+    <p>The same architecture, authored as a Rule-8 bundle (helicopter file plus per-interface detail files). The helicopter entry carries the slim shape; the full DbC content moves to the detail file. A different interface is shown for variety &mdash; <code>IValidate</code>, the in-process call from a CLI adapter into a validation engine in a deterministic-CLI architecture (taken from <code>vmodel-core/specs/architecture.md</code>).</p>
+
+    <pre><code># architecture.md (helicopter) &mdash; slim entry
+interfaces:
+  - name: IValidate
+    from: cli-adapter
+    to: validation-engine
+    protocol: "in-process call."
+    contract:
+      operation: "Validate(set ArtifactSet, graph TraceabilityGraph, mode ValidationMode) (&lt;-chan Finding, error)  -- streaming finding channel; closed on complete or halt."
+      summary_postcondition: "Streams REQ-026-shaped findings on a channel that is closed on completion; halts with typed system-error per REQ-004 on downstream failure."
+      key_invariants: [REQ-029, REQ-031, IC-002]
+      rationale: "Channel matches the language idiom and lets emitter own stable ordering (REQ-029). Schema + rule-catalog + QB bundled into one Validate call because orchestration is one per-artifact / per-scope / per-tree pass."
+    detail: ./architecture/interfaces/IValidate.md
+</code></pre>
+
+    <pre><code># architecture/interfaces/IValidate.md (detail file) &mdash; full DbC clauses
+---
+id: ARCH-IF-IValidate
+parent_artifact: ARCH
+interface_name: IValidate
+---
+
+# IValidate &mdash; full Design-by-Contract detail
+
+## Preconditions
+- `set` is the result of a prior IArtifactLoad call in the same process.
+- `graph` is the result of a prior IGraphBuild call over the same `set`.
+- `mode` is one of {single-artifact, scope-rooted-subtree, whole-tree}; mode must match the construction of `set`.
+
+## Postconditions
+- on_success: every finding emitted on the returned channel conforms to REQ-026
+  shape; ordering is stable per REQ-029 (path, location, rule-id); the channel
+  closes when validation completes.
+- on_precondition_failure: returns (nil, ErrPreconditionViolated) without opening
+  a channel; no findings are emitted.
+- on_downstream_failure: opens a channel, emits any findings produced before the
+  failure, then closes the channel and returns the typed system-error per REQ-004.
+
+## Invariants
+- The same (set, graph, mode) input produces byte-identical findings in the same
+  order across runs (REQ-029).
+- The channel is always closed on return-or-halt; callers may safely range over it.
+
+## Errors
+- ErrPreconditionViolated &mdash; precondition failure (caller bug).
+- ErrSystemFailure &mdash; downstream failure (REQ-004 halt-and-report path).
+
+## Quality attributes
+- Latency: validation throughput &ge; 10 artifacts/second on the pilot fixture set.
+- Determinism: REQ-029 (byte-stable output for byte-stable input).
+
+## Authentication / authorisation
+- n/a (in-process trust boundary).
+
+## Version / deprecation policy
+- Versioned with vmodel-core's overall MAJOR per ADR-001 / REQ-024 (no separate
+  semver per internal package boundary).
+</code></pre>
+
+    <p>Three observations about the bundle form. <strong>First, the helicopter stays scannable.</strong> A reviewer holding the architecture in their head reads the Decomposition + slim Interface roster + Composition without context-switching into per-interface DbC pages; the <code>summary_postcondition</code> + <code>key_invariants</code> pair is enough to keep the helicopter reasoning load-bearing. <strong>Second, the detail file is the single source of truth for full DbC.</strong> A leaf DD that implements <code>IValidate</code> references the interface by ID and names the implementing function; it never re-derives the contract clauses, because the contract is frozen at this detail file (Decision G in TARGET_ARCHITECTURE). <strong>Third, tooling treats helicopter + detail as one logical artifact.</strong> Validation, traceability, and quality-bar checks read both files together; renaming or moving a detail file outside its bundle directory breaks the artifact. The choice between single-file (4.3) and bundle form (4.3b) is per-architecture; do not mix slim and full entries inside one helicopter.</p>
 
     <h3>4.4 &nbsp; Composition &mdash; sequence diagram for the happy path</h3>
 
@@ -613,7 +716,7 @@ decomposition:
   <!-- ===================== SECTION 5: QUALITY BAR ===================== -->
   <section id="arch-quality-bar">
     <h2>5. Quality Bar</h2>
-    <p class="lead">Yes/No checklist, grouped by concern. An Architecture artifact passes when every applicable item is answered Yes. Two cards are meta-or-load-bearing and carry a visual accent: <strong>Composition completeness</strong> (where silent omission has the largest blast radius) and the <strong>Spec Ambiguity Test</strong> (the meta-gate that overrides everything above it).</p>
+    <p class="lead">Yes/No checklist, grouped by concern. An Architecture artifact passes when every applicable item is answered Yes. Two cards are meta-or-load-bearing and carry a visual accent: <strong>Composition completeness</strong> (where silent omission has the largest blast radius) and the <strong>Spec Ambiguity Test</strong> (the meta-gate that overrides everything above it). Authoring-discipline items (<code>QB-ARCH-authoring-discipline-001</code>&hellip;<code>004</code> in the canonical JSON checklist) cover the Rule-0&ndash;Rule-8 set: product-shape only, banned decomposition fields, defer-marker syntax, helicopter + detail bundle integrity. The bundle-aware item <code>QB-ARCH-interfaces-and-contracts-001</code> validates that helicopter slim entries resolve to detail files (or carry full DbC inline in the single-file form), and that contracts are not refined downstream in DDs.</p>
 
     <div class="card">
       <h3>Decomposition and boundaries</h3>

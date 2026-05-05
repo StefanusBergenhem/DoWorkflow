@@ -39,7 +39,6 @@ Yes/No checklist grouped by concern. Every No is flagged inline in the artifact,
 - [ ] Every non-obvious decision carries inline rationale naming the forcing constraint (one of: external / architectural / resource / temporal)
 - [ ] Load-bearing + cross-cutting + hard-to-reverse decisions are extracted to ADR (not inlined); `governing_adrs:` lists them; body citations appear at decision-application points
 - [ ] `derived_from` points to upstream artifact ids (REQ, ARCH interface, sibling DD, or ADR); non-empty
-- [ ] No `[NEEDS-ADR: ...]` or `[NEEDS-CLARIFICATION: ...]` stubs remain in a finalised artifact
 
 ## Retrofit honesty (retrofit only)
 

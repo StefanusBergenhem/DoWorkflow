@@ -8,9 +8,9 @@ source_of_truth: this file. Per-skill copies at `references/authoring-discipline
 
 # Authoring Discipline
 
-Six rules. They exist because spec-tier work runs on a token budget, and bloat caps which model tier can author the artifact.
+Nine rules. They exist because spec-tier work runs on a token budget, bloat caps which model tier can author the artifact, and structural conventions need pinning before they ossify wrong.
 
-**Contents.** Rule 0 product-shape only · Rule 1 boundary-only · Rule 2 small-system collapse · Rule 3 rationale-as-citation · Rule 4 diagram-or-prose · Rule 5 cite-don't-restate · Review enforcement · Distribution.
+**Contents.** Rule 0 product-shape only · Rule 1 boundary-only · Rule 2 small-system collapse · Rule 3 rationale-as-citation · Rule 4 diagram-or-prose · Rule 5 cite-don't-restate · Rule 6 defer-marker semantics · Rule 7 scope tree by layer · Rule 8 architecture multi-file bundle · Review enforcement · Distribution.
 
 ---
 
@@ -107,6 +107,88 @@ verdict, findings, and traceability summary, with deterministic ordering...)..."
 
 ---
 
+## Rule 6 — Defer-marker semantics
+
+A `[DEFER-<TARGET>: <topic>]` marker names a deferred decision and the artifact at which it will be answered. Targets are `DD` and `ADR`. The marker does NOT create the existence of that artifact — every leaf has a DD by mandate (`TARGET_ARCHITECTURE §5.2`); every cross-cutting decision-shaped gap has a home in the existing artifact set.
+
+**Routing.**
+
+- `[DEFER-DD: <component> — <topic>]` when the gap belongs inside a leaf component's internals.
+- `[DEFER-ADR: <topic>]` when the gap is cross-cutting / non-component AND has named alternatives (or alternatives can reasonably be enumerated).
+- **Inline content, no marker** when the gap belongs in an existing root-Architecture section (deployment intent, quality attributes, fitness functions, observability + security, resilience). Those sections already prescribe the home — write the content there.
+- **Inline `<TBD>` placeholder, no marker** when the gap is parametric (numeric threshold / factual value to be calibrated). Tooling locates `<TBD>` by section context.
+- None fit — push back on the marker. Likely artificial, or a decision whose alternatives haven't been thought about.
+
+**Rationale.** Markers were drifting to mean "this artifact is missing", inflating perceived scope and reading like a TOC of artifacts to create. Every leaf already has a mandatory DD; every decision-shaped cross-cutting gap has an ADR home; everything else is a parameter or a section in an existing artifact.
+
+---
+
+## Rule 7 — Scope tree by layer
+
+The spec tree is a strict hierarchy. Each scope is a directory. Children are subdirectories of their parent scope's directory. Root scope is `specs/`.
+
+**Reserved names.** At any scope, the following names are reserved for canonical artifact files or artifact bundles. Child scopes cannot use them as scope IDs:
+
+`architecture, requirements, testspec, adrs, needs, product_brief, detailed_design, architecture-and-design`
+
+**Directory-is-scope rule.** A subdirectory inside a scope is a **child scope** iff its name is not reserved. Otherwise it is an **artifact bundle** (Rule 8) or a fixed structural directory (`adrs/`).
+
+**Canonical filenames per scope role.**
+
+| Filename | Where |
+|---|---|
+| `needs.md` | root only |
+| `product_brief.md` | root only |
+| `requirements.md` | every scope (root + non-root) |
+| `architecture.md` | non-leaf scope (helicopter; see Rule 8) |
+| `detailed_design.md` | leaf scope |
+| `architecture-and-design.md` | small-system collapse (Rule 2) |
+| `testspec.md` | every scope |
+| `adrs/<adr-id>.md` | scope-local ADRs at any scope |
+
+**Front-matter `scope:` is authoritative.** Path is derivable from scope; cross-tree references use IDs, never paths. ID stability across file moves is preserved.
+
+---
+
+## Rule 8 — Architecture multi-file bundle
+
+An Architecture artifact at non-leaf scope MAY be authored as a helicopter file plus a detail bundle. Tooling treats helicopter + bundle as one logical artifact for graph construction, Spec Ambiguity Test, and review.
+
+**Helicopter file** (`architecture.md` at the scope) carries: Overview, Structure Diagram, Decomposition, Interface roster (slim form below), Composition (Runtime pattern, Wiring, Sequence diagrams, Deployment intent at root), Quality Attributes, Resilience, Observability + security, Evolution + fitness functions.
+
+**Detail bundle** (`architecture/` subdirectory at the same scope) carries per-element detail. Initial subtype: `architecture/interfaces/<NAME>.md` for per-interface DbC detail.
+
+**Detail file front-matter.**
+
+```yaml
+---
+id: ARCH-IF-<NAME>                  # globally unique
+belongs_to: <helicopter-id>         # back-link to the architecture artifact
+kind: architecture-interface-detail # subtype within the bundle
+subject: <element-id>               # e.g. interface name
+scope: <scope-of-the-helicopter>
+status: ...
+date: ...
+version: ...
+---
+```
+
+**Helicopter interface entry — slim form.** Keep `name, from, to, protocol, contract.operation, contract.summary_postcondition, contract.key_invariants, contract.rationale, detail`.
+
+- `summary_postcondition` — one-sentence summary of the load-bearing success guarantee plus halt/error behaviour. Derived from existing detailed clauses; not a new claim.
+- `key_invariants` — 1-3-element list of the most architecturally load-bearing IDs (REQ / IC / ADR) this seam structurally enforces.
+- `detail` — relative path to the detail file.
+
+**Detail file content.** Full `preconditions, postconditions` (multi-branch), `invariants, errors, quality_attributes, authentication, authorisation, version, deprecation_policy`. Lifted verbatim from the contract; no editorial changes between helicopter and detail.
+
+**Decomposition entries — banned fields.** `bounded_context_line`, `owning_team_type`, `test_seam`. Team-topology-derived; not load-bearing for AI-first frameworks where Conway's-law concerns do not apply.
+
+**Test surface.** Architecture does NOT carry default test-design content (`fake_strategy`, `driving_ports`, `driven_ports`). Test-design content lives in TestSpec at the corresponding scope. When testing forces an additional architectural seam, it appears as a regular interface entry — not in a separate test block.
+
+**Bundle scope.** Multi-file bundle is currently **architecture-only**. Other artifact types stay single-file pending Phase 6 evidence that the same compression problem appears.
+
+---
+
 ## Review enforcement
 
 | Rule | Check ID | Severity |
@@ -117,6 +199,8 @@ verdict, findings, and traceability summary, with deterministic ordering...)..."
 | 3 | `check.discipline.rationale-narration` | soft_reject |
 | 4 | `check.discipline.diagram-prose-duplication` | soft_reject |
 | 5 | `check.discipline.upstream-restatement` | soft_reject |
+| 7 | `check.discipline.scope-tree-shape` | soft_reject |
+| 8 | `check.discipline.architecture-bundle-shape` | soft_reject |
 
 ---
 

@@ -36,29 +36,17 @@ Mirrors `adr-extraction-cues.md` on the author side.
 
 **recommended_action:** *"Add the cited ADR to `governing_adrs:` OR remove the body citation if the ADR is not actually governing this DD."*
 
-## check.adr.needs-adr-stub-not-resolved (soft)
-
-**Check that** no `[NEEDS-ADR: ...]` stubs remain in a finalised artifact.
-
-**Reject when** the artifact is marked `status: active` (or otherwise finalised) and still contains `[NEEDS-ADR: ...]` markers.
-
-**Approve when** the artifact is `draft` (stubs allowed) OR every stub has been resolved by ADR authoring + body-citation replacement.
-
-**Evidence pattern:** quote the remaining stub.
-
-**recommended_action:** *"Resolve every `[NEEDS-ADR: ...]` stub before finalising: author the ADR, add the id to `governing_adrs:`, replace the stub with a body citation."*
-
 ## check.adr.inline-decision-should-be-extracted (soft)
 
 **Check that** rationale obviously meeting the three ADR criteria (load-bearing AND cross-cutting AND hard-to-reverse) is extracted to an ADR rather than inlined.
 
 **Reject when** inline rationale describes a decision that affects multiple scopes, is hard to reverse, and is load-bearing — but no ADR is referenced.
 
-**Approve when** such decisions are extracted (or stubbed `[NEEDS-ADR: ...]`).
+**Approve when** such decisions are extracted (or carry a `[DEFER-ADR: ...]` marker).
 
 **Evidence pattern:** quote the inline rationale; identify the three criteria it satisfies.
 
-**recommended_action:** *"Extract the decision to an ADR. Inline a `[NEEDS-ADR: <decision> — extract before finalising]` stub in draft mode if no ADR exists yet."*
+**recommended_action:** *"Extract the decision to an ADR. Inline a `[DEFER-ADR: <decision>]` marker if no ADR exists yet — the marker stays in place until the ADR is authored."*
 
 ## Cross-link
 

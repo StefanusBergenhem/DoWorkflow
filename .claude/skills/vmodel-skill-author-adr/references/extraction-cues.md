@@ -2,20 +2,20 @@
 
 ## Contents
 
-- [Default origin — extraction stub from Architecture](#default-origin--extraction-stub-from-architecture)
+- [Default origin — extraction marker from Architecture](#default-origin--extraction-marker-from-architecture)
 - [Alternative origin — pre-existing external policy](#alternative-origin--pre-existing-external-policy)
-- [Consuming a `[NEEDS-ADR: ...]` stub](#consuming-a-needs-adr--stub)
+- [Consuming a `[DEFER-ADR: ...]` marker](#consuming-a-defer-adr--marker)
 - [The matched-side seam](#the-matched-side-seam)
 
-## Default origin — extraction stub from Architecture
+## Default origin — extraction marker from Architecture
 
-The default path: during Architecture authoring, the decomposition exposes a decision that meets the three-condition threshold (load-bearing, ≥2 real options, contingent). The architect drops a `[NEEDS-ADR: <decision>]` stub at the spot in the Architecture body where the decision would otherwise have been inlined as rationale.
+The default path: during Architecture authoring, the decomposition exposes a decision that meets the three-condition threshold (load-bearing, ≥2 real options, contingent). The architect drops a `[DEFER-ADR: <decision>]` marker at the spot in the Architecture body where the decision would otherwise have been inlined as rationale.
 
 ```
-[NEEDS-ADR: use event bus rather than synchronous RPC for cross-service notifications — extract before finalising]
+[DEFER-ADR: use event bus rather than synchronous RPC for cross-service notifications]
 ```
 
-When this skill is invoked, the user has typically just hit such a stub. The job: consume the stub by authoring the ADR.
+When this skill is invoked, the user has typically just hit such a marker. The job: consume the marker by authoring the ADR.
 
 When the user asks "should I just inline the rationale here?": apply the threshold check. If all three conditions hold, refuse to inline — the load-bearing decision deserves its own ADR. If only one or two hold, inline rationale in the consuming Architecture is the right home.
 
@@ -31,27 +31,25 @@ The ADR is written **first**, and the consuming Architecture references it via `
 
 When the user supplies a decision that is already in force before this scope: ask whether a sibling ADR already documents it. If yes, the consuming Architecture should add the `governing_adrs:` link rather than the user authoring a new ADR. If no, this skill authors the policy ADR; later Architectures cite it.
 
-## Consuming a `[NEEDS-ADR: ...]` stub
+## Consuming a `[DEFER-ADR: ...]` marker
 
 The consume sequence:
 
-1. **Read the surrounding Architecture context** for the stub. Identify the decomposition seam, the children at play, the quality attributes the decision affects.
+1. **Read the surrounding Architecture context** for the marker. Identify the decomposition seam, the children at play, the quality attributes the decision affects.
 2. **Identify drivers** from the Architecture's allocated requirements and quality-attribute allocations. The drivers in the new ADR's Context are the constraints the Architecture has already surfaced.
-3. **Surface ≥2 real alternatives.** The Architecture's `[NEEDS-ADR: ...]` text typically names the chosen option; surface the candidates that lost.
+3. **Surface ≥2 real alternatives.** The Architecture's `[DEFER-ADR: ...]` text typically names the chosen option; surface the candidates that lost.
 4. **Author the ADR per the standard procedure** (see `SKILL.md`).
-5. **Hand back to Architecture**: the consuming Architecture replaces the stub with `governing_adrs: [<new-adr-id>]` and a body citation at the stub site.
+5. **Hand back to Architecture**: the consuming Architecture replaces the marker with `governing_adrs: [<new-adr-id>]` and a body citation at the marker site.
 
-The stub is a flag, not a placeholder for inline rationale. The author skill never embeds the rationale itself when the stub is in place — that is the ADR's job.
-
-When the consuming Architecture cannot be finalised because a stub remains: this is correct workflow — the Architecture cannot ship without resolving every stub.
+The marker is a deferred-decision pointer, not a placeholder for inline rationale. The author skill never embeds the rationale itself when the marker is in place — that is the ADR's job. Under Rule 6, a `[DEFER-ADR: ...]` marker can legitimately persist in active artifacts because the decision is genuinely parked at its right home.
 
 ## The matched-side seam
 
-The Architecture authoring skill defines when a stub fires (its three-criteria conjunction: load-bearing AND cross-cutting AND hard-to-reverse). This skill is the receiving side — it does not duplicate the trigger criteria.
+The Architecture authoring skill defines when a marker fires (its three-criteria conjunction: load-bearing AND cross-cutting AND hard-to-reverse). This skill is the receiving side — it does not duplicate the trigger criteria.
 
-When the user is uncertain whether a decision should be extracted to an ADR or stay inline, route to the Architecture skill's extraction cues: the `[NEEDS-ADR: ...]` mechanism is owned there. This skill's job starts when the stub already exists (or when a pre-existing policy needs an ADR before the Architecture is authored).
+When the user is uncertain whether a decision should be extracted to an ADR or stay inline, route to the Architecture skill's extraction cues: the `[DEFER-ADR: ...]` mechanism is owned there. This skill's job starts when the marker already exists (or when a pre-existing policy needs an ADR before the Architecture is authored).
 
-The two skills compose: Architecture flags → ADR author consumes → Architecture finalises by replacing the stub with `governing_adrs:` plus a body citation.
+The two skills compose: Architecture flags → ADR author consumes → Architecture references the new ADR via `governing_adrs:` plus a body citation.
 
 ## Cross-link
 

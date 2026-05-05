@@ -132,11 +132,11 @@ Populate four buckets:
 |---|---|
 | **Lost rationale** | Per-decision `unknown` with follow-up owners |
 | **Behavioural drift** | Where observed code differs from what tests assert |
-| **Missing ADRs** | Load-bearing decisions in production with no preserved record — emit `[NEEDS-ADR: ...]` |
+| **Missing ADRs** | Load-bearing decisions in production with no preserved record — emit `[DEFER-ADR: ...]` |
 | **Coverage gaps** | Public functions with no observable test coverage; tests with no DD postcondition |
 
 Retrofit DD without a populated Gap report → finding `anti-pattern.laundered-retrofit`.
 
 ## Cross-link
 
-`rationale-capture.md` · `adr-extraction-cues.md` (`[NEEDS-ADR]` stubs in retrofit) · `anti-patterns.md` · refusal A in `SKILL.md` · schema `recovery_status` shape
+`rationale-capture.md` · `adr-extraction-cues.md` (`[DEFER-ADR]` markers in retrofit) · `anti-patterns.md` · refusal A in `SKILL.md` · schema `recovery_status` shape

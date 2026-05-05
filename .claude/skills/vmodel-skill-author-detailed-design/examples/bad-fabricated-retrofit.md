@@ -165,7 +165,7 @@ follow_up:
 |---|---|
 | Lost rationale | Why 30-min lifetime; why HMAC-SHA256 over JWT; why no refresh-token path |
 | Behavioural drift | None observed (code matches deployment config) |
-| Missing ADRs | [NEEDS-ADR: signature scheme for session tokens — extract before finalising] |
+| Missing ADRs | [DEFER-ADR: signature scheme for session tokens] |
 | Coverage gaps | No observable test for issuer-not-in-known-set path (test file `test_token.py:88` skips with `# TODO: cover unknown issuers`) |
 ```
 
@@ -174,6 +174,6 @@ follow_up:
 - **`recovery_status.overview: unknown`** — schema-legal; honest. Intent is human-only; no human source available; no fabrication.
 - **`Rationale: status: unknown`** with concrete `follow_up` — actionable; the gap is recorded as a queue entry for the right owner.
 - **Every structural field cites file/line/config evidence** — `src/auth/token.py:42`, `config/prod.yaml:auth.session_ttl_minutes=30`. Reviewers can verify against source; the `reconstructed` markings are not bare claims.
-- **Gap report is populated** — lost rationale, missing ADR (with a `[NEEDS-ADR: ...]` stub), test coverage gaps. The retrofit surfaces what was lost rather than papering over it.
+- **Gap report is populated** — lost rationale, missing ADR (with a `[DEFER-ADR: ...]` marker), test coverage gaps. The retrofit surfaces what was lost rather than papering over it.
 
 The honest version reads less smoothly. That is the signal that it is honest — laundering is what produces the smooth read.

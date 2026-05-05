@@ -32,13 +32,13 @@ Mirrors the author-side `adr-extraction-cues.md`. ADR references in front-matter
 
 **Check that** load-bearing decisions that meet ALL THREE extraction criteria (load-bearing, cross-cutting, hard-to-reverse) are not inlined in Architecture.
 
-**Reject when** the document contains rationale or composition prose that obviously satisfies all three criteria but lacks a `governing_adrs:` reference or a `[NEEDS-ADR: ...]` stub. Examples: "we use Kafka over RabbitMQ for message bus", "we chose mTLS over JWT for inter-service authn", "Postgres over Cassandra for transactional data".
+**Reject when** the document contains rationale or composition prose that obviously satisfies all three criteria but lacks a `governing_adrs:` reference or a `[DEFER-ADR: ...]` marker. Examples: "we use Kafka over RabbitMQ for message bus", "we chose mTLS over JWT for inter-service authn", "Postgres over Cassandra for transactional data".
 
-**Approve when** all three-criteria decisions are referenced via `governing_adrs:` (with body citation), OR carry an explicit `[NEEDS-ADR: ...]` stub flagging the extraction is pending.
+**Approve when** all three-criteria decisions are referenced via `governing_adrs:` (with body citation), OR carry an explicit `[DEFER-ADR: ...]` marker flagging the decision is parked at its right home.
 
 **Evidence pattern:** quote the inlined rationale; explain why it meets all three criteria.
 
-**recommended_action:** *"Extract the decision to an ADR (or emit a `[NEEDS-ADR: ...]` stub). Inlining a load-bearing cross-cutting hard-to-reverse decision makes the rationale invisible to other scopes that depend on it."*
+**recommended_action:** *"Extract the decision to an ADR (or emit a `[DEFER-ADR: ...]` marker). Inlining a load-bearing cross-cutting hard-to-reverse decision makes the rationale invisible to other scopes that depend on it."*
 
 ## check.traceability.requirement-not-allocated (soft)
 

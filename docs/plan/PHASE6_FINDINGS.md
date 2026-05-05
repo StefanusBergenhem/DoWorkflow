@@ -127,6 +127,18 @@ Skill-flow refinements. Mostly small per-skill updates.
 
 ---
 
+## Issues 25 + 26 — surfaced 2026-05-05, resolved by Rules 6 + 7 + 8
+
+**Issue 25 — Marker semantics conflate "artifact missing" with "decision deferred".**
+- Surface: `[NEEDS-DD: ...]` markers in vmodel-core's architecture read like a TOC of DDs to write, but every leaf already has a mandatory DD per `TARGET_ARCHITECTURE §5.2`. Some markers also pointed to non-component topics (e.g., build-pipeline release surface) — category errors.
+- Resolution: **Rule 6** in `authoring-discipline.md`. Markers renamed `NEEDS-X` → `DEFER-X`. Routing rule: DD for component-internal gaps, ADR for cross-cutting decisions with named alternatives, inline `<TBD>` for parametric gaps, push back if none fit.
+
+**Issue 26 — Cross-cutting non-component decisions had no documented home.**
+- Surface: markers like `[NEEDS-DD: build-pipeline release surface]` named topics that aren't leaf components, but the framework had no documented routing.
+- Resolution: **Rule 6 routing table.** Three routes: ADR (decision with alternatives) / inline content in existing root-Architecture sections (deployment intent, fitness functions, observability) / `<TBD>` (parametric). No new artifact type; no ADR sub-category.
+
+---
+
 ## What to monitor (not yet issues, but watch)
 
 - **Cumulative spec budget per scope.** Architecture is ~30k tokens; DD has not yet been authored. If DD repeats 50%+ of architecture content, the cumulative budget per scope explodes. Validate the architecture/DD layering rule produces clean separation before the first DD is authored.

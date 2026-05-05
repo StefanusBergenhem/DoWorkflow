@@ -25,20 +25,19 @@ governing_adrs:
 #   action: "Emit OrderPlaced via outbox relay (per ADR-019 — at-least-once delivery)"
 
 
-# === STUB FOR DECISIONS NOT YET ADR'D ===
+# === MARKER FOR DECISIONS NOT YET ADR'D ===
 # When DD authoring surfaces a decision meeting all three criteria (load-bearing AND
-# cross-cutting AND hard-to-reverse) but no ADR exists yet, emit a stub:
+# cross-cutting AND hard-to-reverse) but no ADR exists yet, emit a marker:
 
-# [NEEDS-ADR: <one-sentence decision> — extract before finalising]
+# [DEFER-ADR: <one-sentence decision>]
 
 # Examples:
-# [NEEDS-ADR: choose at-least-once vs exactly-once delivery for OrderPlaced events
-#             — extract before finalising]
-# [NEEDS-ADR: choose HMAC-SHA256 over JWT for session token signature
-#             — extract before finalising]
+# [DEFER-ADR: choose at-least-once vs exactly-once delivery for OrderPlaced events]
+# [DEFER-ADR: choose HMAC-SHA256 over JWT for session token signature]
 
-# Finalising means: ADR authored → ADR id added to `governing_adrs:` → stub replaced
-# with the body-citation pattern above.
+# Under Rule 6, the marker can persist in active artifacts because the decision is
+# parked at its right home (the ADR). When the ADR is later authored: ADR id added
+# to `governing_adrs:` → marker replaced with the body-citation pattern above.
 
 # A `governing_adrs:` list with no body citations is decoration.
 # A body citation with no `governing_adrs:` entry is an unresolvable reference.

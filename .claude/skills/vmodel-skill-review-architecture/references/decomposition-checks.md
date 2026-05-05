@@ -90,6 +90,10 @@ Mirrors the author-side `decomposition-discipline.md`. Walk every Decomposition 
 
 **recommended_action:** *"Move implementation choices to Detailed Design (or, if cross-cutting, an ADR). Replace here with the architectural responsibility — what is owned or coordinated, not how it is built."*
 
+### Banned fields (Rule 8)
+
+Hard-fail Decomposition entries that carry any of: `bounded_context_line`, `owning_team_type`, `test_seam` (including its sub-fields `driving_ports`, `driven_ports`, `fake_strategy`). Severity: `soft_reject`. Identifier: `check.discipline.architecture-bundle-shape`. Reason: team-topology-derived fields, not load-bearing for AI-first frameworks; test-design content lives in TestSpec at the corresponding scope.
+
 ## Sweep order
 
 Walk top to bottom. The HARD check is last in the list because it is also caught by the anti-pattern sweep (`anti-pattern.dd-content-in-architecture`); flagging it here as well preserves per-element granularity that the matched author skill needs.

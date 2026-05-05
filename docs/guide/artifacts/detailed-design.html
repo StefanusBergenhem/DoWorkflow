@@ -54,7 +54,9 @@
     <h3>Where DD sits in the scope tree</h3>
     <p>DD lives at leaf scopes only. Non-leaf scopes carry Requirements and Architecture; the tree recurses through Architecture decompositions until subdivision stops earning its keep &mdash; at that point the scope is a leaf, and the leaf owns a DD. The DD's <code>parent_architecture</code> link points to the Architecture that allocated work to this leaf; the DD's sibling TestSpec owns the unit tests that verify it.</p>
 
-    <p>The DD does not re-derive what the parent Architecture already fixed. It receives the leaf's responsibilities, the interfaces it must honour with its siblings, and the ADRs it is governed by. Its job is to say precisely what the code inside this leaf must be true of &mdash; and nothing else.</p>
+    <p><strong>Every leaf component in the parent Architecture's decomposition gets a DD &mdash; mandatory.</strong> The presence or absence of a <code>[DEFER-DD: …]</code> marker in upstream artifacts does <em>not</em> determine whether a DD is needed. Markers describe content gaps inside future DDs; they never gate the existence of a DD. If the parent Architecture allocates a leaf, that leaf has a DD by mandate, even if no upstream marker mentions it.</p>
+
+    <p>The DD does not re-derive what the parent Architecture already fixed. It receives the leaf's responsibilities, the interfaces it must honour with its siblings, and the ADRs it is governed by. <strong>Interface contracts are frozen at Architecture scope; the DD implements them, never refines them.</strong> The DD's Public Interface section names the actual functions that satisfy the architectural contract and references the interface by ID; the architectural interface entry remains the single source of truth for preconditions, postconditions, invariants, and errors that callers can rely on. Its job is to say precisely what the code inside this leaf must be true of &mdash; and nothing else.</p>
 
     <h3>Why the framework has it</h3>
     <p>Every artifact in the framework earns its place by producing something the rest of the system cannot. At the leaf, the DD's contribution is making the gap between specification and code closable without a judgement call: a reader with the DD in hand can implement the code, and a different reader with the DD in hand can write the tests, and the two outputs will agree.</p>
@@ -160,6 +162,19 @@
 
     <h4>Defensive programming vs. DbC</h4>
     <p>These are philosophically opposed. DbC assigns each consistency condition to one party: either it is the caller's precondition (caller's bug if violated) or the implementation's obligation (implementation's bug if violated). Defensive programming validates everything everywhere, which blurs responsibility and multiplies checks that never fire under a correct caller. Practical synthesis: use DbC semantics in the DD; place defensive checks only at trust boundaries where an untrusted caller exists (external I/O, IPC, process edges).</p>
+
+    <h4>How DD Public Interface relates to the parent Architecture interfaces</h4>
+    <p>When a leaf component implements an interface defined in the parent Architecture, the DD's Public Interface section <em>names the implementing function</em>; it does not re-derive the contract. The architectural interface entry (carrying preconditions, postconditions, invariants, errors, quality attributes, authn/authz) is the single source of truth; the DD references it by ID and adds the leaf-internal detail the architecture cannot carry: the actual function name and parameter shape, internal-state preconditions that further bound when the function may legitimately be called, ownership and lifetime of returned objects, thread-safety category, and complexity notes.</p>
+    <p>The discipline matters in two directions. <strong>Upward:</strong> the DD must not strengthen a precondition or weaken a postcondition that the architecture promised callers; doing so violates the architectural contract and breaks every caller that read the architecture entry as truth. <strong>Downward:</strong> the DD <em>may</em> carry additional preconditions that are internal to the leaf (e.g., "this function must be called only after <code>init()</code>; calling it before is a programming error"). These are leaf-internal contract clauses; they are not part of the architectural contract and never appear there.</p>
+    <p>Concretely: a DD entry that implements <code>IValidate</code> from a parent Architecture says "<code>Validate(set, graph, mode)</code> implements <code>IValidate</code> per <code>ARCH-IF-IValidate</code>; thread-safety: thread-safe; internal precondition: schema cache must have been initialised by a prior <code>loadSchemas()</code> call" &mdash; <em>not</em> a re-listing of <code>IValidate</code>'s preconditions, postconditions, and errors. The architectural entry stays load-bearing; the DD adds only the implementing-function contract.</p>
+
+    <h4>Marker syntax inside the DD</h4>
+    <p>When authoring the DD reveals a downstream gap, mark it with one of two forms.</p>
+    <ul>
+      <li><code>[DEFER-ADR: &lt;decision&gt;]</code> &mdash; a cross-cutting decision-shaped item with at least two named alternatives that the DD touches but cannot resolve. The marker reserves the ADR slot; the ADR is authored when the decision is taken.</li>
+      <li>Inline <code>&lt;TBD&gt;</code> &mdash; a parametric gap inside the DD itself (a numeric threshold not yet calibrated, an enumeration not yet enumerated). The DD ships when the parameter is filled; it does not get a defer marker.</li>
+    </ul>
+    <p>A DD does <em>not</em> carry <code>[DEFER-DD: …]</code> markers about itself &mdash; the DD is the artifact those markers anticipated. Sibling DDs at the same scope are independent artifacts and are not in scope for this DD's defer markers either.</p>
 
     <!-- ===== 2.4 Data structures by invariant ===== -->
     <h3>2.4 Specify data structures by invariant, not by field layout</h3>
@@ -342,6 +357,12 @@ Null inputs are rejected with IllegalArgumentException.</code></div>
       <li><strong>Happy-path bias.</strong> The Public Interface and Algorithms sections are thorough; the Error Handling section is a one-liner. Tell: an LLM-authored DD with a full error-handling matrix for input validation and nothing about downstream failures, timeouts, or partial-success paths.</li>
       <li><strong>Post-hoc DD.</strong> The DD is written after the code, to catch the documentation up. The option space collapsed before the DD existed, and the DD justifies the current code rather than specifying what any valid code must satisfy. Tell: the rationale for non-obvious choices reads as a defence of the current implementation rather than a record of alternatives considered.</li>
     </ol>
+
+    <h3>Architecture-DD boundary failures</h3>
+    <ol start="17">
+      <li><strong>Restating the parent architecture's interface contract.</strong> The DD's Public Interface section reproduces the preconditions, postconditions, invariants, and errors that already live on the parent Architecture's interface entry. Two places for one fact &mdash; they will drift, and the architectural contract loses its single-source-of-truth status. Tell: a DD entry whose Postconditions paragraph reads identically to the parent Architecture's interface entry; a DD that carries quality-attribute budgets that already live on the architectural interface contract. The DD references the architecture interface by ID, names the implementing function, and adds only leaf-internal detail (internal-state preconditions, ownership, complexity); it does not re-derive the contract.</li>
+      <li><strong>Treating <code>[DEFER-DD: …]</code> markers as a TODO list of DDs.</strong> An author concludes that only the leaves named in upstream <code>DEFER-DD</code> markers need DDs, leaving other leaves un-authored. Every leaf in the parent Architecture's decomposition gets a DD by mandate; markers describe gaps inside future DDs, never DD existence. Tell: a scope where the parent Architecture allocates five children but only three DDs exist, paired with three matching <code>DEFER-DD</code> markers from upstream &mdash; the missing two are leaves whose DDs are still mandatory.</li>
+    </ol>
   </section>
 
   <!-- ===================== SECTION 4: EXAMPLES ===================== -->
@@ -370,28 +391,32 @@ ADR-017 fixes the queue backing store and this access pattern.
 
 ## Public Interface
 
+The functions below implement the IDequeue interface contract specified
+at ARCH-app-jobs (architectural interface entry `ARCH-IF-IDequeue`); the
+preconditions, postconditions, invariants, and typed errors callers can
+rely on are frozen there. The DD entries below name the implementing
+functions and add only leaf-internal detail: internal-state preconditions,
+ownership, side effects, thread-safety, and complexity.
+
 ### claimJob(workerId: WorkerId, visibilityTimeout: Duration): Claim?
-- Preconditions: `workerId` is registered in `app.workers`; the calling
-  process holds no outstanding claim for a row it has not yet released.
-- Postconditions: on success, returns a Claim whose `row_id` is not
-  claimed by any other worker and whose `expires_at` is now +
-  `visibilityTimeout`; the underlying row's `locked_until` is advanced
-  to `expires_at`. On empty queue, returns null.
-- Errors: `IllegalArgumentException` if `visibilityTimeout` is outside
-  [1s, 15min]. Database connection errors surface as `QueueUnavailable`
-  after the circuit breaker opens (see Error Handling).
+- Implements: `ARCH-IF-IDequeue#claim` (see ARCH-app-jobs for the full
+  caller-facing DbC).
+- Internal-state preconditions: the schema-migration runner has applied
+  V034 or higher (the implementing SQL relies on the `worker_id` column
+  added in V034); the connection pool has been initialised.
 - Side effects: writes to `app.jobs` (row-level lock + update).
 - Thread-safety: thread-safe; concurrent calls from different workers
   never see the same row.
+- Complexity notes: one round-trip per call; no client-side iteration.
 
 ### completeJob(claim: Claim): void
-- Preconditions: `claim` was returned by `claimJob` in this process and
-  has not yet been completed or released; `claim.expires_at` is in the
-  future.
-- Postconditions: the row referenced by `claim.row_id` is removed from
-  `app.jobs`. The claim is consumed (subsequent calls with it raise).
-- Errors: `ClaimExpired` if `expires_at` has passed; `UnknownClaim` if
-  the row was reassigned (e.g., due to expiry-sweep).
+- Implements: `ARCH-IF-IDequeue#complete`.
+- Internal-state preconditions: `claim` was returned by `claimJob` in
+  this process (in-process ownership; not transferable across processes)
+  and has not yet been completed or released by this DD's bookkeeping.
+- Side effects: deletes the row referenced by `claim.row_id` from
+  `app.jobs`; consumes the claim (subsequent calls with it raise per the
+  architectural contract).
 
 ### releaseJob(claim: Claim, reason: ReleaseReason): void
 [&hellip; same shape as above, omitted for brevity &hellip;]
@@ -445,7 +470,7 @@ consistent view via the database's MVCC semantics.
 | Connection refused        | Immediate              | Circuit breaker   | Enter open state; fast-fail    | QueueUnavailable      |
 </code></div>
 
-    <p>What this example gets right: every public function has a full contract; the <code>Claim</code> data structure is specified by invariant rather than by language-idiomatic fields; the algorithm is the SQL statement because that is the contract (ADR-017 fixes the access pattern), not an implementation detail; the State section is short because there is none, and the shortness is an explicit assertion; the error matrix rows correspond one-to-one with robustness test cases the sibling TestSpec will carry.</p>
+    <p>What this example gets right: every public function names the architectural interface entry it implements (<code>ARCH-IF-IDequeue</code>) and adds only leaf-internal detail &mdash; internal-state preconditions, side effects, thread-safety, complexity &mdash; instead of restating the architectural DbC clauses (preconditions, postconditions, errors, invariants are frozen at <code>ARCH-app-jobs</code> and live there as the single source of truth); the <code>Claim</code> data structure is specified by invariant rather than by language-idiomatic fields; the algorithm is the SQL statement because that is the contract (ADR-017 fixes the access pattern), not an implementation detail; the State section is short because there is none, and the shortness is an explicit assertion; the error matrix rows correspond one-to-one with robustness test cases the sibling TestSpec will carry.</p>
 
     <h3>4.2 Good &mdash; a spare DD for a simple leaf</h3>
     <p>Not every leaf needs rich content in every section. This one &mdash; an application configuration loader &mdash; is straightforward: read YAML, expose typed accessors, be immutable after load. The 7-section shape is still honoured; several sections are a few lines because there is little to say.</p>

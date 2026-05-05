@@ -171,7 +171,7 @@ Six questions answered for every error class; matrix populated; recovery strateg
 
 ### Step 7 — Rationale, retrofit, ADR, TestSpec-seam sweep
 
-Every non-obvious decision carries inline rationale with constraint kind named; load-bearing+cross-cutting+hard-to-reverse decisions extracted to ADR (not inlined); `governing_adrs:` resolves and is body-cited; `[NEEDS-ADR: ...]` stubs do not remain in finalised artifacts; retrofit posture honest (Overview narrowed; rationale verified-or-unknown); every error-matrix row maps to a TestSpec robustness target.
+Every non-obvious decision carries inline rationale with constraint kind named; load-bearing+cross-cutting+hard-to-reverse decisions extracted to ADR (not inlined); `governing_adrs:` resolves and is body-cited; retrofit posture honest (Overview narrowed; rationale verified-or-unknown); every error-matrix row maps to a TestSpec robustness target.
 
 → See `references/rationale-checks.md`, `references/retrofit-discipline-checks.md`, `references/adr-traceability-checks.md`, `references/testspec-traceability-checks.md`
 

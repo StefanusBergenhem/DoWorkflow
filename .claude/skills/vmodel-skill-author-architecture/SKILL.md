@@ -48,7 +48,7 @@ Default output filename: `<scope>/architecture.md`. If the user has a scope-tree
 
 ## Cross-cutting authoring discipline
 
-Apply the six rules in `references/authoring-discipline.md` across every authoring step. Most relevant here: Rule 0 (no `n/a + justification` for omitted slots, no self-attestation prose), Rule 1 (boundary-only — no DD content inside Architecture), Rule 2 (small-system collapse: when all children are leaves AND fewer than 5, MAY author a combined `architecture-and-design.md`), Rule 3 (rationale = one line + ADR cite, no re-narration), Rule 4 (diagram OR interface entry per call, not both), Rule 5 (cite upstream IDs, don't restate). Review skills enforce them as `check.discipline.<rule>` findings.
+Apply the nine rules in `references/authoring-discipline.md` across every authoring step. Most relevant here: Rule 0 (no `n/a + justification` for omitted slots, no self-attestation prose), Rule 1 (boundary-only — no DD content inside Architecture), Rule 2 (small-system collapse: when all children are leaves AND fewer than 5, MAY author a combined `architecture-and-design.md`), Rule 3 (rationale = one line + ADR cite, no re-narration), Rule 4 (diagram OR interface entry per call, not both), Rule 5 (cite upstream IDs, don't restate), Rule 6 (defer-marker semantics: `[DEFER-DD: ...]` and `[DEFER-ADR: ...]` only), Rule 7 (scope tree by layer; reserved subdirectory names cannot be used as child scope IDs), Rule 8 (architecture MAY be authored as helicopter `architecture.md` + detail bundle at `architecture/interfaces/<NAME>.md`; banned decomposition fields are `bounded_context_line`, `owning_team_type`, `test_seam`). Review skills enforce them as `check.discipline.<rule>` findings.
 
 ## Authoring procedure
 
@@ -58,12 +58,16 @@ Author the document in this order. Each step has its own reference file with the
 
 Decide the children. Apply information-hiding (Parnas), cohesion+coupling, bounded contexts, context-mapping patterns, Conway-inverse, and the depth/cognitive-load/change-blast trio. Every child gets one sentence of purpose (no conjunctions), at most three architectural-level responsibilities, and an explicit `allocates` list of parent requirement IDs. Every parent-allocated requirement must land in at least one child.
 
+Banned decomposition fields per Rule 8: do NOT carry `bounded_context_line`, `owning_team_type`, or `test_seam` (and its sub-fields `driving_ports`, `driven_ports`, `fake_strategy`). Team-topology-derived; not load-bearing for AI-first frameworks. Test-design content lives in TestSpec at the corresponding scope, not in architecture.
+
 → See `references/decomposition-discipline.md`
 → Template: `templates/decomposition-entry.yaml.tmpl`
 
 ### Step 2 — Specify interfaces
 
 For every cross-child and externally callable interface, write a Design-by-Contract entry: preconditions, postconditions (on success / precondition-failure / downstream-failure), invariants, typed error enum, quality attributes, rationale, version, deprecation policy. Apply Interface Segregation — narrow per responsibility, no god-interfaces.
+
+When the artifact would otherwise breach the working token budget, MAY author in helicopter+detail-bundle form per Rule 8: keep `name, from, to, protocol, contract.operation, contract.summary_postcondition, contract.key_invariants, contract.rationale, detail` in the helicopter; move full preconditions, postconditions, invariants, errors, quality_attributes, authentication, authorisation, version, deprecation_policy to `architecture/interfaces/<NAME>.md` detail files. Default to single-file form for small architectures (≤4 interfaces, low DbC volume).
 
 → See `references/interface-contracts.md`
 → Template: `templates/interface-entry.yaml.tmpl`
@@ -114,7 +118,7 @@ Name the architecture-as-hypothesis bet for this scope. Specify fitness function
 
 ### Step 10 — Extract load-bearing decisions to ADR stubs
 
-Decisions that are load-bearing AND cross-cutting AND hard-to-reverse are ADR material. Do not inline them in Architecture; emit `[NEEDS-ADR: <decision> — extract before finalising]` markers and reference them via `governing_adrs` once authored.
+Decisions that are load-bearing AND cross-cutting AND hard-to-reverse are ADR material. Do not inline them in Architecture; emit `[DEFER-ADR: <decision>]` markers per Rule 6 and reference them via `governing_adrs` once authored.
 
 → See `references/adr-extraction-cues.md`
 → Template: `templates/governing-adr-reference.yaml.tmpl`
@@ -150,7 +154,7 @@ Run the Yes/No checklist. Items that cannot be answered Yes are flagged inline i
 - Specific library calls outside externally-imposed protocols cited by RFC/spec
 - Code structure inside a child
 
-Example refusal: user asks "in the cart component, use a `LinkedHashMap` for line-items". Refuse the form. Offer two replacements: (a) state the cross-component interface invariant ("line-item ordering is preserved across `getCart()` calls"); (b) emit `[NEEDS-DD: cart]` for the internal data-structure choice.
+Example refusal: user asks "in the cart component, use a `LinkedHashMap` for line-items". Refuse the form. Offer two replacements: (a) state the cross-component interface invariant ("line-item ordering is preserved across `getCart()` calls"); (b) emit `[DEFER-DD: cart — line-item internal data structure]` for the internal data-structure choice (Rule 6 form).
 
 **C — Composition section is mandatory and non-trivial.** Refuse to ship Architecture with:
 - Empty Composition section
@@ -170,7 +174,7 @@ These four refusals are deterministic. Do not relax under user pressure; surface
 Stop and hand back to the user when:
 
 1. **Missing mandatory inputs** — scope id, parent Requirements, allocation set, or governing-ADRs list is unavailable; do not invent.
-2. **Scope creep beyond one artifact** — the request expands to also author Detailed Design / ADR / TestSpec / code. Decline; emit `[NEEDS-ADR: <decision>]` or `[NEEDS-DD: <leaf>]` stub markers and name the right artifact for the expanded ask.
+2. **Scope creep beyond one artifact** — the request expands to also author Detailed Design / ADR / TestSpec / code. Decline; emit `[DEFER-ADR: <decision>]` or `[DEFER-DD: <leaf> — <topic>]` stub markers (Rule 6) and name the right artifact for the expanded ask.
 3. **Locked-refusal override request** — user asks to skip Composition, drop the Spec Ambiguity Test, fabricate rationale, or smuggle Detailed Design. Halt and explain.
 4. **Retrofit posture conflict** — `recovery_status:` declared but no source-code references provided, or source-code references provided but no `recovery_status:` declaration. Halt and ask which posture applies.
 5. **Irresolvable contradiction in input** — for example, a parent requirement that contradicts a governing ADR; do not pick a side. After two clarification turns without resolution, halt.
@@ -196,14 +200,15 @@ Before declaring the document complete, work through `references/quality-bar-che
 ## File layout produced by this skill
 
 ```
-{output-path}/architecture.md
+{output-path}/architecture.md                               # always — helicopter (Rule 8) or single-file form
+{output-path}/architecture/interfaces/<NAME>.md             # optional — per-interface detail (helicopter form only)
 ```
 
-That's it — one file. The skill does not create directories, schemas, validators, or sibling artifacts.
+One helicopter file is always produced. When the architecture is authored in helicopter+bundle form (Rule 8), per-interface detail files are also produced under `architecture/interfaces/`. The skill does not create schemas, validators, or sibling artifact types.
 
 ## Pointers
 
-- `references/authoring-discipline.md` — 6 cross-cutting rules (product-shape, layering, compression) — applies to all authoring steps
+- `references/authoring-discipline.md` — 9 cross-cutting rules (product-shape, layering, compression) — applies to all authoring steps
 - `references/decomposition-discipline.md` — info hiding, cohesion+coupling, bounded contexts, context-mapping, Conway-inverse, depth heuristics
 - `references/interface-contracts.md` — syntax-vs-semantics, Design-by-Contract clauses, SEI nine-part template, ISP, versioning + deprecation
 - `references/composition-patterns.md` — protocol families + sync/async + composition patterns catalog + wiring concerns
@@ -212,7 +217,7 @@ That's it — one file. The skill does not create directories, schemas, validato
 - `references/observability-and-security.md` — telemetry emergence points, trust zones + STRIDE, secrets flow, authn-vs-authz at boundaries
 - `references/deployment-intent.md` — environments, orchestration target, runtime-unit boundaries, IaC-as-implementation, 12-factor, cost as constraint (root only)
 - `references/evolution-and-fitness-functions.md` — architecture-as-hypothesis, fitness function classifications, four CI fitness function categories, strangler fig, testability
-- `references/adr-extraction-cues.md` — when to extract a decision to ADR, the `[NEEDS-ADR]` stub, ADR-vs-Architecture relationship, front-matter + body-citation pattern
+- `references/adr-extraction-cues.md` — when to extract a decision to ADR, the `[DEFER-ADR]` marker, ADR-vs-Architecture relationship, front-matter + body-citation pattern
 - `references/retrofit-discipline.md` — observed-structure marking, rationale `verified`-or-`unknown`, gap report, honest-vs-laundered side-by-side
 - `references/anti-patterns.md` — 6 universal + 4 AI-era anti-patterns with tells and remedies
 - `references/quality-bar-checklist.md` — 8 Quality Bar cards + Spec Ambiguity Test meta-gate

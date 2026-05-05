@@ -104,7 +104,7 @@ Every retrofit Architecture carries a Gap report (a section in the artifact) pop
 |---|---|
 | **Lost rationale** | Decomposition / interface / composition entries where the *why* is `unknown`; pair each with a follow-up owner and action |
 | **Structural drift** | Where the cleaned-up Architecture diagram differs from the actual runtime (cyclic imports the diagram does not show, shared mutable state across boxes the diagram pretends are independent) |
-| **Missing ADRs** | Load-bearing cross-cutting hard-to-reverse decisions in production with no preserved decision record — emit `[NEEDS-ADR: ...]` stubs |
+| **Missing ADRs** | Load-bearing cross-cutting hard-to-reverse decisions in production with no preserved decision record — emit `[DEFER-ADR: ...]` markers |
 | **Coverage gaps** | Parent requirements with no observable allocation in the running system (the requirement may have been silently dropped; the requirement may exist as a manual process; the requirement may have been forgotten) |
 
 A retrofit artifact without a populated Gap report is laundered by omission.

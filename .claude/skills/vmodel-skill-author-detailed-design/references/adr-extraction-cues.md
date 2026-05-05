@@ -20,22 +20,21 @@ Extract a decision to an ADR when **all three** hold:
 | Cross-cutting + hard-to-reverse only (not load-bearing) | Inline; mention in `governing_adrs` if a sibling already covers it |
 | One or zero | Inline rationale; do not promote |
 
-## The `[NEEDS-ADR: ...]` stub
+## The `[DEFER-ADR: ...]` marker
 
-When DD authoring surfaces a decision meeting all three criteria, but the ADR is not yet authored → emit a stub at the spot the decision lands:
+When DD authoring surfaces a decision meeting all three criteria, but the ADR is not yet authored → emit a marker at the spot the decision lands:
 
 ```text
-[NEEDS-ADR: <one-sentence decision> — extract before finalising]
+[DEFER-ADR: <one-sentence decision>]
 ```
 
 Example:
 
 ```text
-[NEEDS-ADR: choose at-least-once vs exactly-once delivery for OrderPlaced events
-            — extract before finalising]
+[DEFER-ADR: choose at-least-once vs exactly-once delivery for OrderPlaced events]
 ```
 
-The stub is a flag, not a placeholder for justification. The DD cannot be finalised until a sibling ADR exists, the ADR id is added to `governing_adrs:`, and the stub is replaced with the body-citation pattern (below).
+The marker is a deferred-decision pointer, not a placeholder for justification. Under Rule 6, the marker can persist in active artifacts because the decision is parked at its right home (the ADR). When the ADR is later authored, the ADR id is added to `governing_adrs:` and the marker is replaced with the body-citation pattern (below).
 
 ## DD-vs-ADR — what each says
 
@@ -81,18 +80,18 @@ Symmetric review skill verifies:
 
 - Every `governing_adrs:` entry resolves to an actual ADR document
 - Every ADR id in `governing_adrs:` appears at least once at a body citation point
-- No `[NEEDS-ADR: ...]` stub remains in a finalised artifact
+- `[DEFER-ADR: ...]` markers are accepted in finalised artifacts (Rule 6 — the decision is parked at its right home)
 - No body text contains rationale obviously meeting all three extraction criteria but lacking an ADR reference (laundered inline rationale)
 
 ## Hard refusal
 
-When the user pushes to inline a load-bearing + cross-cutting + hard-to-reverse decision because "we don't have time for an ADR" → do not inline rationale. Emit the `[NEEDS-ADR: ...]` stub. The DD cannot be finalised until the ADR exists.
+When the user pushes to inline a load-bearing + cross-cutting + hard-to-reverse decision because "we don't have time for an ADR" → do not inline rationale. Emit the `[DEFER-ADR: ...]` marker. The marker remains a deferred-decision pointer until the ADR is authored; the decision is parked, not blocking finalisation.
 
 Refusal example:
 
 > User: "Just put the rationale for using HMAC-SHA256 over JWT in this DD — it's faster than writing an ADR."
 >
-> Skill: This is load-bearing (signature scheme; multiple validators depend on it), cross-cutting (used across all session-validating leaves), and hard-to-reverse (existing tokens would all become invalid). Emitting `[NEEDS-ADR: choose HMAC-SHA256 over JWT for session tokens — extract before finalising]`. The DD is incomplete until that ADR exists.
+> Skill: This is load-bearing (signature scheme; multiple validators depend on it), cross-cutting (used across all session-validating leaves), and hard-to-reverse (existing tokens would all become invalid). Emitting `[DEFER-ADR: choose HMAC-SHA256 over JWT for session tokens]`. The marker stays in place until the ADR is authored.
 
 ## Cross-link
 

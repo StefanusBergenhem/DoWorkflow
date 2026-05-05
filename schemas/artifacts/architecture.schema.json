@@ -154,16 +154,36 @@
           "minLength": 1
         },
 
+        "detail": {
+          "description": "Optional relative path to the per-interface detail file when this interface is authored in helicopter+bundle form (Rule 8). When present, the detail file at the cited path carries the full Design-by-Contract content (preconditions, full postconditions tree, invariants, errors, quality_attributes, authentication, authorisation, version, deprecation_policy); the helicopter contract retains only operation, summary_postcondition, key_invariants, and rationale. When absent, the architecture is single-file and the contract carries the full DbC inline. Path is relative to the helicopter file's directory; tooling resolves to the corresponding architecture-interface-detail.md artifact.",
+          "type": "string",
+          "minLength": 1
+        },
+
         "contract": {
-          "description": "Design-by-Contract specification of the interface. Minimum structural shape: operation + preconditions + postconditions (with on_success). invariants / errors / quality_attributes / rationale are optional at schema level — the Quality Bar asserts they are populated for complete interfaces; absence at schema time flags a structural error rather than an incomplete one.",
+          "description": "Design-by-Contract specification of the interface. Two valid shapes: (a) helicopter form — operation + summary_postcondition + key_invariants + rationale (full DbC lives in the detail file referenced by the sibling 'detail' field per Rule 8); (b) single-file form — operation + preconditions + postconditions (with on_success) plus invariants/errors/quality_attributes/rationale as needed. Schema permits both; review skill enforces the form-specific completeness via check.discipline.architecture-bundle-shape.",
           "type": "object",
-          "required": ["operation", "preconditions", "postconditions"],
+          "required": ["operation"],
           "properties": {
 
             "operation": {
               "description": "The operation this contract describes. Free-form — HTTP method + path for REST ('POST /checkout/{cart_id}/finalise'), RPC signature for gRPC ('CartService.FinaliseCheckout'), topic name for events ('checkout.order-placed.v1'), or a function signature for in-process.",
               "type": "string",
               "minLength": 1
+            },
+
+            "summary_postcondition": {
+              "description": "Helicopter-form field (Rule 8). One-sentence summary of the load-bearing success guarantee plus halt/error behaviour. Derived from the existing detailed clauses in the detail file; not a new claim. Required when the sibling 'detail' field on the interface is present; absent in single-file form (where the full postconditions tree carries the equivalent content).",
+              "type": "string",
+              "minLength": 1
+            },
+
+            "key_invariants": {
+              "description": "Helicopter-form field (Rule 8). 1-3 IDs (REQ / IC / ADR) representing the most architecturally load-bearing invariants this seam structurally enforces. Drawn from the detail file's full invariants list; not new IDs. Required when the sibling 'detail' field on the interface is present; absent in single-file form.",
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1,
+              "maxItems": 3
             },
 
             "preconditions": {

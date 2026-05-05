@@ -1,6 +1,11 @@
 # One entry per cross-child or externally callable interface.
 # Embed inside the architecture.md `interfaces:` block.
 # Specify both syntactic (signature, types, errors) and semantic (pre/post/invariants) — the second half is where most integration failures come from.
+#
+# Two valid authoring shapes:
+#   - Single-file form (default; below) — full DbC inline. Use for ≤4 interfaces with modest DbC volume.
+#   - Helicopter form (Rule 8; at end of file) — slim entry pointing at architecture/interfaces/<NAME>.md detail file.
+#     Use when the artifact would otherwise breach the working token budget.
 
 - name: <<IInterfaceName>>                    # PascalCase; "I"-prefix optional but consistent within the artifact
   from: <<source-component-id>>               # caller — must match a Decomposition child id or be an external actor
@@ -56,3 +61,19 @@
   #   - "<<file/line — e.g., src/main/java/.../CartController.java:78>>"
   #   - "<<API spec / OpenAPI / proto file>>"
   # rationale_status: <<verified | unknown>>   # NEVER 'reconstructed'
+
+# === Helicopter form (Rule 8) ===
+# Use when the artifact would otherwise breach the working token budget.
+# Slim entry in architecture.md; full DbC moves to architecture/interfaces/<NAME>.md.
+# Detail file front-matter: artifact_type: architecture-interface-detail; belongs_to: <this artifact id>; subject: <NAME>.
+#
+# - name: <<IInterfaceName>>
+#   from: <<source-component-id>>
+#   to:   <<target-component-id>>
+#   protocol: "<<HTTP/1.1 + JSON | gRPC + protobuf | ...>>"
+#   contract:
+#     operation: "<<METHOD /path | rpc Name(Req) returns (Resp) | event-name on topic-name>>"
+#     summary_postcondition: "<<one sentence — success guarantee plus halt/error behaviour>>"
+#     key_invariants: [REQ-NNN, IC-NNN, ADR-NNN]      # 1–3 IDs the seam structurally enforces
+#     rationale: "<<one line + ADR cite if extracted>>"
+#   detail: ./architecture/interfaces/<<IInterfaceName>>.md

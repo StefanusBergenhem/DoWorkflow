@@ -62,8 +62,8 @@
       "items": [
         {
           "id": "QB-ARCH-interfaces-and-contracts-001",
-          "prompt": "Does every interface entry carry preconditions, postconditions (on success, on precondition failure, on downstream failure), invariants, a typed error enum, and quality attributes?",
-          "references": { "fields": ["preconditions", "postconditions", "invariants", "errors", "quality_attributes"] }
+          "prompt": "Does every interface entry — helicopter (slim) plus its detail file when present (Rule 8) — collectively carry preconditions, postconditions (on success, on precondition failure, on downstream failure), invariants, a typed error enum, and quality attributes? When the helicopter's 'detail:' field is present, those clauses live in the detail file; when absent, they live inline.",
+          "references": { "fields": ["preconditions", "postconditions", "invariants", "errors", "quality_attributes", "detail"] }
         },
         {
           "id": "QB-ARCH-interfaces-and-contracts-002",
@@ -282,6 +282,37 @@
         {
           "id": "QB-ARCH-retrofit-discipline-005",
           "prompt": "Is the gap report populated (lost rationale, structural drift, missing ADRs, coverage gaps, ambiguous spec)?"
+        }
+      ]
+    },
+
+    {
+      "id": "authoring-discipline-conformance",
+      "title": "Authoring discipline conformance",
+      "kind": "checklist",
+      "load_bearing": false,
+      "items": [
+        {
+          "id": "QB-ARCH-authoring-discipline-001",
+          "prompt": "Are the banned fields bounded_context_line, owning_team_type, and test_seam absent from every Decomposition entry? (Rule 8 — team-topology-derived; not load-bearing for AI-first frameworks.)",
+          "references": { "rules": ["check.discipline.architecture-bundle-shape"] }
+        },
+        {
+          "id": "QB-ARCH-authoring-discipline-002",
+          "prompt": "Do all deferred-decision markers in this artifact use the [DEFER-DD: ...] or [DEFER-ADR: ...] form? Are parametric gaps captured as inline <TBD> rather than as markers? (Rule 6.)"
+        },
+        {
+          "id": "QB-ARCH-authoring-discipline-003",
+          "prompt": "If this Architecture is authored as helicopter + detail bundle, does each helicopter interface entry carry a one-line summary_postcondition, a 1–3-element key_invariants list of REQ/IC/ADR IDs, and a detail: relative path? Does the detail file at that path exist, validate as architecture-interface-detail, and back-link via belongs_to? (Rule 8.)",
+          "references": {
+            "fields": ["summary_postcondition", "key_invariants", "detail"],
+            "rules": ["check.discipline.architecture-bundle-shape", "TRV-BUNDLE-001"]
+          }
+        },
+        {
+          "id": "QB-ARCH-authoring-discipline-004",
+          "prompt": "Are the reserved subdirectory names (architecture, requirements, testspec, adrs, needs, product_brief, detailed_design, architecture-and-design) absent as child scope IDs in this scope's children? (Rule 7.)",
+          "references": { "rules": ["TRV-SCOPE-001", "check.discipline.scope-tree-shape"] }
         }
       ]
     },

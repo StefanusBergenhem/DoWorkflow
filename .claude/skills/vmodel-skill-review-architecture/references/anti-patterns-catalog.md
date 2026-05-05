@@ -1,13 +1,14 @@
 # Anti-patterns catalog — sweep targets
 
-Ten failure modes, each with a tell, a `check_failed` identifier, a severity, and a generic recommended_action. Walk every Decomposition entry, Interface entry, Composition section, and the document as a whole through this catalog. Every hit becomes a finding.
+Twelve failure modes, each with a tell, a `check_failed` identifier, a severity, and a generic recommended_action. Walk every Decomposition entry, Interface entry, Composition section, and the document as a whole through this catalog. Every hit becomes a finding.
 
-Patterns 1–6 are universal; patterns 7–10 are AI-era / retrofit-specific. Hard-reject triggers are flagged ★.
+Patterns 1–6 are universal; patterns 7–10 are AI-era / retrofit-specific; patterns 11–12 are architecture-bundle (Rule 8) checks. Hard-reject triggers are flagged ★.
 
 ## Contents
 
 - Universal six (1. Big ball of mud / 2. Distributed monolith / 3. God component / 4. Premature decomposition / 5. Stale architecture / 6. Cyclic dependencies)
 - AI-era and retrofit four (7. Laundered architecture HARD / 8. Fabricated decomposition rationale HARD / 9. Ad-hoc composition / 10. DD-content-in-architecture HARD)
+- Architecture-bundle two (11. Team-topology fields in Architecture / 12. Helicopter without resolvable detail HARD)
 - Sweep order
 - Aggregation rule
 
@@ -96,6 +97,24 @@ Patterns 1–6 are universal; patterns 7–10 are AI-era / retrofit-specific. Ha
 - **severity**: `hard_reject` ★ (refusal B)
 - **evidence pattern**: quote the leak verbatim — name the data structure, library, or algorithm; identify which Decomposition or Interface entry it lives in.
 - **recommended_action**: *"Move to Detailed Design (or, if cross-cutting, an ADR). Replace here with the externally observable invariant."*
+
+## Architecture-bundle (two)
+
+### 11. Team-topology fields in Architecture
+
+- **Tell**: Decomposition entry carries `bounded_context_line`, `owning_team_type`, or `test_seam` (including any `driving_ports` / `driven_ports` / `fake_strategy` sub-fields).
+- **check_failed**: `anti-pattern.team-topology-fields-in-architecture`
+- **severity**: `soft_reject`
+- **evidence pattern**: name the field and the entry it appears in.
+- **recommended_action**: *"Delete the field. Team-topology-derived shapes are not load-bearing for AI-first frameworks; test-design content lives in TestSpec at the corresponding scope (Rule 8)."*
+
+### 12. Helicopter without resolvable detail (HARD ★)
+
+- **Tell**: a helicopter interface entry carries `detail:` but the cited file is missing, fails to validate as `architecture-interface-detail`, has `belongs_to` pointing elsewhere, or has `subject` not matching the helicopter interface name.
+- **check_failed**: `anti-pattern.helicopter-without-detail`
+- **severity**: `hard_reject` ★ (broken-reference integrity per Rule 8)
+- **evidence pattern**: name which condition fired (missing file, wrong artifact_type, mismatched belongs_to, mismatched subject).
+- **recommended_action**: *"Fix the back-link or remove the `detail:` field and inline the full DbC. The framework treats helicopter + bundle as one logical artifact; an unresolvable detail link means the artifact is incomplete."*
 
 ## Sweep order
 

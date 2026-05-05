@@ -132,4 +132,15 @@ Mirrors the author-side `interface-contracts.md`. Walk every Interface entry aga
 
 **recommended_action:** *"Move implementation choice to Detailed Design. Replace here with the externally observable invariant the implementation was meant to guarantee."*
 
+### Helicopter+bundle shape (Rule 8)
+
+When any interface entry carries a `detail:` field, the artifact is in helicopter+bundle form. Apply these checks:
+
+- Helicopter slim form: `contract.operation`, `contract.summary_postcondition`, `contract.key_invariants`, `contract.rationale` all present. Identifier: `check.discipline.architecture-bundle-shape` if any missing.
+- The `detail:` path resolves to a real file. Identifier: `check.bundle.detail-link-broken` if not.
+- The detail file front-matter declares `artifact_type: architecture-interface-detail`, `belongs_to:` matches this artifact's `id`, and `subject:` matches the helicopter interface's `name`. Identifier: `check.bundle.belongs-to-mismatch` on any mismatch.
+- The detail file body YAML contains the full preconditions / postconditions tree / invariants / errors / quality_attributes / authentication / authorisation / version / deprecation_policy completeness — evaluate the merged helicopter+detail logical artifact against the existing per-field completeness rules.
+
+Single-file form (no `detail:` field on any interface) keeps the existing inline DbC completeness checks unchanged.
+
 Cross-link: `anti-patterns-catalog.md` (dd-content-in-architecture); `quality-bar-gate.md` (Interfaces card).

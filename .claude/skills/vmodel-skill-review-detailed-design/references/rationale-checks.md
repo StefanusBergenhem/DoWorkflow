@@ -56,7 +56,7 @@ Mirrors `rationale-capture.md` on the author side.
 
 **Approve when** such decisions are linked via `governing_adrs:` and body-cited.
 
-**recommended_action:** *"Extract the decision to an ADR. Inline a `[NEEDS-ADR: <decision> — extract before finalising]` stub if no ADR exists yet."*
+**recommended_action:** *"Extract the decision to an ADR. Inline a `[DEFER-ADR: <decision>]` marker if no ADR exists yet."*
 
 ## check.rationale.unknown-without-followup (soft on greenfield; required on retrofit)
 

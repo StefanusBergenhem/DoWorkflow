@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vmodelworkflow.dev/schemas/artifacts/architecture-interface-detail/v1",
+  "title": "Architecture interface detail (bundle sub-artifact)",
+  "description": "Front-matter shape for an architecture-interface-detail artifact. A detail file that belongs to a helicopter Architecture artifact (kind: bundle sub-artifact, Rule 8 in docs/authoring-discipline.md). Lives at <scope>/architecture/interfaces/<NAME>.md when the parent architecture is authored in helicopter+bundle form. Carries the full Design-by-Contract content (preconditions, full postconditions tree, invariants, typed errors, quality_attributes, authentication, authorisation, version, deprecation_policy) that is too verbose for the helicopter interface roster. Tooling treats helicopter + all detail files in the bundle as one logical artifact for graph construction, Spec Ambiguity Test, and review. The id pattern is ARCH-IF-<NAME>; belongs_to points back to the helicopter ARCH(-{scope}) id; subject names the interface the detail describes. Status uses the universal lifecycle (draft | active | superseded). recovery_status applies the same retrofit discipline as the helicopter — observed structure can be reconstructed; the no-fabrication rule is enforced per-field by review skill, not at envelope.",
+
+  "allOf": [
+    { "$ref": "https://vmodelworkflow.dev/schemas/artifacts/envelope/v1" },
+    {
+      "type": "object",
+      "required": ["id", "artifact_type", "belongs_to", "kind", "subject", "scope"],
+      "properties": {
+
+        "id": {
+          "description": "Detail-file identifier. Pattern: ARCH-IF-<NAME>, where NAME is the interface name (free-form alphanumerics, underscores, and hyphens — covers PascalCase, I-prefixed, snake_case conventions). Globally unique across the spec tree.",
+          "type": "string",
+          "pattern": "^ARCH-IF-[A-Za-z0-9_-]+$"
+        },
+
+        "artifact_type": {
+          "description": "Artifact-type discriminator, fixed for this schema. Tooling uses this to route to the correct schema; pairs with kind for bundle subtype dispatch.",
+          "const": "architecture-interface-detail"
+        },
+
+        "belongs_to": {
+          "description": "Helicopter artifact ID this detail file belongs to. Must resolve to an architecture artifact in the corpus (TRV-REF-001). The bundle relationship is structural: tooling composes helicopter + detail files into one logical artifact at validation time.",
+          "type": "string",
+          "pattern": "^ARCH(-[a-z0-9]+(-[a-z0-9]+)*)?$"
+        },
+
+        "kind": {
+          "description": "Bundle subtype discriminator. Pinned to architecture-interface-detail for this schema; future detail kinds (e.g. architecture-decomposition-detail) will get their own per-kind schemas with matching constants.",
+          "const": "architecture-interface-detail"
+        },
+
+        "subject": {
+          "description": "Interface name this detail file describes. Mirrors the 'name' field on the corresponding interface entry in the helicopter; tooling cross-checks that the helicopter's detail: link resolves to a file whose subject equals the helicopter interface name.",
+          "type": "string",
+          "minLength": 1
+        },
+
+        "scope": {
+          "description": "Scope path of the helicopter Architecture this detail file belongs to. Mirrors the helicopter's scope; redundant with belongs_to but kept for direct query without graph resolution. Empty string at root scope.",
+          "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/scope_path"
+        },
+
+        "governing_adrs": {
+          "description": "Optional. ADRs that constrain this specific interface beyond the parent architecture's governing_adrs. Most detail files inherit governing ADRs via belongs_to and leave this absent.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ADR-\\d{3,}-[a-z0-9]+(-[a-z0-9]+)*$"
+          }
+        },
+
+        "status": {
+          "description": "Lifecycle state. Detail files inherit the helicopter's lifecycle in practice — promoting a helicopter to active also promotes its bundle. Tracked separately at schema level for parity with all other artifacts.",
+          "$ref": "https://vmodelworkflow.dev/schemas/artifacts/common-defs/v1#/$defs/lifecycle_status"
+        }
+      }
+    }
+  ],
+
+  "$defs": {
+
+    "interface_detail_body": {
+      "description": "Body-content shape for the YAML block in a detail file's markdown body. Contains the pushed-out Design-by-Contract fields lifted verbatim from the helicopter's interface entry per Rule 8. The schema enforces structural completeness here — the detail file is where DbC completeness lives, not the helicopter. Exported as a $def so parsers and validators can extract the body block directly. Not enforced on the front-matter object.",
+      "type": "object",
+      "required": ["preconditions", "postconditions"],
+      "properties": {
+
+        "preconditions": {
+          "description": "What the caller must ensure on the way in. Each item is one precondition expressed as a predicate. Required at the detail level — an interface with no preconditions beyond 'callable' should state that explicitly.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+
+        "postconditions": {
+          "description": "What the supplier guarantees on the way out, split across outcome (on_success required; on_precondition_failure and on_downstream_failure when distinguished). Same shape as architecture.schema.json#/$defs/interface.contract.postconditions.",
+          "type": "object",
+          "required": ["on_success"],
+          "properties": {
+            "on_success": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1
+            },
+            "on_precondition_failure": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "on_downstream_failure": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          },
+          "additionalProperties": true
+        },
+
+        "invariants": {
+          "description": "Properties that hold across repeat or concurrent calls. See architecture.schema.json#/$defs/interface.contract.invariants.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+
+        "errors": {
+          "description": "Typed error enumeration. Same shape as architecture.schema.json#/$defs/interface.contract.errors. The 'http' field is required when the protocol has HTTP semantics; for non-HTTP interfaces (in-process call, etc.), the field may be omitted via additionalProperties extension.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["code", "meaning"],
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9]*$|^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "http": {
+                "type": "integer",
+                "minimum": 400,
+                "maximum": 599
+              },
+              "meaning": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+
+        "quality_attributes": {
+          "description": "NFR budgets the interface carries. Same shape as architecture.schema.json#/$defs/interface.contract.quality_attributes.",
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+
+        "authentication": {
+          "description": "Authentication requirement at this interface. Free-form string (e.g. 'mTLS', 'OAuth2 client_credentials', 'n/a — in-process call'). Required content; review skill checks completeness for externally callable interfaces.",
+          "type": "string",
+          "minLength": 1
+        },
+
+        "authorisation": {
+          "description": "Authorisation requirement at this interface. Free-form string.",
+          "type": "string",
+          "minLength": 1
+        },
+
+        "version": {
+          "description": "Versioning scheme statement (free-form string), e.g. 'v1 — additive-only-within-major'. Required content; review skill checks completeness.",
+          "type": "string",
+          "minLength": 1
+        },
+
+        "deprecation_policy": {
+          "description": "Deprecation policy for this interface — minimum notice period, migration path, sunset rules. Free-form string.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

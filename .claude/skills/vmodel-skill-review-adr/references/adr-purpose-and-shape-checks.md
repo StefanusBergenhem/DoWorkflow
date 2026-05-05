@@ -42,4 +42,4 @@ The orphan-ADR check (`anti-pattern.orphan-adr` / `check.linkage.scope-tags-empt
 
 ## When inputs are missing
 
-When the ADR's parent Architecture is referenced (e.g., the ADR was extracted from a `[NEEDS-ADR: …]` stub) but the Architecture is not provided as input AND a SAT failure suspects an upstream-traceable cause, halt with `missing-inputs` per SKILL.md HALT condition 4. Otherwise proceed; the threshold check is self-contained at this layer.
+When the ADR's parent Architecture is referenced (e.g., the ADR was extracted from a `[DEFER-ADR: …]` marker) but the Architecture is not provided as input AND a SAT failure suspects an upstream-traceable cause, halt with `missing-inputs` per SKILL.md HALT condition 4. Otherwise proceed; the threshold check is self-contained at this layer.

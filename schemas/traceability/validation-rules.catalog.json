@@ -8,8 +8,8 @@
       "title": "Link target resolves",
       "category": "reference_integrity",
       "severity": "error",
-      "description": "Every derived_from, allocates, verifies, governing_adrs, supersedes, and superseded_by target resolves to an existing artifact in the corpus. Unresolved targets are validation errors, never warnings.",
-      "applies_to_links": ["derived_from", "allocates", "verifies", "governing_adrs", "supersedes", "superseded_by"]
+      "description": "Every derived_from, allocates, verifies, governing_adrs, supersedes, superseded_by, and belongs_to target resolves to an existing artifact in the corpus. Unresolved targets are validation errors, never warnings.",
+      "applies_to_links": ["derived_from", "allocates", "verifies", "governing_adrs", "supersedes", "superseded_by", "belongs_to"]
     },
     {
       "id": "TRV-REF-002",
@@ -112,6 +112,25 @@
       "description": "Upstream Quality Bar failure blocks downstream approval. A leaf artifact cannot pass review if any ancestor scope has unresolved Quality Bar items. Prevents leaf-level rubber-stamping on top of a broken parent (TARGET §6).",
       "applies_to_artifact_types": ["product-brief", "requirements", "architecture", "adr", "detailed-design", "test-spec"],
       "note": "Quality Bar container (schemas/artifacts/quality-bar/quality-bar.schema.json) and all six per-artifact checklists (product-brief / requirements / architecture / adr / detailed-design / test-spec) are in place. Runtime enforcement depends on Phase 5/6 tooling: the review skill reads upstream QB results via the traceability graph before approving a downstream artifact. Listed here as the cross-artifact rule; schemas validate shape, the review skill evaluates content."
+    },
+    {
+      "id": "TRV-SCOPE-001",
+      "title": "No reserved-name scope collisions",
+      "category": "scope_tree",
+      "severity": "error",
+      "description": "No child scope ID may use a reserved name (architecture, requirements, testspec, adrs, needs, product_brief, detailed_design, architecture-and-design). Reserved names are reserved for canonical artifact files or artifact-bundle subdirectories at every scope. A subdirectory inside a scope is a child scope iff its name is not on the reserved list; otherwise it is an artifact bundle (Rule 8) or fixed structural directory.",
+      "applies_to_artifact_types": ["architecture", "detailed-design"],
+      "note": "Enforced by the scope-tree validator over the filesystem layout. The reserved-name registry is canonical at common-defs.schema.json#/$defs/reserved_scope_name. Front-matter alone cannot detect a violation; this rule applies to corpus traversal at validation time. Phase 6 finding (Issue 26) — see docs/authoring-discipline.md Rule 7."
+    },
+    {
+      "id": "TRV-BUNDLE-001",
+      "title": "Architecture bundle back-link consistency",
+      "category": "reference_integrity",
+      "severity": "error",
+      "description": "For every architecture-interface-detail artifact: belongs_to must point at an architecture artifact whose body contains an interface entry whose detail field resolves back to this detail file's path, AND whose interface name matches this detail file's subject. Bi-directional consistency between the helicopter's forward 'detail:' pointer and the detail file's 'belongs_to' back-link prevents drift.",
+      "applies_to_artifact_types": ["architecture-interface-detail"],
+      "applies_to_links": ["belongs_to"],
+      "note": "Multi-file architecture bundle (Rule 8). The helicopter's detail: field is a relative path; this rule enforces that the path resolves to a real detail file, that the detail file's belongs_to points back to the helicopter, and that subject equals the helicopter interface's name. Detail files orphaned from any helicopter, or helicopter detail: paths that don't resolve, both fail this rule."
     }
   ]
 }
